@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @extends WC_Payment_Gateway
  */
-class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
+class WC_Gateway_Heidelpay extends WC_Payment_Gateway {
 
 	/**
 	 * Should we capture Credit cards
@@ -136,7 +136,7 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 			$this->description  = trim( $this->description );
 		}
 
-		WC_Heidelpay_API::set_secret_key( $this->secret_key );
+		//WC_Heidelpay_API::set_secret_key( $this->secret_key );
 
 		// Hooks.
 		add_action( 'wp_enqueue_scripts', array( $this, 'payment_scripts' ) );
@@ -181,32 +181,8 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 	 * @return float|int
 	 */
 	public function get_heidelpay_amount( $total, $currency = '' ) {
-		if ( ! $currency ) {
-			$currency = get_woocommerce_currency();
-		}
-		switch ( strtoupper( $currency ) ) {
-			// Zero decimal currencies.
-			case 'BIF' :
-			case 'CLP' :
-			case 'DJF' :
-			case 'GNF' :
-			case 'JPY' :
-			case 'KMF' :
-			case 'KRW' :
-			case 'MGA' :
-			case 'PYG' :
-			case 'RWF' :
-			case 'VND' :
-			case 'VUV' :
-			case 'XAF' :
-			case 'XOF' :
-			case 'XPF' :
-				$total = absint( $total );
-				break;
-			default :
-				$total = round( $total, 2 ) * 100; // In cents.
-				break;
-		}
+		$currency = get_woocommerce_currency();
+		$total = round( $total, 2 ) * 100; // In cents.
 		return $total;
 	}
 
@@ -284,7 +260,6 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 			data-name="' . esc_attr( $this->statement_descriptor ) . '"
 			data-currency="' . esc_attr( strtolower( get_woocommerce_currency() ) ) . '"
 			data-image="' . esc_attr( $this->heidelpay_checkout_image ) . '"
-			data-bitcoin="' . esc_attr( $this->bitcoin ? 'true' : 'false' ) . '"
 			data-locale="' . esc_attr( $this->heidelpay_checkout_locale ? $this->heidelpay_checkout_locale : 'en' ) . '"
 			data-allow-remember-me="' . esc_attr( $this->saved_cards ? 'true' : 'false' ) . '">';
 
@@ -311,8 +286,8 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 	/**
 	 * Localize Heidelpay messages based on code
 	 *
-	 * @since 3.0.6
-	 * @version 3.0.6
+	 * @since 1.0.0
+	 * @version 1.0.0
 	 * @return array
 	 */
 	public function get_localized_messages() {
@@ -335,8 +310,8 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 	/**
 	 * Load admin scripts.
 	 *
-	 * @since 3.1.0
-	 * @version 3.1.0
+	 * @since 1.0.0
+	 * @version 1.0.0
 	 */
 	public function admin_scripts() {
 		if ( 'woocommerce_page_wc-settings' !== get_current_screen()->id ) {
@@ -454,65 +429,12 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 		/**
 		 * Filter the return value of the WC_Payment_Gateway_CC::generate_payment_request.
 		 *
-		 * @since 3.1.0
+		 * @since 3.1.0.0
 		 * @param array $post_data
 		 * @param WC_Order $order
 		 * @param object $source
 		 */
 		return apply_filters( 'wc_heidelpay_generate_payment_request', $post_data, $order, $source );
-	}
-
-	/**
-	 * Get payment source. This can be a new token or existing card.
-	 *
-	 * @param string $user_id
-	 * @param bool  $force_customer Should we force customer creation.
-	 *
-	 * @throws Exception When card was not added or for and invalid card.
-	 * @return object
-	 */
-	protected function get_source( $user_id, $force_customer = false ) {
-		$heidelpay_customer = new WC_Heidelpay_Customer( $user_id );
-		$force_customer  = apply_filters( 'wc_heidelpay_force_customer_creation', $force_customer, $heidelpay_customer );
-		$heidelpay_source   = false;
-		$token_id        = false;
-
-		// New CC info was entered and we have a new token to process
-		if ( isset( $_POST['heidelpay_token'] ) ) {
-			$heidelpay_token     = wc_clean( $_POST['heidelpay_token'] );
-			$maybe_saved_card = isset( $_POST['wc-heidelpay-new-payment-method'] ) && ! empty( $_POST['wc-heidelpay-new-payment-method'] );
-
-			// This is true if the user wants to store the card to their account.
-			if ( ( $user_id && $this->saved_cards && $maybe_saved_card ) || $force_customer ) {
-				$heidelpay_source = $heidelpay_customer->add_card( $heidelpay_token );
-
-				if ( is_wp_error( $heidelpay_source ) ) {
-					throw new Exception( $heidelpay_source->get_error_message() );
-				}
-			} else {
-				// Not saving token, so don't define customer either.
-				$heidelpay_source   = $heidelpay_token;
-				$heidelpay_customer = false;
-			}
-		} elseif ( isset( $_POST['wc-heidelpay-payment-token'] ) && 'new' !== $_POST['wc-heidelpay-payment-token'] ) {
-			// Use an existing token, and then process the payment
-
-			$token_id = wc_clean( $_POST['wc-heidelpay-payment-token'] );
-			$token    = WC_Payment_Tokens::get( $token_id );
-
-			if ( ! $token || $token->get_user_id() !== get_current_user_id() ) {
-				WC()->session->set( 'refresh_totals', true );
-				throw new Exception( __( 'Invalid payment method. Please input a new card number.', 'woocommerce-heidelpay' ) );
-			}
-
-			$heidelpay_source = $token->get_token();
-		}
-
-		return (object) array(
-			'token_id' => $token_id,
-			'customer' => $heidelpay_customer ? $heidelpay_customer->get_id() : false,
-			'source'   => $heidelpay_source,
-		);
 	}
 
 	/**
@@ -561,12 +483,6 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 						delete_user_meta( get_current_user_id(), '_heidelpay_customer_id' );
 						return $this->process_payment( $order_id, false, $force_customer );
 						// Source param wrong? The CARD may have been deleted on heidelpay's end. Remove token and show message.
-					} elseif ( 'source' === $response->get_error_code() && $source->token_id ) {
-						$token = WC_Payment_Tokens::get( $source->token_id );
-						$token->delete();
-						$message = __( 'This card is no longer available and has been removed.', 'woocommerce-heidelpay' );
-						$order->add_order_note( $message );
-						throw new Exception( $message );
 					}
 
 					$localized_messages = $this->get_localized_messages();
@@ -681,8 +597,7 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 
 	/**
 	 * Add payment method via account screen.
-	 * We don't store the token locally, but to the Heidelpay API.
-	 * @since 3.0.0
+	 * @since 1.0.0
 	 */
 	public function add_payment_method() {
 		if ( empty( $_POST['heidelpay_token'] ) || ! is_user_logged_in() ) {
@@ -757,8 +672,8 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 	/**
 	 * Sends the failed order email to admin
 	 *
-	 * @version 3.1.0
-	 * @since 3.1.0
+	 * @version 1.0.0
+	 * @since 1.0.0
 	 * @param int $order_id
 	 * @return null
 	 */
@@ -772,8 +687,8 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway_CC {
 	/**
 	 * Logs
 	 *
-	 * @since 3.1.0
-	 * @version 3.1.0
+	 * @since 1.0.0
+	 * @version 1.0.0
 	 *
 	 * @param string $message
 	 */

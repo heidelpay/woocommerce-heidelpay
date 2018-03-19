@@ -3,8 +3,8 @@
  * Heidelpay Payment Request API
  *
  * @package WooCommerce_Heidelpay/Classes/Payment_Request
- * @since   3.1.0
- * @version 3.1.0
+ * @since   1.0.0
+ * @version 1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -134,8 +134,8 @@ class WC_Heidelpay_Payment_Request {
 	/**
 	 * Calculate and set shipping method.
 	 *
-	 * @since 3.1.0
-	 * @version 3.2.0
+	 * @since 1.0.0
+	 * @version 1.0.0
 	 * @param array $address
 	 */
 	public function calculate_shipping( $address = array() ) {
