@@ -1,0 +1,32 @@
+language: php
+dist: trusty
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.6
+      env: deps=no
+    - php: 7.0
+      env: deps=no
+    - php: 7.0
+      env: deps=high
+    - php: 7.1
+      env: deps=no
+    - php: 7.1
+      env: deps=high
+    - php: 7.2
+      env: deps=no
+    - php: 7.2
+      env: deps=high
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.php-cs-fixer
+    - $HOME/.local
+before_install:
+    - ./tests/script/travis_before_install.sh
+install:
+    - if [ "$(phpenv version-name)" == "5.6" ]; then travis_wait ./tests/script/travis_install.sh; else ./tests/script/travis_install.sh; fi
+script:
+    - ./tests/script/travis_script.sh
+after_success:
+    - php vendor/bin/codacycoverage clover tests/_output/coverage.xml
