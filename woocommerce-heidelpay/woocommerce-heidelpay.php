@@ -106,14 +106,60 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
              * Init the plugin after plugins_loaded so environment variables are set.
              */
             public function init() {
+                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-logger.php' );
 
-                /*include_once( dirname( __FILE__ ) . '/includes/php-api.php' );
-                include_once( dirname( __FILE__ ) . '/includes/customer-messages.php' );
+                // Don't hook anything else in the plugin if we're in an incompatible environment
+                if ( self::get_environment_warning() ) {
+                    return;
+                }
 
-                // Init the gateway itself
-                $this->init_gateways();
+                load_plugin_textdomain( 'woocommerce-heidelpay', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 
-                include_once( dirname( __FILE__ ) . '/includes/heidelpay-payment-request.php' );*/
+                require_once( dirname( __FILE__ ) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php' );
+                //require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-webhook-handler.php' );
+                //require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-sepa-payment-token.php' );
+                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay.php' );
+                require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php' );
+                require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php' );
+                require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-pp.php' );
+                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-payment-request.php' );
+
+                /*
+                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-order-handler.php' );
+                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-payment-tokens.php' );
+                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-customer.php' );*/
+
+                add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
+                add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
+                add_filter( 'woocommerce_get_sections_checkout', array( $this, 'filter_gateway_order_admin' ) );
+            }
+
+            /**
+             * Add the gateways to WooCommerce.
+             */
+            public function add_gateways( $methods ) {
+                $methods[] = 'WC_Gateway_HP_CC';
+                $methods[] = 'WC_Gateway_HP_DD';
+                $methods[] = 'WC_Gateway_HP_PP';
+
+                return $methods;
+            }
+
+            /**
+             * Modifies the order of the gateways displayed in admin.
+             */
+            public function filter_gateway_order_admin( $sections ) {
+                //unset( $sections['heidelpay'] );
+                unset( $sections['hp_cc'] );
+                unset( $sections['hp_dd'] );
+                unset( $sections['heidelpay_pp'] );
+
+                //$sections['heidelpay']            = 'heidelpay';
+                $sections['hp_cc'] = __( 'heidelpay CC', 'woocommerce-heidelpay' );
+                $sections['hp_dd'] = __( 'heidelpay DD', 'woocommerce-heidelpay' );
+                $sections['hp_pp'] = __( 'heidelpay PP', 'woocommerce-heidelpay' );
+
+                return $sections;
             }
 
             /**
@@ -250,7 +296,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
             }
         }
 
-        $GLOBALS['wc_heidelpay'] = WC_Heidelpay::get_instance();
+        WC_Heidelpay::get_instance();
 
     endif;
 

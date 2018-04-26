@@ -3,6 +3,7 @@
 namespace Heidelpay\PhpPaymentApi\Adapter;
 
 use Heidelpay\PhpPaymentApi\Response;
+use Heidelpay\PhpPaymentApi\Constants\ProcessingResult;
 
 /**
  * Standard curl adapter
@@ -13,9 +14,9 @@ use Heidelpay\PhpPaymentApi\Response;
  *
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
- * @link  http://dev.heidelpay.com/heidelpay-php-api/
+ * @link  http://dev.heidelpay.com/heidelpay-php-payment-api/
  *
  * @author  Jens Richter
  *
@@ -40,7 +41,7 @@ class CurlAdapter implements HttpAdapterInterface
 
         if (!extension_loaded('curl')) {
             $result = array(
-                'PROCESSING_RESULT' => 'NOK',
+                'PROCESSING_RESULT' => ProcessingResult::NOK,
                 'PROCESSING_RETURN' => 'Connection error php-curl not installed',
                 'PROCESSING_RETURN_CODE' => 'CON.ERR.CUR'
             );
@@ -79,7 +80,7 @@ class CurlAdapter implements HttpAdapterInterface
                     : 'DEF';
 
             $result = array(
-                'PROCESSING_RESULT' => 'NOK',
+                'PROCESSING_RESULT' => ProcessingResult::NOK,
                 'PROCESSING_RETURN' => 'Connection error http status ' . $error,
                 'PROCESSING_RETURN_CODE' => 'CON.ERR.' . $errorCode
             );

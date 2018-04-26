@@ -2,7 +2,6 @@
 /**
  * Heidelpay Payment Request API
  *
- * @package WooCommerce_Heidelpay/Classes/Payment_Request
  * @since   1.0.0
  * @version 1.0.0
  */

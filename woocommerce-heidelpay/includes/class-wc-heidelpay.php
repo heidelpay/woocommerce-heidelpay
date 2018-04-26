@@ -453,12 +453,6 @@ class WC_Gateway_Heidelpay extends WC_Payment_Gateway {
 			$order  = wc_get_order( $order_id );
 			$source = $this->get_source( get_current_user_id(), $force_customer );
 
-			if ( empty( $source->source ) && empty( $source->customer ) ) {
-				$error_msg = __( 'Please enter your card details to make a payment.', 'woocommerce-heidelpay' );
-				$error_msg .= ' ' . __( 'Developers: Please make sure that you are including jQuery and there are no JavaScript errors on the page.', 'woocommerce-heidelpay' );
-				throw new Exception( $error_msg );
-			}
-
 			// Store source to order meta.
 			$this->save_source( $order, $source );
 
