@@ -24,7 +24,7 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
 
 		$this->id                 = 'hp_dd';
 		//$this->icon               = apply_filters( 'hp_dd_icon', '' );
-		$this->has_fields         = false;
+		$this->has_fields         = true;
 		$this->method_title       = __( 'HP_DD', 'woocommerce-heidelpay' );
 		$this->method_description = __( 'heidelpay direct debit', 'woocommerce-heidelpay' );
 
@@ -37,23 +37,9 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
 		$this->description  = $this->get_option( 'description' );
 		$this->instructions = $this->get_option( 'instructions' );
 
-		// HP_DD account fields shown on the thanks page and in emails
-		$this->account_details = get_option( 'woocommerce_hp_dd_accounts',
-			array(
-				array(
-					'account_name'   => $this->get_option( 'account_name' ),
-					'account_number' => $this->get_option( 'account_number' ),
-					'sort_code'      => $this->get_option( 'sort_code' ),
-					'bank_name'      => $this->get_option( 'bank_name' ),
-					'iban'           => $this->get_option( 'iban' ),
-					'bic'            => $this->get_option( 'bic' ),
-				),
-			)
-		);
-
-		/*// Actions
+		// Actions
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
+		/*add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
 		add_action( 'woocommerce_thankyou_hp_dd', array( $this, 'thankyou_page' ) );
 
 		// Customer Emails
@@ -70,7 +56,7 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
 				'title'   => __( 'Enable/Disable', 'woocommerce-heidelpay' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable direct debit', 'woocommerce-heidelpay' ),
-				'default' => 'no',
+				'default' => 'yes',
 			),
 			'title' => array(
 				'title'       => __( 'Title', 'woocommerce-heidelpay' ),
@@ -93,117 +79,63 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
 				'default'     => 'The following acount will be billed:',
 				'desc_tip'    => true,
 			),
-			'account_details' => array(
-				'type'        => 'account_details',
-			),
+            'security_sender' => array(
+                'title'       => __( 'Security Sender', 'woocommerce-heidelpay' ),
+                'type' => 'text',
+                'id' => 'hp_dd_security_sender',
+                'description' => 'Security Sender',
+                'default' => '31HA07BC8142C5A171745D00AD63D182',
+            ),
+            'user_login' => array(
+                'title'       => __( 'User Login', 'woocommerce-heidelpay' ),
+                'type' => 'text',
+                'id' => 'hp_dd_user_login',
+                'description' => 'User Login',
+                'default' => '31ha07bc8142c5a171744e5aef11ffd3',
+            ),
+            'user_password' => array(
+                'title'       => __( 'User Password', 'woocommerce-heidelpay' ),
+                'type' => 'text',
+                'id' => 'hp_dd_user_password',
+                'description' => 'User Password',
+                'default' => '93167DE7',
+            ),
+            'transaction_channel' => array(
+                'title'       => __( 'Transaction Channel', 'woocommerce-heidelpay' ),
+                'type' => 'text',
+                'id' => 'hp_dd_transaction_channel',
+                'description' => 'Transaction Channel',
+                'default' => '31HA07BC8142C5A171744F3D6D155865',
+            ),
+            'sandbox' => array(
+                'title'   => __( 'Sandbox', 'woocommerce-heidelpay' ),
+                'type'    => 'checkbox',
+                'id' => 'hp_dd_sandbox',
+                'label'   => __( 'Enable sandbox mode', 'woocommerce-heidelpay' ),
+                'default' => 'yes',
+            ),
 		);
-
 	}
 
-	/**
-	 * Output for the order received page.
-	 *
-	 * @param int $order_id
-	 */
-	public function thankyou_page( $order_id ) {
+    public function admin_options() {
+        ?>
+        <h2><?php _e('heidelpay DD','woocommerce'); ?></h2>
+        <table class="form-table">
+            <?php $this->generate_settings_html(); ?>
+        </table> <?php
+    }
 
-		if ( $this->instructions ) {
-			echo wpautop( wptexturize( wp_kses_post( $this->instructions ) ) );
-		}
-		$this->bank_details( $order_id );
+	//payment form
+    public function payment_fields() {
+        echo '<div>';
 
-	}
+        echo
+            'Holder:<input type="text" name="ACCOUNT.HOLDER" value="" /><br/>
+            IBan:<input type="text" name="ACCOUNT.IBAN" value="" /><br/>'
+        ;
 
-	/**
-	 * Add content to the WC emails.
-	 */
-	public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
-
-		if ( ! $sent_to_admin && 'hp_dd' === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
-			if ( $this->instructions ) {
-				echo wpautop( wptexturize( $this->instructions ) ) . PHP_EOL;
-			}
-			$this->bank_details( $order->get_id() );
-		}
-
-	}
-
-	/**
-	 * Get bank details and place into a list format.
-	 *
-	 * @param int $order_id
-	 */
-	private function bank_details( $order_id = '' ) {
-
-		if ( empty( $this->account_details ) ) {
-			return;
-		}
-
-		// Get order and store in $order
-		$order 		= wc_get_order( $order_id );
-
-		// Get the order country and country $locale
-		$country 	= $order->get_billing_country();
-		$locale		= $this->get_country_locale();
-
-		// Get sortcode label in the $locale array and use appropriate one
-		$sortcode = isset( $locale[ $country ]['sortcode']['label'] ) ? $locale[ $country ]['sortcode']['label'] : __( 'Sort code', 'woocommerce-heidelpay' );
-
-		$hp_dd_accounts = apply_filters( 'woocommerce_hp_dd_accounts', $this->account_details );
-
-		if ( ! empty( $hp_dd_accounts ) ) {
-			$account_html = '';
-			$has_details  = false;
-
-			foreach ( $hp_dd_accounts as $hp_dd_account ) {
-				$hp_dd_account = (object) $hp_dd_account;
-
-				if ( $hp_dd_account->account_name ) {
-					$account_html .= '<h3 class="wc-hp_dd-bank-details-account-name">' . wp_kses_post( wp_unslash( $hp_dd_account->account_name ) ) . ':</h3>' . PHP_EOL;
-				}
-
-				$account_html .= '<ul class="wc-hp_dd-bank-details order_details hp_dd_details">' . PHP_EOL;
-
-				// HP_DD account fields shown on the thanks page and in emails
-				$account_fields = apply_filters( 'woocommerce_hp_dd_account_fields', array(
-					'bank_name' => array(
-						'label' => __( 'Bank', 'woocommerce-heidelpay' ),
-						'value' => $hp_dd_account->bank_name,
-					),
-					'account_number' => array(
-						'label' => __( 'Account number', 'woocommerce-heidelpay' ),
-						'value' => $hp_dd_account->account_number,
-					),
-					'sort_code'     => array(
-						'label' => $sortcode,
-						'value' => $hp_dd_account->sort_code,
-					),
-					'iban'          => array(
-						'label' => __( 'IBAN', 'woocommerce-heidelpay' ),
-						'value' => $hp_dd_account->iban,
-					),
-					'bic'           => array(
-						'label' => __( 'BIC', 'woocommerce-heidelpay' ),
-						'value' => $hp_dd_account->bic,
-					),
-				), $order_id );
-
-				foreach ( $account_fields as $field_key => $field ) {
-					if ( ! empty( $field['value'] ) ) {
-						$account_html .= '<li class="' . esc_attr( $field_key ) . '">' . wp_kses_post( $field['label'] ) . ': <strong>' . wp_kses_post( wptexturize( $field['value'] ) ) . '</strong></li>' . PHP_EOL;
-						$has_details   = true;
-					}
-				}
-
-				$account_html .= '</ul>';
-			}
-
-			if ( $has_details ) {
-				echo '<section class="woocommerce-hp_dd-bank-details"><h2 class="wc-hp_dd-bank-details-heading">' . __( 'Our bank details', 'woocommerce-heidelpay' ) . '</h2>' . PHP_EOL . $account_html . '</section>';
-			}
-		}
-
-	}
+        echo '</div>';
+    }
 
 	/**
 	 * Process the payment and return the result.
@@ -212,7 +144,6 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-
 		$order = wc_get_order( $order_id );
 
 		// Mark as on-hold (we're awaiting the payment)
@@ -228,11 +159,11 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
          * Set up your authentification data for Heidepay api
          */
         $this->DirectDebit->getRequest()->authentification(
-            '31HA07BC8142C5A171745D00AD63D182',  // SecuritySender
-            '31ha07bc8142c5a171744e5aef11ffd3',  // UserLogin
-            '93167DE7',                          // UserPassword
-            '31HA07BC8142C5A171744F3D6D155865',  // TransactionChannel credit card without 3d secure
-            true                                 // Enable sandbox mode
+            $this->get_option('hp_dd_security_sender'),  // SecuritySender
+            $this->get_option('hp_dd_user_login'),  // UserLogin
+            $this->get_option('hp_dd_user_password'),                         // UserPassword
+            $this->get_option('hp_dd_transaction_channel'),  // TransactionChannel
+            $this->get_option('hp_dd_sandbox')                                 // Enable sandbox mode
         );
         /**
          * Set up asynchronous request parameters
@@ -244,37 +175,31 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
             'HeidelpayResponse.php'  // Response url from your application
         );
 
-        // Return thankyou redirect
-        /*return array(
-            'result'    => 'success',
-            'redirect'  => $this->get_return_url( $order ),
-        );*/
-
-
         /**
          * Set up customer information required for risk checks
          */
+
         $this->DirectDebit->getRequest()->customerAddress(
-            'Heidel',                  // Given name
-            'Berger-Payment',           // Family name
-            null,                     // Company Name
-            '12344',                   // Customer id of your application
-            'Vagerowstr. 18',          // Billing address street
-            'DE-BW',                   // Billing address state
-            '69115',                   // Billing address post code
-            'Heidelberg',              // Billing address city
-            'DE',                      // Billing address country code
-            'support@heidelpay.de'     // Customer mail address
+            $order->get_billing_first_name,                  // Given name
+            $order->get_billing_last_name,           // Family name
+            $order->get_billing_company,                     // Company Name
+            $order->get_customer_id,                   // Customer id of your application
+            $order->get_billing_address_1 . $order->get_billing_address_2,          // Billing address street
+            $order->get_billing_state,                   // Billing address state
+            $order->get_billing_postcode,                   // Billing address post code
+            $order->get_billing_city,              // Billing address city
+            $order->get_billing_country,                      // Billing address country code
+            $order->get_billing_email     // Customer mail address
         );
 
         /**
          * Set up basket or transaction information
          */
         $this->DirectDebit->getRequest()->basketData(
-            '2843294932', // Reference Id of your application
-            23.12,                         // Amount of this request
+            $order_id, //order id
+            WC()->cart->total,                         //cart amount
             'EUR',                         // Currency code of this request
-            '39542395235ßfsokkspreipsr'    // A secret passphrase from your application
+            'secret'    // A secret passphrase from your application
         );
 
         /**
