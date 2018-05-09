@@ -4,8 +4,11 @@ namespace Heidelpay\Tests\PhpPaymentApi\Unit\PaymentMethods;
 
 use AspectMock\Test as test;
 use Heidelpay\PhpPaymentApi\Constants\ApiConfig;
+use Heidelpay\PhpPaymentApi\Constants\PaymentMethod;
+use Heidelpay\PhpPaymentApi\Constants\TransactionType;
 use Heidelpay\PhpPaymentApi\PaymentMethods\EasyCreditPaymentMethod;
 use Heidelpay\Tests\PhpPaymentApi\Helper\BasePaymentMethodTest;
+use Heidelpay\PhpPaymentApi\Constants\TransactionMode;
 
 /**
  * This test class verifies the special functionality of the EasyCreditPaymentMethod not covered in
@@ -13,9 +16,9 @@ use Heidelpay\Tests\PhpPaymentApi\Helper\BasePaymentMethodTest;
  * There is no actual communication to the server since the curl adapter is being mocked.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
- * @link  http://dev.heidelpay.com/heidelpay-php-api/
+ * @link  http://dev.heidelpay.com/heidelpay-php-payment-api/
  *
  * @author  Simon Gabriel
  *
@@ -23,7 +26,7 @@ use Heidelpay\Tests\PhpPaymentApi\Helper\BasePaymentMethodTest;
  */
 class EasyCreditPaymentMethodTest extends BasePaymentMethodTest
 {
-    const PAYMENT_METHOD_SHORT = 'HP';
+    const PAYMENT_METHOD_SHORT = PaymentMethod::HIRE_PURCHASE;
 
     //<editor-fold desc="Init">
 
@@ -172,13 +175,13 @@ class EasyCreditPaymentMethodTest extends BasePaymentMethodTest
             'IDENTIFICATION.TRANSACTIONID' => $timestamp,
             'NAME.GIVEN' => $firstName,
             'NAME.FAMILY' => $lastName,
-            'PAYMENT.CODE' => self::PAYMENT_METHOD_SHORT . '.IN',
+            'PAYMENT.CODE' => self::PAYMENT_METHOD_SHORT . '.' . TransactionType::INITIALIZE,
             'PRESENTATION.AMOUNT' => self::TEST_AMOUNT,
             'PRESENTATION.CURRENCY' => $this->currency,
             'REQUEST.VERSION' => '1.0',
             'SECURITY.SENDER' => $securitySender,
             'TRANSACTION.CHANNEL' => $transactionChannel,
-            'TRANSACTION.MODE' => 'CONNECTOR_TEST',
+            'TRANSACTION.MODE' => TransactionMode::CONNECTOR_TEST,
             'USER.LOGIN' => $userLogin,
             'USER.PWD' => $userPassword,
         ];

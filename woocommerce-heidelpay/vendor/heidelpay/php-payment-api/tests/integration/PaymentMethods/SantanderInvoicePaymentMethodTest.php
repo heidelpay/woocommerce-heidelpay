@@ -2,6 +2,8 @@
 
 namespace Heidelpay\Tests\PhpPaymentApi\Integration\PaymentMethods;
 
+use Heidelpay\PhpPaymentApi\Constants\PaymentMethod;
+use Heidelpay\PhpPaymentApi\Constants\TransactionType;
 use Heidelpay\PhpPaymentApi\PaymentMethods\SantanderInvoicePaymentMethod;
 use Heidelpay\Tests\PhpPaymentApi\Helper\BasePaymentMethodTest;
 
@@ -97,7 +99,7 @@ class SantanderInvoicePaymentMethodTest extends BasePaymentMethodTest
         $this->paymentObject->getRequest()->basketData($timestamp, 123.12, $this->currency, $this->secret);
 
         $this->paymentObject->getRequest()->b2cSecured('MRS', '1982-07-12');
-        $this->paymentObject->getRequest()->async('DE', 'https://dev.heidelpay.de');
+        $this->paymentObject->getRequest()->async('DE', 'https://dev.heidelpay.com');
         $this->paymentObject->getRequest()->getFrontend()->setEnabled('FALSE');
 
         $this->paymentObject->authorize();
@@ -223,7 +225,7 @@ class SantanderInvoicePaymentMethodTest extends BasePaymentMethodTest
 
         $this->paymentObject->refund((string)$referenceId);
 
-        $this->assertEquals('IV.RF', $this->paymentObject->getRequest()->getPayment()->getCode());
+        $this->assertEquals(PaymentMethod::INVOICE . '.' . TransactionType::REFUND, $this->paymentObject->getRequest()->getPayment()->getCode());
 
         $this->logDataToDebug();
     }

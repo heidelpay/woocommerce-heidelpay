@@ -3,19 +3,23 @@
 namespace Heidelpay\Tests\PhpPaymentApi\Unit;
 
 use Codeception\TestCase\Test;
+use Heidelpay\PhpPaymentApi\Constants\PaymentMethod;
+use Heidelpay\PhpPaymentApi\Constants\TransactionType;
 use Heidelpay\PhpPaymentApi\Exceptions\JsonParserException;
 use Heidelpay\PhpPaymentApi\Response;
 use Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException;
 use Heidelpay\PhpPaymentApi\Exceptions\HashVerificationException;
+use Heidelpay\PhpPaymentApi\Constants\TransactionMode;
+use Heidelpay\PhpPaymentApi\Constants\ProcessingResult;
 
 /**
  *
  *  This unit test will cover the response object.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
- * @link  http://dev.heidelpay.com/heidelpay-php-api/
+ * @link  http://dev.heidelpay.com/heidelpay-php-payment-api/
  *
  * @author  Jens Richter
  *
@@ -60,16 +64,16 @@ class ResponseTest extends Test
             'ADDRESS_STREET' => 'Vagerowstr. 18',
             'FRONTEND_ENABLED' => true,
             'PRESENTATION_AMOUNT' => 23.12,
-            'TRANSACTION_MODE' => 'CONNECTOR_TEST',
+            'TRANSACTION_MODE' => TransactionMode::CONNECTOR_TEST,
             'ACCOUNT_EXPIRY_MONTH' => '05',
             'PROCESSING_TIMESTAMP' => '2016-09-16 12:14:31',
-            'CONTACT_EMAIL' => 'development@heidelpay.de',
-            'FRONTEND_RESPONSE_URL' => 'http://dev.heidelpay.de/response.php',
+            'CONTACT_EMAIL' => 'development@heidelpay.com',
+            'FRONTEND_RESPONSE_URL' => 'http://dev.heidelpay.com/response.php',
             'REQUEST_VERSION' => 1.0,
             'ACCOUNT_BRAND' => 'MASTER',
             'PROCESSING_STATUS_CODE' => '90',
             'NAME_GIVEN' => 'Heidel',
-            'FRONTEND_PAYMENT_FRAME_ORIGIN' => 'http://dev.heidelpay.de/',
+            'FRONTEND_PAYMENT_FRAME_ORIGIN' => 'http://dev.heidelpay.com/',
             'IDENTIFICATION_SHORTID' => '3379.5447.1520',
             'ADDRESS_CITY' => 'Heidelberg',
             'ACCOUNT_HOLDER' => 'Heidel Berger-Payment',
@@ -81,7 +85,7 @@ class ResponseTest extends Test
             'USER_PWD' => '93167DE7',
             'IDENTIFICATION_SHOPPERID' => '12344',
             'PROCESSING_RETURN_CODE' => '000.100.112',
-            'PROCESSING_RESULT' => 'ACK',
+            'PROCESSING_RESULT' => ProcessingResult::ACK,
             'FRONTEND_MODE' => 'WHITELABEL',
             'IDENTIFICATION_UNIQUEID' => '31HA07BC8108A9126F199F2784552637',
             'CRITERION_SECRET' => '209022666cd4706e5f451067592b6be1aff4a913d5bb7f8249f7418ee25c91b3' .
@@ -98,7 +102,7 @@ class ResponseTest extends Test
             'PROCESSING_RETURN' => "Request successfully processed in 'Merchant in Connector Test Mode'",
             'TRANSACTION_CHANNEL' => '31HA07BC8142C5A171744F3D6D155865',
             'FRONTEND_LANGUAGE' => 'DE',
-            'PAYMENT_CODE' => 'CC.RG',
+            'PAYMENT_CODE' => PaymentMethod::CREDIT_CARD . '.' . TransactionType::REGISTRATION,
             'BASKET_ID' => '31HA07BC8129FBB819367B2205CD6FB4',
             'RISKINFORMATION_SINCE' => '2017-01-01',
             'RISKINFORMATION_ORDERCOUNT' => '5',
@@ -106,6 +110,7 @@ class ResponseTest extends Test
             'CONNECTOR_ACCOUNT_HOLDER' => 'Test Account Holder',
             'CRITERION_TEST_VALUE' => 'Test Value',
             'INVALID_PROP' => 'Invalid',
+            'lang' => 'de'
         );
 
         $this->responseObject = new Response($this->responseArray);
@@ -119,7 +124,7 @@ class ResponseTest extends Test
     public function isSuccess()
     {
         $this->assertTrue($this->responseObject->isSuccess(), 'isSuccess should be true');
-        $this->responseObject->getProcessing()->set('result', 'NOK');
+        $this->responseObject->getProcessing()->set('result', ProcessingResult::NOK);
         $this->assertFalse($this->responseObject->isSuccess(), 'isSuccess should be false.');
     }
 
@@ -145,7 +150,7 @@ class ResponseTest extends Test
     public function isError()
     {
         $this->assertFalse($this->responseObject->isError(), 'isError should be false');
-        $this->responseObject->getProcessing()->set('result', 'NOK');
+        $this->responseObject->getProcessing()->set('result', ProcessingResult::NOK);
         $this->assertTrue($this->responseObject->isError(), 'isError should be true');
     }
 
@@ -185,11 +190,11 @@ class ResponseTest extends Test
     public function getPaymentFormUrl()
     {
         /** iframe url for credit and debit card*/
-        $expectedUrl = 'http://dev.heidelpay.de';
+        $expectedUrl = 'http://dev.heidelpay.com';
         $this->responseObject->getFrontend()->set('payment_frame_url', $expectedUrl);
         $this->assertEquals($expectedUrl, $this->responseObject->getPaymentFormUrl());
 
-        $expectedUrl = 'http://www.heidelpay.de';
+        $expectedUrl = 'http://www.heidelpay.com';
         $this->responseObject->getFrontend()->setRedirectUrl($expectedUrl);
 
         /** url in case of credit and debit card reference Transaction */
@@ -271,7 +276,7 @@ class ResponseTest extends Test
     public function verifySecurityHashEmpty()
     {
         $response = new Response();
-        $response->getProcessing()->set('result', 'ACK');
+        $response->getProcessing()->set('result', ProcessingResult::ACK);
         $this->expectException(HashVerificationException::class);
         $response->verifySecurityHash($this->secret, 'Order 12345');
     }
@@ -285,7 +290,7 @@ class ResponseTest extends Test
     public function verifySecurityHashValid()
     {
         $response = new Response();
-        $response->getProcessing()->set('result', 'ACK');
+        $response->getProcessing()->set('result', ProcessingResult::ACK);
         $response->getCriterion()->set(
             'secret',
             '3c02e798e22f278ccc8652a37da2c84c0a5b32021da2e1558956c55d422a8e585be4e774245a49afc939b0' .
@@ -308,7 +313,7 @@ class ResponseTest extends Test
     public function verifySecurityHashInvalid()
     {
         $response = new Response();
-        $response->getProcessing()->set('result', 'ACK');
+        $response->getProcessing()->set('result', ProcessingResult::ACK);
         $this->expectException(HashVerificationException::class);
         $response->getCriterion()->set(
             'secret',

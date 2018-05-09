@@ -3,13 +3,15 @@
 namespace Heidelpay\Tests\PhpPaymentApi\Unit\ParameterGroup;
 
 use Codeception\TestCase\Test;
+use Heidelpay\PhpPaymentApi\Constants\PaymentMethod;
+use Heidelpay\PhpPaymentApi\Constants\TransactionType;
 use Heidelpay\PhpPaymentApi\ParameterGroups\PaymentParameterGroup as Payment;
 
 /**
  * Unit test for PaymentParameterGroup
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
  * @link  http://dev.heidelpay.com/heidelpay-php-api/
  *
@@ -26,7 +28,7 @@ class PaymentParameterGroupTest extends Test
     {
         $Payment = new Payment();
 
-        $value = 'IV.PA';
+        $value = PaymentMethod::INVOICE . '.' . TransactionType::RESERVATION;
         $Payment->setCode($value);
 
         $this->assertEquals($value, $Payment->getCode());

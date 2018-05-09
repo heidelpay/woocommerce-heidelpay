@@ -4,14 +4,15 @@ namespace Heidelpay\PhpPaymentApi;
 
 use Heidelpay\PhpPaymentApi\Adapter\CurlAdapter;
 use Heidelpay\PhpPaymentApi\Adapter\HttpAdapterInterface;
+use Heidelpay\PhpPaymentApi\Constants\TransactionMode;
 
 /**
  * Heidelpay request object
  *
  * @license    Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright  Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright  Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
- * @link       http://dev.heidelpay.com/heidelpay-php-api/
+ * @link       http://dev.heidelpay.com/heidelpay-php-payment-api/
  *
  * @author     Jens Richter
  *
@@ -56,10 +57,10 @@ class Request extends AbstractMethod
         $this->getUser()->setLogin($userLogin);
         $this->getUser()->setPassword($userPassword);
         $this->getTransaction()->setChannel($transactionChannel);
-        $this->getTransaction()->setMode('LIVE');
+        $this->getTransaction()->setMode(TransactionMode::LIVE);
 
         if ($sandboxRequest) {
-            $this->getTransaction()->setMode('CONNECTOR_TEST');
+            $this->getTransaction()->setMode(TransactionMode::CONNECTOR_TEST);
         }
         return $this;
     }

@@ -15,9 +15,9 @@ use AspectMock\Test as aspectMockTest;
  *  Please note that connection test can fail due to network issues and scheduled downtime.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
- * @link  http://dev.heidelpay.com/heidelpay-php-api/
+ * @link  http://dev.heidelpay.com/heidelpay-php-payment-api/
  *
  * @author  Jens Richter
  *
@@ -63,7 +63,7 @@ class RequestTest extends Test
         $Request = new Request();
 
         $LanguageCode = 'DE';
-        $ResponseUrl = 'https://dev.heidelpay.de/';
+        $ResponseUrl = 'https://dev.heidelpay.com/';
 
         $Request->async($LanguageCode, $ResponseUrl);
 
@@ -92,7 +92,7 @@ class RequestTest extends Test
         $addressZip = '69115';
         $addressCity = 'Heidelberg';
         $addressCountry = 'DE';
-        $contactMail = 'development@heidelpay.de';
+        $contactMail = 'development@heidelpay.com';
 
         $Request->customerAddress(
             $nameGiven,
@@ -169,7 +169,7 @@ class RequestTest extends Test
             'PRESENTATION.AMOUNT' => 23.12,
             'PRESENTATION.CURRENCY' => 'EUR',
             'REQUEST.VERSION' => '1.0',
-            'TRANSACTION.MODE' => 'CONNECTOR_TEST',
+            'TRANSACTION.MODE' => TransactionMode::CONNECTOR_TEST,
             'CRITERION.SDK_NAME' => $criterion->getSdkName(),
             'CRITERION.SDK_VERSION' => $criterion->getSdkVersion()
         );
