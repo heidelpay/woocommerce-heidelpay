@@ -123,6 +123,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php' );
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-pp.php' );
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-iv.php' );
+                require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-so.php' );
                 require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-payment-request.php' );
 
                 /*
@@ -143,6 +144,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $methods[] = 'WC_Gateway_HP_DD';
                 $methods[] = 'WC_Gateway_HP_PP';
                 $methods[] = 'WC_Gateway_HP_IV';
+                $methods[] = 'WC_Gateway_HP_SO';
 
                 return $methods;
             }
@@ -154,6 +156,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 //unset( $sections['heidelpay'] );
                 unset( $sections['hp_cc'] );
                 unset( $sections['hp_dd'] );
+                unset( $sections['hp_so'] );
                 unset( $sections['heidelpay_pp'] );
                 unset( $sections['hp_iv'] );
 
@@ -162,6 +165,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $sections['hp_dd'] = __( 'heidelpay DD', 'woocommerce-heidelpay' );
                 $sections['hp_pp'] = __( 'heidelpay PP', 'woocommerce-heidelpay' );
                 $sections['hp_iv'] = __( 'heidelpay IV', 'woocommerce-heidelpay' );
+                $sections['hp_so'] = __( 'heidelpay SO', 'woocommerce-heidelpay' );
 
                 return $sections;
             }
