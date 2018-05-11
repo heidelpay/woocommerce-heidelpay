@@ -187,16 +187,16 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
          */
 
         $this->SecuredInvoice->getRequest()->customerAddress(
-            $order->get_billing_first_name,                  // Given name
-            $order->get_billing_last_name,           // Family name
-            $order->get_billing_company,                     // Company Name
-            $order->get_customer_id,                   // Customer id of your application
-            $order->get_billing_address_1 . $order->get_billing_address_2,          // Billing address street
-            $order->get_billing_state,                   // Billing address state
-            $order->get_billing_postcode,                   // Billing address post code
-            $order->get_billing_city,              // Billing address city
-            $order->get_billing_country,                      // Billing address country code
-            $order->get_billing_email     // Customer mail address
+            $order->get_billing_first_name(),                  // Given name
+            $order->get_billing_last_name(),           // Family name
+            $order->get_billing_company(),                     // Company Name
+            $order->get_customer_id(),                   // Customer id of your application
+            $order->get_billing_address_1() . $order->get_billing_address_2(),          // Billing address street
+            $order->get_billing_state(),                   // Billing address state
+            $order->get_billing_postcode(),                   // Billing address post code
+            $order->get_billing_city(),              // Billing address city
+            $order->get_billing_country(),                      // Billing address country code
+            $order->get_billing_email()     // Customer mail address
         );
 
         /**
