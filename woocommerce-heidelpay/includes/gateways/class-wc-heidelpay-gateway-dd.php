@@ -159,20 +159,17 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
          * Set up your authentification data for Heidepay api
          */
         $this->DirectDebit->getRequest()->authentification(
-            $this->get_option('hp_dd_security_sender'),  // SecuritySender
-            $this->get_option('hp_dd_user_login'),  // UserLogin
-            $this->get_option('hp_dd_user_password'),                         // UserPassword
-            $this->get_option('hp_dd_transaction_channel'),  // TransactionChannel
-            $this->get_option('hp_dd_sandbox')                                 // Enable sandbox mode
+            $this->settings('hp_dd_security_sender'),  // SecuritySender
+            $this->settings('hp_dd_user_login'),  // UserLogin
+            $this->settings('hp_dd_user_password'),                         // UserPassword
+            $this->settings('hp_dd_transaction_channel'),  // TransactionChannel
+            $this->settings('hp_dd_sandbox')                                 // Enable sandbox mode
         );
         /**
          * Set up asynchronous request parameters
          */
         $this->DirectDebit->getRequest()->async(
-            'EN', // Language code for the Frame
-            HEIDELPAY_PHP_PAYMENT_API_URL .
-            HEIDELPAY_PHP_PAYMENT_API_FOLDER .
-            'HeidelpayResponse.php'  // Response url from your application
+            'https://www.google.de'
         );
 
         /**
@@ -205,6 +202,6 @@ class WC_Gateway_HP_DD extends WC_Payment_Gateway {
         /**
          * Set necessary parameters for Heidelpay payment Frame and send a registration request
          */
-        $this->DirectDebit->registration();
+        $this->DirectDebit->debit();
 	}
 }
