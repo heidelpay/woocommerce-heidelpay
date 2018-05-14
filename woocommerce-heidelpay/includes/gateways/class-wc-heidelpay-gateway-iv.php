@@ -5,9 +5,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Secured Invoice
+ * Rechnugskauf gesichert
  */
-require_once dirname(__DIR__) . '../../vendor/autoload.php';
+require_once(dirname(__DIR__) . '../../vendor/autoload.php');
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\InvoiceB2CSecuredPaymentMethod;
 
@@ -17,19 +17,20 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
     /** @var array Array of locales */
     public $locale;
 
+    public $payMethod;
+
     /**
      * Constructor for the gateway.
      */
     public function __construct()
     {
-
-        $this->SecuredInvoice = new InvoiceB2CSecuredPaymentMethod();
+        $this->payMethod = new InvoiceB2CSecuredPaymentMethod();
 
         $this->id = 'hp_iv';
         //$this->icon               = apply_filters( 'hp_iv_icon', '' );
-        $this->has_fields = true;
+        $this->has_fields = false;
         $this->method_title = __('HP_IV', 'woocommerce-heidelpay');
-        $this->method_description = __('heidelpay secured invoice', 'woocommerce-heidelpay');
+        $this->method_description = __('heidelpay secured Invoice', 'woocommerce-heidelpay');
 
         // Load the settings.
         $this->init_form_fields();
@@ -42,11 +43,6 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
 
         // Actions
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-        /*add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
-        add_action( 'woocommerce_thankyou_hp_dd', array( $this, 'thankyou_page' ) );
-
-        // Customer Emails
-        add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );*/
     }
 
     /**
@@ -54,33 +50,32 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
      */
     public function init_form_fields()
     {
-
         $this->form_fields = array(
             'enabled' => array(
                 'title' => __('Enable/Disable', 'woocommerce-heidelpay'),
                 'type' => 'checkbox',
-                'label' => __('Enable secured invoice', 'woocommerce-heidelpay'),
+                'label' => __('Enable Invoice Secured', 'woocommerce-heidelpay'),
                 'default' => 'no',
             ),
             'title' => array(
                 'title' => __('Title', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'description' => __('This controls the title which the user sees during checkout.', 'woocommerce-heidelpay'),
-                'default' => __('secured invoice', 'woocommerce-heidelpay'),
+                'default' => __('Secured Invoice', 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'description' => array(
                 'title' => __('Description', 'woocommerce-heidelpay'),
                 'type' => 'textarea',
                 'description' => __('Payment method description that the customer will see on your checkout.', 'woocommerce-heidelpay'),
-                'default' => __('Insert payment data for secured invoice', 'woocommerce-heidelpay'),
+                'default' => __('Insert payment data for Secured Invoice', 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'instructions' => array(
                 'title' => __('Instructions', 'woocommerce-heidelpay'),
                 'type' => 'textarea',
                 'description' => __('Instructions that will be added to the thank you page and emails.', 'woocommerce-heidelpay'),
-                'default' => 'Please transfer to this Data',
+                'default' => 'The following acount will be billed:',
                 'desc_tip' => true,
             ),
             'security_sender' => array(
@@ -88,35 +83,35 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
                 'type' => 'text',
                 'id' => 'hp_iv_security_sender',
                 'description' => 'Security Sender',
-                'default' => '31HA07BC8142C5A171745D00AD63D182',
+                'default' => '31HA07BC8142C5A171745D00AD63D182'
             ),
             'user_login' => array(
                 'title' => __('User Login', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => 'hp_iv_user_login',
                 'description' => 'User Login',
-                'default' => '31ha07bc8142c5a171744e5aef11ffd3',
+                'default' => '31ha07bc8142c5a171744e5aef11ffd3'
             ),
             'user_password' => array(
                 'title' => __('User Password', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => 'hp_iv_user_password',
                 'description' => 'User Password',
-                'default' => '93167DE7',
+                'default' => '93167DE7'
             ),
             'transaction_channel' => array(
                 'title' => __('Transaction Channel', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => 'hp_iv_transaction_channel',
                 'description' => 'Transaction Channel',
-                'default' => '31HA07BC81895ACFE22C154CBC521922',
+                'default' => '31HA07BC81895ACFE22C154CBC521922'
             ),
             'sandbox' => array(
                 'title' => __('Sandbox', 'woocommerce-heidelpay'),
                 'type' => 'checkbox',
                 'id' => 'hp_iv_sandbox',
                 'label' => __('Enable sandbox mode', 'woocommerce-heidelpay'),
-                'default' => 'yes',
+                'default' => 'yes'
             ),
         );
     }
@@ -130,23 +125,13 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
         </table> <?php
     }
 
-    //payment form
-    public function payment_fields()
-    {
-        echo '<div>';
-
-        echo
-        'Holder:<input type="text" name="ACCOUNT.HOLDER" value="" /><br/>
-            IBan:<input type="text" name="ACCOUNT.IBAN" value="" /><br/>';
-
-        echo '</div>';
-    }
-
     /**
      * Process the payment and return the result.
      *
      * @param int $order_id
-     * @return void
+     * @return array
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
      */
     public function process_payment($order_id)
     {
@@ -159,34 +144,30 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
         wc_reduce_stock_levels($order_id);
 
         // Remove cart
-        WC()->cart->empty_cart();
+        wc()->cart->empty_cart();
 
         /**
          * Set up your authentification data for Heidepay api
          */
-        $this->SecuredInvoice->getRequest()->authentification(
-            $this->get_option('hp_dd_security_sender'),  // SecuritySender
-            $this->get_option('hp_dd_user_login'),  // UserLogin
-            $this->get_option('hp_dd_user_password'),                         // UserPassword
-            $this->get_option('hp_dd_transaction_channel'),  // TransactionChannel
-            $this->get_option('hp_dd_sandbox')                                 // Enable sandbox mode
+        $this->payMethod->getRequest()->authentification(
+            $this->settings['security_sender'],  // SecuritySender
+            $this->settings['user_login'],  // UserLogin
+            $this->settings['user_password'],  // UserPassword
+            $this->settings['transaction_channel'],  // TransactionChannel
+            $this->settings['sandbox']  // Enable sandbox mode
         );
         /**
          * Set up asynchronous request parameters
          */
-        $this->SecuredInvoice->getRequest()->async(
+        $this->payMethod->getRequest()->async(
             'EN', // Language code for the Frame
-            'EN', // Language code for the Frame
-            HEIDELPAY_PHP_PAYMENT_API_URL .
-            HEIDELPAY_PHP_PAYMENT_API_FOLDER .
-            'HeidelpayResponse.php'  // Response url from your application
+            'https://www.google.de/'
         );
 
         /**
          * Set up customer information required for risk checks
          */
-
-        $this->SecuredInvoice->getRequest()->customerAddress(
+        $this->payMethod->getRequest()->customerAddress(
             $order->get_billing_first_name(),                  // Given name
             $order->get_billing_last_name(),           // Family name
             $order->get_billing_company(),                     // Company Name
@@ -202,16 +183,35 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
         /**
          * Set up basket or transaction information
          */
-        $this->SecuredInvoice->getRequest()->basketData(
+        $this->payMethod->getRequest()->basketData(
             $order_id, //order id
-            WC()->cart->total,                         //cart amount
+            $order->get_total(),                         //cart amount
             'EUR',                         // Currency code of this request
             'secret'    // A secret passphrase from your application
         );
 
         /**
-         * Set necessary parameters for Heidelpay payment Frame and send a authorize request
+         * Set necessary parameters for Heidelpay payment Frame and send a registration request
          */
-        $this->SecuredInvoice->authorize();
+        $this->payMethod->authorize();
+
+        //logging and debug
+        $logger = wc_get_logger();
+        mail('florian.evertz@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(), 1));
+        $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(), 1));
+        $logger->log(WC_Log_Levels::DEBUG, print_r($this->settings['security_sender'], 1));
+
+        if ($this->payMethod->getResponse()->isSuccess()) {
+            return [
+                'result' => 'success',
+                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
+            ];
+        } else {
+            wc_add_notice(
+                __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+                'error'
+            );
+            return null;
+        }
     }
 }
