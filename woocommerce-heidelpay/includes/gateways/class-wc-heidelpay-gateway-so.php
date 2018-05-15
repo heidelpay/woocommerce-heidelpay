@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Sofort
  */
 require_once ( dirname(__DIR__) . '../../vendor/autoload.php');
+
 use Heidelpay\PhpPaymentApi\PaymentMethods\SofortPaymentMethod;
 
 class WC_Gateway_HP_SO extends WC_Payment_Gateway {
@@ -25,7 +26,6 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
         $this->payMethod = new SofortPaymentMethod();
 
 		$this->id                 = 'hp_so';
-		//$this->icon               = apply_filters( 'hp_so_icon', '' );
 		$this->has_fields         = false;
 		$this->method_title       = __( 'HP_SO', 'woocommerce-heidelpay' );
 		$this->method_description = __( 'heidelpay sofort', 'woocommerce-heidelpay' );
@@ -40,12 +40,8 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
 		$this->instructions = $this->get_option( 'instructions' );
 
 		// Actions
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		/*add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
-		add_action( 'woocommerce_thankyou_hp_so', array( $this, 'thankyou_page' ) );
-
-		// Customer Emails
-		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );*/
+        add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+        add_action('woocommerce_api_' . $this->id, array($this, 'callback_handler'));
 	}
 
 	/**
@@ -129,14 +125,6 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
 
 	//payment form
     public function payment_fields() {
-        /*echo '<div>';
-
-        echo
-            'Holder:<input type="text" name="ACCOUNT.HOLDER" value="" /><br/>
-            IBan:<input type="text" name="ACCOUNT.IBAN" value="" /><br/>'
-        ;
-
-        echo '</div>';*/
     }
 
 	/**
@@ -161,16 +149,16 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
          * Set up your authentification data for Heidepay api
          */
         $this->payMethod->getRequest()->authentification(
-                $this->settings['security_sender'],  // SecuritySender
+            $this->get_option('security_sender'),
+            $this->get_option('user_login'),
+            $this->get_option('user_password'),
+            $this->get_option('transaction_channel'),
+            $this->get_option('sandbox')
+                /*$this->settings['security_sender'],  // SecuritySender
                 $this->settings['user_login'],  // UserLogin
                 $this->settings['user_password'],  // UserPassword
                 $this->settings['transaction_channel'],  // TransactionChannel
-                $this->settings['sandbox']  // Enable sandbox mode
-            //$this->get_option('hp_so_security_sender'),
-            //$this->get_option('hp_so_user_login'),
-            //$this->get_option('hp_so_user_password'),
-            //$this->get_option('hp_so_transaction_channel'),
-            //$this->get_option('hp_so_sandbox')
+                $this->settings['sandbox']  // Enable sandbox mode*/
         );
         /**
          * Set up asynchronous request parameters
@@ -213,24 +201,32 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
         /**
          * Set necessary parameters for Heidelpay payment Frame and send a registration request
          */
-        $this->payMethod->authorize();
+        $logger = wc_get_logger();
+
+        try {
+            $this->payMethod->authorize();
+        } catch(\Exception $exception) {
+
+        }
 
         //logging and debug
-        $logger = wc_get_logger();
         mail('david.owusu@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(),1));
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
-        $logger->log(WC_Log_Levels::DEBUG, print_r($this->settings['security_sender'],1));
 
         if($this->payMethod->getResponse()->isSuccess()) {
             return [
-                    'result' => 'success',
-                'redicect' => $this->payMethod->getResponse()->getPaymentFormUrl()
-            ];
-        } else {
-            return [
                 'result' => 'success',
-                'redirect' => 'https://www.google.de/'
+                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
             ];
         }
+
+        return [
+            'result' => 'success',
+            'redirect' => 'https://www.google.de/'
+        ];
 	}
+
+	public function callback_handler() {
+	    //callback stuff
+    }
 }

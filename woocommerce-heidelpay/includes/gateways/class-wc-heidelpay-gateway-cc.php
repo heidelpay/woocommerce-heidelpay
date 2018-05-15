@@ -22,11 +22,11 @@ class WC_Gateway_HP_CC extends WC_Payment_Gateway {
 
         $this->DirectDebit = new CreditCardPaymentMethod();
 
-		$this->id                 = 'hp_dd';
-		//$this->icon               = apply_filters( 'hp_dd_icon', '' );
-		$this->has_fields         = false;
-		$this->method_title       = __( 'HP_CC', 'woocommerce-heidelpay' );
-		$this->method_description = __( 'heidelpay credit card', 'woocommerce-heidelpay' );
+        $this->id = 'hp_cc';
+		//$this->icon               = apply_filters('hp_cc_icon', '');
+        //$this->has_fields         = false;
+        //$this->method_title       = __( 'HP_CC', 'woocommerce-heidelpay' );
+        //$this->method_description = __( 'heidelpay credit card', 'woocommerce-heidelpay' );
 
 		// Load the settings.
 		$this->init_form_fields();
@@ -37,8 +37,8 @@ class WC_Gateway_HP_CC extends WC_Payment_Gateway {
 		$this->description  = $this->get_option( 'description' );
 		$this->instructions = $this->get_option( 'instructions' );
 
-		/*// HP_DD account fields shown on the thanks page and in emails
-		$this->account_details = get_option( 'woocommerce_hp_dd_accounts',
+		/*// HP_CC account fields shown on the thanks page and in emails
+		$this->account_details = get_option( 'woocommerce_hp_cc_accounts',
 			array(
 				array(
 					'account_name'   => $this->get_option( 'account_name' ),
@@ -54,7 +54,7 @@ class WC_Gateway_HP_CC extends WC_Payment_Gateway {
 		/*// Actions
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
-		add_action( 'woocommerce_thankyou_hp_dd', array( $this, 'thankyou_page' ) );
+		add_action( 'woocommerce_thankyou_hp_cc', array( $this, 'thankyou_page' ) );
 
 		// Customer Emails
 		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );*/
@@ -119,7 +119,7 @@ class WC_Gateway_HP_CC extends WC_Payment_Gateway {
 	 */
 	public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
 
-		if ( ! $sent_to_admin && 'hp_dd' === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
+		if ( ! $sent_to_admin && 'hp_cc' === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
 			if ( $this->instructions ) {
 				echo wpautop( wptexturize( $this->instructions ) ) . PHP_EOL;
 			}
