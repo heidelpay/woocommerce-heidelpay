@@ -11,7 +11,7 @@ require_once(dirname(__DIR__) . '../../vendor/autoload.php');
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\InvoiceB2CSecuredPaymentMethod;
 
-class WC_Gateway_HP_IV extends WC_Payment_Gateway
+class WC_Gateway_HP_IVPG extends WC_Payment_Gateway
 {
 
     /** @var array Array of locales */
@@ -26,11 +26,11 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
     {
         $this->payMethod = new InvoiceB2CSecuredPaymentMethod();
 
-        $this->id = 'hp_iv';
-        //$this->icon               = apply_filters( 'hp_iv_icon', '' );
+        $this->id = 'hp_ivpg';
+        //$this->icon               = apply_filters( 'hp_ivpg_icon', '' );
         $this->has_fields = false;
-        $this->method_title = __('HP_IV', 'woocommerce-heidelpay');
-        $this->method_description = __('heidelpay secured Invoice', 'woocommerce-heidelpay');
+        $this->method_title = __('HP_IVPG', 'woocommerce-heidelpay');
+        $this->method_description = __('heidelpay Invoice', 'woocommerce-heidelpay');
 
         // Load the settings.
         $this->init_form_fields();
@@ -43,6 +43,7 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
 
         // Actions
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+        add_action('woocommerce_api_' . $this->id, array($this, 'callback_handler'));
     }
 
     /**
@@ -61,14 +62,14 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
                 'title' => __('Title', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'description' => __('This controls the title which the user sees during checkout.', 'woocommerce-heidelpay'),
-                'default' => __('Secured Invoice', 'woocommerce-heidelpay'),
+                'default' => __('Invoice', 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'description' => array(
                 'title' => __('Description', 'woocommerce-heidelpay'),
                 'type' => 'textarea',
                 'description' => __('Payment method description that the customer will see on your checkout.', 'woocommerce-heidelpay'),
-                'default' => __('Insert payment data for Secured Invoice', 'woocommerce-heidelpay'),
+                'default' => __('Insert payment data for Invoice', 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'instructions' => array(
@@ -81,35 +82,35 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
             'security_sender' => array(
                 'title' => __('Security Sender', 'woocommerce-heidelpay'),
                 'type' => 'text',
-                'id' => 'hp_iv_security_sender',
+                'id' => 'hp_ivpg_security_sender',
                 'description' => 'Security Sender',
                 'default' => '31HA07BC8142C5A171745D00AD63D182'
             ),
             'user_login' => array(
                 'title' => __('User Login', 'woocommerce-heidelpay'),
                 'type' => 'text',
-                'id' => 'hp_iv_user_login',
+                'id' => 'hp_ivpg_user_login',
                 'description' => 'User Login',
                 'default' => '31ha07bc8142c5a171744e5aef11ffd3'
             ),
             'user_password' => array(
                 'title' => __('User Password', 'woocommerce-heidelpay'),
                 'type' => 'text',
-                'id' => 'hp_iv_user_password',
+                'id' => 'hp_ivpg_user_password',
                 'description' => 'User Password',
                 'default' => '93167DE7'
             ),
             'transaction_channel' => array(
                 'title' => __('Transaction Channel', 'woocommerce-heidelpay'),
                 'type' => 'text',
-                'id' => 'hp_iv_transaction_channel',
+                'id' => 'hp_ivpg_transaction_channel',
                 'description' => 'Transaction Channel',
-                'default' => '31HA07BC81895ACFE22C154CBC521922'
+                'default' => '31HA07BC8181E8CCFDAD0419C1D13E84'
             ),
             'sandbox' => array(
                 'title' => __('Sandbox', 'woocommerce-heidelpay'),
                 'type' => 'checkbox',
-                'id' => 'hp_iv_sandbox',
+                'id' => 'hp_ivpg_sandbox',
                 'label' => __('Enable sandbox mode', 'woocommerce-heidelpay'),
                 'default' => 'yes'
             ),
@@ -119,10 +120,25 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
     public function admin_options()
     {
         ?>
-        <h2><?php _e('heidelpay IV', 'woocommerce'); ?></h2>
+        <h2><?php _e('heidelpay IVPG', 'woocommerce'); ?></h2>
         <table class="form-table">
             <?php $this->generate_settings_html(); ?>
         </table> <?php
+    }
+
+    //payment form
+    public function payment_fields() {
+        echo '<div>';
+
+        echo
+        'Salutation:<select name="salutation">
+<option>Herr</option>
+<option>Frau</option>
+</select><br/>
+            Birthdate:<input type="date" name="birthdate" id="date" value="" /><br/>'
+        ;
+
+        echo '</div>';
     }
 
     /**
@@ -138,7 +154,7 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
         $order = wc_get_order($order_id);
 
         // Mark as on-hold (we're awaiting the payment)
-        $order->update_status('on-hold', __('Awaiting HP_IV payment', 'woocommerce-heidelpay'));
+        $order->update_status('on-hold', __('Awaiting HP_IVPG payment', 'woocommerce-heidelpay'));
 
         // Reduce stock levels
         wc_reduce_stock_levels($order_id);
@@ -180,6 +196,8 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
             $order->get_billing_email()     // Customer mail address
         );
 
+        $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
+
         /**
          * Set up basket or transaction information
          */
@@ -197,7 +215,8 @@ class WC_Gateway_HP_IV extends WC_Payment_Gateway
 
         //logging and debug
         $logger = wc_get_logger();
-        mail('florian.evertz@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(), 1));
+        mail('florian.evertz@heidelpay.de', 'woo-response', print_r($this->payMethod->getResponse(), 1));
+        mail('florian.evertz@heidelpay.de', 'woo-request', print_r($this->payMethod->getRequest(), 1));
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(), 1));
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->settings['security_sender'], 1));
 
