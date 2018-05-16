@@ -34,12 +34,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     abstract protected function setPayMethod();
 
-    /**
-     * Send payment request
-     * @return mixed
-     */
-    abstract protected function performRequest();
-
     public function init_form_fields()
     {
 
@@ -126,7 +120,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->setAuthentification();
         $this->setAsync();
         $this->setCustomer($order);
-        $this->setBasket($order_id);
+        $this->setBasket($order);
 
         return $this->performRequest();
     }
@@ -172,14 +166,31 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
-    protected function setBasket($order_id)
+    protected function setBasket($order)
     {
-        $order = wc_get_order($order_id);
         $this->payMethod->getRequest()->basketData(
-            $order_id, //order id
+            $order->get_id(), //order id
             $order->get_total(),                         //cart amount
             'EUR',                         // Currency code of this request
             'secret'    // A secret passphrase from your application
         );
+    }
+
+    /**
+     * Send payment request
+     * @return mixed
+     */
+    abstract protected function performRequest();
+
+    public function admin_options()
+    {
+        //$header = ;
+
+        echo '<h2>';
+        _e('heidelpay ' . strtoupper($this->id), 'woocommerce');
+        echo '</h2>';
+        echo '<table class="form-table">';
+        $this->generate_settings_html();
+        echo '</table>';
     }
 }
