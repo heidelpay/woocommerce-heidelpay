@@ -41,6 +41,8 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
 
 		// Actions
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+        //callback handler for response
+        add_action( 'woocommerce_api_' . $this->id, array( $this, 'callback_handler' ) );
 		/*add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
 		add_action( 'woocommerce_thankyou_hp_so', array( $this, 'thankyou_page' ) );
 
@@ -148,15 +150,6 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		// Mark as on-hold (we're awaiting the payment)
-		$order->update_status( 'on-hold', __( 'Awaiting HP_SO payment', 'woocommerce-heidelpay' ) );
-
-		// Reduce stock levels
-		wc_reduce_stock_levels( $order_id );
-
-		// Remove cart
-		WC()->cart->empty_cart();
-
         /**
          * Set up your authentification data for Heidepay api
          */
@@ -177,7 +170,7 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
          */
         $this->payMethod->getRequest()->async(
             'EN', // Language code for the Frame
-                'https://www.google.de/'
+            wc_get_page_id('shop') . 'wc-api' . strtolower(get_class($this)) //
             /*HEIDELPAY_PHP_PAYMENT_API_URL .
             HEIDELPAY_PHP_PAYMENT_API_FOLDER .
             'HeidelpayResponse.php'  // Response url from your application*/
@@ -217,7 +210,6 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
 
         //logging and debug
         $logger = wc_get_logger();
-        mail('david.owusu@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(),1));
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->settings['security_sender'],1));
 
@@ -233,4 +225,15 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
             ];
         }
 	}
+
+	/*
+	 * callback handler for response and push
+	 */
+    public function callback_handler() {
+
+        $response = new WC_Heidelpay_Response();
+
+        //echoes response URL
+        $response->init($_POST);
+    }
 }
