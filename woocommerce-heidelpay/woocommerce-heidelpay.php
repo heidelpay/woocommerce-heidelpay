@@ -116,20 +116,14 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 load_plugin_textdomain( 'woocommerce-heidelpay', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 
                 require_once( dirname( __FILE__ ) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php' );
-                //require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-webhook-handler.php' );
-                //require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-sepa-payment-token.php' );
                 require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay.php' );
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php' );
+                require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php' );
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php' );
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-pp.php' );
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
                 require_once( dirname( __FILE__ ) . '/includes/gateways/class-wc-heidelpay-gateway-so.php' );
                 require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-payment-request.php' );
-
-                /*
-                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-order-handler.php' );
-                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-payment-tokens.php' );
-                require_once( dirname( __FILE__ ) . '/includes/class-wc-heidelpay-customer.php' );*/
 
                 add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
                 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
@@ -141,6 +135,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
              */
             public function add_gateways( $methods ) {
                 $methods[] = 'WC_Gateway_HP_CC';
+                $methods[] = 'WC_Gateway_HP_DC';
                 $methods[] = 'WC_Gateway_HP_DD';
                 $methods[] = 'WC_Gateway_HP_PP';
                 $methods[] = 'WC_Gateway_HP_IVPG';
@@ -155,6 +150,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
             public function filter_gateway_order_admin( $sections ) {
                 //unset( $sections['heidelpay'] );
                 unset( $sections['hp_cc'] );
+                unset( $sections['hp_dc'] );
                 unset( $sections['hp_dd'] );
                 unset( $sections['hp_so'] );
                 unset( $sections['heidelpay_pp'] );
@@ -162,6 +158,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
                 //$sections['heidelpay']            = 'heidelpay';
                 $sections['hp_cc'] = __( 'heidelpay CC', 'woocommerce-heidelpay' );
+                $sections['hp_dc'] = __( 'heidelpay DC', 'woocommerce-heidelpay' );
                 $sections['hp_dd'] = __( 'heidelpay DD', 'woocommerce-heidelpay' );
                 $sections['hp_pp'] = __( 'heidelpay PP', 'woocommerce-heidelpay' );
                 $sections['hp_ivpg'] = __( 'heidelpay IVPG', 'woocommerce-heidelpay' );
