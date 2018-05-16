@@ -28,7 +28,7 @@ class WC_Gateway_HP_IVPG extends WC_Payment_Gateway
 
         $this->id = 'hp_ivpg';
         //$this->icon               = apply_filters( 'hp_ivpg_icon', '' );
-        $this->has_fields = false;
+        $this->has_fields = true;
         $this->method_title = __('HP_IVPG', 'woocommerce-heidelpay');
         $this->method_description = __('heidelpay Invoice', 'woocommerce-heidelpay');
 
@@ -127,16 +127,21 @@ class WC_Gateway_HP_IVPG extends WC_Payment_Gateway
     }
 
     //payment form
-    public function payment_fields() {
+    public function payment_fields()
+    {
         echo '<div>';
 
         echo
-        'Salutation:<select name="salutation">
-<option>Herr</option>
-<option>Frau</option>
-</select><br/>
-            Birthdate:<input type="date" name="birthdate" id="date" value="" /><br/>'
-        ;
+            '<label for="salutation">Salutation:</label>' .
+            '<select name="salutation" id="salutation">' .
+            '<option selected disabled>Anrede</option>' .
+            '<option>Herr</option>' .
+            '<option>Frau</option>' .
+            '</select>' .
+            '<br/>' .
+            '<label for="date">Birthdate:</label>' .
+            '<input type="date" name="birthdate" id="date" value="" />' .
+            '<br/>';
 
         echo '</div>';
     }
@@ -163,7 +168,7 @@ class WC_Gateway_HP_IVPG extends WC_Payment_Gateway
         wc()->cart->empty_cart();
 
         /**
-         * Set up your authentification data for Heidepay api
+         * Set up your authentication data for Heidepay api
          */
         $this->payMethod->getRequest()->authentification(
             $this->settings['security_sender'],  // SecuritySender
@@ -225,12 +230,11 @@ class WC_Gateway_HP_IVPG extends WC_Payment_Gateway
                 'result' => 'success',
                 'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
             ];
-        } else {
-            wc_add_notice(
-                __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
-                'error'
-            );
-            return null;
         }
+        wc_add_notice(
+            __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+            'error'
+        );
+        return null;
     }
 }
