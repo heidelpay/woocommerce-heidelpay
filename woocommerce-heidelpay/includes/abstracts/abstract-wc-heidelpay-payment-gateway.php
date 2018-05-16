@@ -1,218 +1,185 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+if (!defined('ABSPATH')) {
+    exit;
 }
 
-abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway {
-	const META_NAME_FEE = 'Heidelpay Fee';
-	const META_NAME_NET = 'Net Revenue From Heidelpay';
+abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
+{
 
-	/**
-	 * Check if this gateway is enabled
-	 */
-	public function is_available() {
-		if ( 'yes' === $this->enabled ) {
-			if ( ! $this->testmode && is_checkout() && ! is_ssl() ) {
-				return false;
-			}
-			if ( ! $this->secret_key || ! $this->publishable_key ) {
-				return false;
-			}
-			return true;
-		}
+    public $payMethod;
 
-		return parent::is_available();
-	}
+    public function __construct()
+    {
+        $this->has_fields = false;
 
-	/**
-	 * Allow this class and other classes to add slug keyed notices (to avoid duplication).
-	 */
-	public function add_admin_notice( $slug, $class, $message ) {
-		$this->notices[ $slug ] = array(
-			'class'   => $class,
-			'message' => $message,
-		);
-	}
+        $this->setPayMethod();
+        $this->method_title = __(strtoupper($this->id), 'woocommerce-heidelpay');
 
-	/**
-	 * Remove admin notice.
-	 */
-	public function remove_admin_notice() {
-		if ( did_action( 'woocommerce_update_options' ) ) {
-			remove_action( 'admin_notices', array( $this, 'check_environment' ) );
-		}
-	}
+        // Load the settings.
+        $this->init_form_fields();
+        $this->init_settings();
 
-	/**
-	 * Validates that the order meets the minimum order amount
-	 */
-	public function validate_minimum_order_amount( $order ) {
-		if ( $order->get_total() * 100 < WC_Heidelpay_Helper::get_minimum_amount() ) {
-			/* translators: 1) dollar amount */
-			throw new Exception( sprintf( __( 'Sorry, the minimum allowed order total is %1$s to use this payment method.', 'woocommerce-heidelpay' ), wc_price( WC_Heidelpay_Helper::get_minimum_amount() / 100 ) ) );
-		}
-	}
+        // Define user set variables
+        $this->title = $this->get_option('title');
+        $this->description = $this->get_option('description');
+        $this->instructions = $this->get_option('instructions');
 
-	/**
-	 * Builds the return URL from redirects.
-	 */
-	public function get_heidelpay_return_url( $order = null, $id = null ) {
-		if ( is_object( $order ) ) {
-			if ( empty( $id ) ) {
-				$id = uniqid();
-			}
+        // Actions
+        add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+        add_action('woocommerce_api_' . $this->id, array($this, 'callback_handler'));
+    }
 
-			$order_id = WC_Heidelpay_Helper::is_pre_30() ? $order->id : $order->get_id();
+    /**
+     * Set the id and PaymenMethod
+     */
+    abstract protected function setPayMethod();
 
-			$args = array(
-				'utm_nooverride' => '1',
-				'order_id'       => $order_id,
-			);
+    /**
+     * Send payment request
+     * @return mixed
+     */
+    abstract protected function performRequest();
 
-			return esc_url_raw( add_query_arg( $args, $this->get_return_url( $order ) ) );
-		}
+    public function init_form_fields()
+    {
 
-		return esc_url_raw( add_query_arg( array( 'utm_nooverride' => '1' ), $this->get_return_url() ) );
-	}
+        $this->form_fields = array(
+            'enabled' => array(
+                'title' => __('Enable/Disable', 'woocommerce-heidelpay'),
+                'type' => 'checkbox',
+                'label' => __('Enable Sofort', 'woocommerce-heidelpay'),
+                'default' => 'yes',
+            ),
+            'title' => array(
+                'title' => __('Title', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'description' =>
+                    __('This controls the title which the user sees during checkout.', 'woocommerce-heidelpay'),
+                'default' => __('', 'woocommerce-heidelpay'),
+                'desc_tip' => true,
+            ),
+            'description' => array(
+                'title' => __('Description', 'woocommerce-heidelpay'),
+                'type' => 'textarea',
+                'description' => __('Payment method description that the customer will see on your checkout.', 'woocommerce-heidelpay'),
+                'default' => __('Insert payment data for Sofort', 'woocommerce-heidelpay'),
+                'desc_tip' => true,
+            ),
+            'instructions' => array(
+                'title' => __('Instructions', 'woocommerce-heidelpay'),
+                'type' => 'textarea',
+                'description' => __('Instructions that will be added to the thank you page and emails.', 'woocommerce-heidelpay'),
+                'default' => 'The following acount will be billed:',
+                'desc_tip' => true,
+            ),
+            'security_sender' => array(
+                'title' => __('Security Sender', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'id' => $this->id . '_security_sender',
+                'description' => 'Security Sender',
+                'default' => ''
+            ),
+            'user_login' => array(
+                'title' => __('User Login', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'id' => $this->id . '_user_login',
+                'description' => 'User Login',
+                'default' => ''
+            ),
+            'user_password' => array(
+                'title' => __('User Password', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'id' => $this->id . '_user_password',
+                'description' => 'User Password',
+                'default' => '93167DE7'
+            ),
+            'transaction_channel' => array(
+                'title' => __('Transaction Channel', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'id' => $this->id . '_transaction_channel',
+                'description' => 'Transaction Channel',
+                'default' => ''
+            ),
+            'sandbox' => array(
+                'title' => __('Sandbox', 'woocommerce-heidelpay'),
+                'type' => 'checkbox',
+                'id' => $this->id . '_sandbox',
+                'label' => __('Enable sandbox mode', 'woocommerce-heidelpay'),
+                'default' => 'yes'
+            ),
+        );
+    }
 
-	/**
-	 * Generate the request for the payment.
-	 */
-	public function generate_payment_request( $order, $source ) {
-		$settings                          = get_option( 'woocommerce_heidelpay_settings', array() );
-		$statement_descriptor              = ! empty( $settings['statement_descriptor'] ) ? str_replace( "'", '', $settings['statement_descriptor'] ) : '';
-		$capture                           = ! empty( $settings['capture'] ) && 'yes' === $settings['capture'] ? true : false;
-		$post_data                         = array();
-		$post_data['currency']             = strtolower( $order->get_currency() );
-		$post_data['amount']               = WC_Heidelpay_Helper::get_heidelpay_amount( $order->get_total(), $post_data['currency'] );
-		$post_data['description']          = sprintf( __( '%1$s - Order %2$s', 'woocommerce-heidelpay' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ), $order->get_order_number() );
-		$billing_email      = $order->get_billing_email();
-		$billing_first_name = $order->get_billing_first_name();
-		$billing_last_name  = $order->get_billing_last_name();
+    public function process_payment($order_id)
+    {
+        $order = wc_get_order($order_id);
 
-		if ( ! empty( $billing_email ) && apply_filters( 'wc_heidelpay_send_heidelpay_receipt', false ) ) {
-			$post_data['receipt_email'] = $billing_email;
-		}
+        // Mark as on-hold (we're awaiting the payment)
+        $order->update_status('on-hold', __('Awaiting ' . strtoupper($this->id) . ' payment', 'woocommerce-heidelpay'));
 
-		$post_data['expand[]'] = 'balance_transaction';
+        // Reduce stock levels
+        wc_reduce_stock_levels($order_id);
 
-		$metadata = array(
-			__( 'customer_name', 'woocommerce-heidelpay' ) => sanitize_text_field( $billing_first_name ) . ' ' . sanitize_text_field( $billing_last_name ),
-			__( 'customer_email', 'woocommerce-heidelpay' ) => sanitize_email( $billing_email ),
-			'order_id' => $order->get_id(),
-		);
+        // Remove cart
+        //WC()->cart->empty_cart();
 
-		$post_data['metadata'] = apply_filters( 'wc_heidelpay_payment_metadata', $metadata, $order, $source );
+        $this->setAuthentification();
+        $this->setAsync();
+        $this->setCustomer($order);
+        $this->setBasket($order_id);
 
-		if ( $source->customer ) {
-			$post_data['customer'] = $source->customer;
-		}
+        return $this->performRequest();
+    }
 
-		if ( $source->source ) {
-			$post_data['source'] = $source->source;
-		}
+    /**
+     * Set up your authentification data for Heidepay api
+     */
+    protected function setAuthentification()
+    {
+        $this->payMethod->getRequest()->authentification(
+            $this->get_option('security_sender'),
+            $this->get_option('user_login'),
+            $this->get_option('user_password'),
+            $this->get_option('transaction_channel'),
+            $this->get_option('sandbox')
+        );
+    }
 
-		/**
-		 * Filter the return value of the WC_Payment_Gateway_CC::generate_payment_request.
-		 */
-		return apply_filters( 'wc_heidelpay_generate_payment_request', $post_data, $order, $source );
-	}
+    /**
+     * Set up asynchronous request parameters
+     */
+    protected function setAsync()
+    {
+        $this->payMethod->getRequest()->async(
+            'EN', // Language code for the Frame
+            'https://www.google.de/'
+        );
+    }
 
-	/**
-	 * Store extra meta data for an order from a Heidelpay Response.
-	 */
-	public function process_response( $response, $order ) {
-		WC_Heidelpay_Logger::log( 'Processing response: ' . print_r( $response, true ) );
+    protected function setCustomer($order)
+    {
+        $this->payMethod->getRequest()->customerAddress(
+            $order->get_billing_first_name(),                  // Given name
+            $order->get_billing_last_name(),           // Family name
+            $order->get_billing_company(),                     // Company Name
+            $order->get_customer_id(),                   // Customer id of your application
+            $order->get_billing_address_1() . $order->get_billing_address_2(),          // Billing address street
+            $order->get_billing_state(),                   // Billing address state
+            $order->get_billing_postcode(),                   // Billing address post code
+            $order->get_billing_city(),              // Billing address city
+            $order->get_billing_country(),                      // Billing address country code
+            $order->get_billing_email()         // Customer mail address
+        );
+    }
 
-		$order->get_id();
-
-		// Store charge data
-		$order->update_meta_data( '_heidelpay_charge_captured', $response->captured ? 'yes' : 'no' );
-
-		if ( $response->captured ) {
-			/**
-			 * Charge can be captured but in a pending state. Payment methods
-			 * that are asynchronous may take couple days to clear. Webhook will
-			 * take care of the status changes.
-			 */
-			if ( 'pending' === $response->status ) {
-				if ( ! wc_string_to_bool( get_post_meta( $order_id, '_order_stock_reduced', true ) ) ) {
-					wc_reduce_stock_levels( $order_id );
-				}
-
-				$order->set_transaction_id( $response->id );
-				/* translators: transaction id */
-				$order->update_status( 'on-hold', sprintf( __( 'Heidelpay charge awaiting payment: %s.', 'woocommerce-heidelpay' ), $response->id ) );
-			}
-
-			if ( 'succeeded' === $response->status ) {
-				$order->payment_complete( $response->id );
-
-				/* translators: transaction id */
-				$message = sprintf( __( 'Heidelpay charge complete (Charge ID: %s)', 'woocommerce-heidelpay' ), $response->id );
-				$order->add_order_note( $message );
-			}
-
-			if ( 'failed' === $response->status ) {
-				$error_msg = __( 'Payment processing failed. Please retry.', 'woocommerce-heidelpay' );
-				$order->add_order_note( $error_msg );
-				throw new Exception( $error_msg );
-			}
-		} else {
-			$order->set_transaction_id( $response->id );
-
-			if ( $order->has_status( array( 'pending', 'failed' ) ) ) {
-				wc_reduce_stock_levels( $order_id );
-			}
-
-			/* translators: transaction id */
-			$order->update_status( 'on-hold', sprintf( __( 'Heidelpay charge authorized (Charge ID: %s). Process order to take payment, or cancel to remove the pre-authorization.', 'woocommerce-heidelpay' ), $response->id ) );
-		}
-
-		if ( is_callable( array( $order, 'save' ) ) ) {
-			$order->save();
-		}
-
-		do_action( 'wc_heidelpay_process_response', $response, $order );
-
-		return $response;
-	}
-
-	/**
-	 * Sends the failed order email to admin.
-	 */
-	public function send_failed_order_email( $order_id ) {
-		$emails = WC()->mailer()->get_emails();
-		if ( ! empty( $emails ) && ! empty( $order_id ) ) {
-			$emails['WC_Email_Failed_Order']->trigger( $order_id );
-		}
-	}
-
-	/**
-	 * Get owner details.
-	 */
-	public function get_owner_details( $order ) {
-		$billing_first_name = $order->get_billing_first_name();
-		$billing_last_name  = $order->get_billing_last_name();
-
-		$details = array();
-
-		$details['name']                   = $billing_first_name . ' ' . $billing_last_name;
-		$details['email']                  = $order->get_billing_email();
-
-		$phone                             = $order->get_billing_phone();
-
-		if ( ! empty( $phone ) ) {
-			$details['phone']              = $phone;
-		}
-
-		$details['address']['line1']       = $order->get_billing_address_1();
-		$details['address']['line2']       = $order->get_billing_address_2();
-		$details['address']['state']       = $order->get_billing_state();
-		$details['address']['city']        = $order->get_billing_city();
-		$details['address']['postal_code'] = $order->get_billing_postcode();
-		$details['address']['country']     = $order->get_billing_country();
-
-		return (object) apply_filters( 'wc_heidelpay_owner_details', $details, $order );
-	}
+    protected function setBasket($order_id)
+    {
+        $order = wc_get_order($order_id);
+        $this->payMethod->getRequest()->basketData(
+            $order_id, //order id
+            $order->get_total(),                         //cart amount
+            'EUR',                         // Currency code of this request
+            'secret'    // A secret passphrase from your application
+        );
+    }
 }
