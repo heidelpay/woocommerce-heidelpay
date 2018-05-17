@@ -61,13 +61,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         echo '</div>';
     }
 
-    //payment form
-
-    public function callback_handler()
-    {
-        //callback stuff
-    }
-
     public function email_instructions($order, $sent_to_admin, $plain_text = false)
     {
         if ($this->instructions) {

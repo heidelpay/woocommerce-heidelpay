@@ -91,9 +91,13 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
 	 * callback handler for response and push
 	 */
     public function callback_handler() {
+        wc_get_logger()->debug('calback-post_data: '.print_r($_POST,1));
+
         $response = new WC_Heidelpay_Response();
 
         //echoes response URL
         $response->init($_POST, '');
+
+        wc_get_logger()->debug('callback-response'. print_r($response::$response,1));
     }
 }

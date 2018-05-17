@@ -7,12 +7,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Direct debit
  */
-require_once ( dirname(__DIR__) . '/vendor/autoload.php');
+require_once ( WC_HEIDELPAY_PLUGIN_PATH . '/vendor/autoload.php');
+
 use Heidelpay\PhpPaymentApi\Response;
 
 class WC_Heidelpay_Response {
 
     public static $response;
+
+    /*public function __construct($post_data)
+    {
+        self::$response = new Response($post_data);
+    }*/
 
     public function init (array $post_data, $secret) {
 
@@ -20,13 +26,14 @@ class WC_Heidelpay_Response {
         //TODO
         
         if ( empty( self::$response ) ) {
-            self::$response = new Heidelpay\PhpPaymentApi\Response($post_data);
-            
-            $orderId = self::$response->getIdentification()->getTransactionId();
-
+            self::$response = new Response($post_data);
             /*if (!self::$response->verifySecurityHash($secretPass, $orderId))
                 exit(); //error*/
         }
+
+        $orderId = self::$response->getIdentification()->getTransactionId();
+        wc_get_logger()->debug('callback-response' . print_r(self::$response, 1)); // TODO: remove debugging
+        wc_get_logger()->debug('callback-response' . print_r($orderId, 1));
 
         $this->handleResult($post_data, $orderId);
 
@@ -55,10 +62,13 @@ class WC_Heidelpay_Response {
 
                 //show thank you page
                 echo $order->get_checkout_order_received_url();
+            } else {
+                echo $order->get_checkout_payment_url( $on_checkout = false );
             }
 
             /* redirect customer to success page */
-            echo $this->getReturnURL($order);
+            //echo $this->getReturnURL($order);
+
 
         } elseif (self::$response->isError()) {
             $error = self::$response->getError();
@@ -66,7 +76,7 @@ class WC_Heidelpay_Response {
             //haven't really figured out error notices yet
             wc_add_notice( __('Payment error:', 'woothemes') . $error, 'error' );
 
-            echo $order->get_checkout_payment_url( $on_checkout = false );
+            echo $order->get_checkout_payment_url();
         } elseif (self::$response->isPending()) {
             //update status to on hold
             $order->update_status( 'on-hold', __( 'Awaiting payment', 'woocommerce-heidelpay' ) );
