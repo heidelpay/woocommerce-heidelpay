@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * credit card
  */
-require_once ( dirname(__DIR__) . '../../vendor/autoload.php');
 use Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod;
 
 class WC_Gateway_HP_DC extends WC_Payment_Gateway {
