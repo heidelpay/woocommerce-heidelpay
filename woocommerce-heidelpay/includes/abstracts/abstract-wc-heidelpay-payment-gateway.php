@@ -114,7 +114,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         wc_reduce_stock_levels($order_id);
 
         // Remove cart
-        //WC()->cart->empty_cart();
+        //wc()->cart->empty_cart();
 
         $this->setAuthentification();
         $this->setAsync();
@@ -188,5 +188,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         echo '<table class="form-table">';
         $this->generate_settings_html();
         echo '</table>';
+    }
+
+    public function callback_handler()
+    {
+        $response = new WC_Heidelpay_Response();
+
+        //echoes response URL
+        $response->init($_POST, '');
     }
 }
