@@ -8,113 +8,84 @@ if ( ! defined( 'ABSPATH' ) ) {
  * credit card
  */
 require_once ( dirname(__DIR__) . '../../vendor/autoload.php');
+require_once (WC_HEIDELPAY_PLUGIN_PATH.'/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
+
 use Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod;
 
-class WC_Gateway_HP_CC extends WC_Payment_Gateway {
+class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
 
 	/** @var array Array of locales */
 	public $locale;
 
-	/**
-	 * Constructor for the gateway.
-	 */
-	public function __construct() {
+    public function setPayMethod()
+    {
+        $this->payMethod = new CreditCardPaymentMethod();
+        $this->id                 = 'hp_cc';
+        $this->name = 'Credit Card';
+        $this->has_fields         = false;
+        $this->method_description = __('heidelpay credit card', 'woocommerce-heidelpay');
+    }
 
-        $this->DirectDebit = new CreditCardPaymentMethod();
+    public function payment_fields()
+    {
 
-        $this->id = 'hp_cc';
-		//$this->icon               = apply_filters('hp_cc_icon', '');
-        //$this->has_fields         = false;
-        //$this->method_title       = __( 'HP_CC', 'woocommerce-heidelpay' );
-        //$this->method_description = __( 'heidelpay credit card', 'woocommerce-heidelpay' );
+        /*wp_register_script('heidelpay-iFrame',
+            WC_HEIDELPAY_PLUGIN_URL . 'includes/js/creditCardFrame.js'
+        );*/
 
-		// Load the settings.
-		$this->init_form_fields();
-		$this->init_settings();
+        wp_enqueue_script('heidelpay-iFrame');
 
-		// Define user set variables
-		$this->title        = $this->get_option( 'title' );
-		$this->description  = $this->get_option( 'description' );
-		$this->instructions = $this->get_option( 'instructions' );
+        $this->setAuthentification();
+        $this->setAsync();
 
-		/*// HP_CC account fields shown on the thanks page and in emails
-		$this->account_details = get_option( 'woocommerce_hp_cc_accounts',
-			array(
-				array(
-					'account_name'   => $this->get_option( 'account_name' ),
-					'account_number' => $this->get_option( 'account_number' ),
-					'sort_code'      => $this->get_option( 'sort_code' ),
-					'bank_name'      => $this->get_option( 'bank_name' ),
-					'iban'           => $this->get_option( 'iban' ),
-					'bic'            => $this->get_option( 'bic' ),
-				),
-			)
-		);*/
+        $this->payMethod->registration(
+            'http://qa.heidelpay.intern',
+            // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
+            'FALSE'
+        );
 
-		/*// Actions
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_account_details' ) );
-		add_action( 'woocommerce_thankyou_hp_cc', array( $this, 'thankyou_page' ) );
+        echo '<form method="post" class="formular" id="paymentFrameForm">';
+        if ($this->payMethod->getResponse()->isSuccess()) {
+            echo '<iframe id="paymentFrameIframe" src="'
+                . $this->payMethod->getResponse()->getPaymentFormUrl()
+                . '" frameborder="0" scrolling="no" style="height:250px;"></iframe><br />';
+        } else {
+            echo get_home_url().'/wp-content/plugins/woocommerce-heidelpay/vendor/';
+            echo '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
+        }
+        echo '</form>';
+    }
 
-		// Customer Emails
-		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );*/
-	}
-
-	/**
+    /**
 	 * Initialise Gateway Settings Form Fields.
 	 */
 	public function init_form_fields() {
 
-		$this->form_fields = array(
-			'enabled' => array(
-				'title'   => __( 'Enable/Disable', 'woocommerce-heidelpay' ),
-				'type'    => 'checkbox',
-				'label'   => __( 'Enable credit card', 'woocommerce-heidelpay' ),
-				'default' => 'no',
-			),
-			'title' => array(
-				'title'       => __( 'Title', 'woocommerce-heidelpay' ),
-				'type'        => 'text',
-				'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce-heidelpay' ),
-				'default'     => __( 'credit card', 'woocommerce-heidelpay' ),
-				'desc_tip'    => true,
-			),
-			'description' => array(
-				'title'       => __( 'Description', 'woocommerce-heidelpay' ),
-				'type'        => 'textarea',
-				'description' => __( 'Payment method description that the customer will see on your checkout.', 'woocommerce-heidelpay' ),
-				'default'     => __( 'Insert payment data for direct debit', 'woocommerce-heidelpay' ),
-				'desc_tip'    => true,
-			),
-			'instructions' => array(
-				'title'       => __( 'Instructions', 'woocommerce-heidelpay' ),
-				'type'        => 'textarea',
-				'description' => __( 'Instructions that will be added to the thank you page and emails.', 'woocommerce-heidelpay' ),
-				'default'     => 'The following acount will be billed:',
-				'desc_tip'    => true,
-			),
-			'account_details' => array(
-				'type'        => 'account_details',
-			),
-		);
+        parent::init_form_fields();
 
+        $this->form_fields['description']['default'] = __('Insert payment data for '
+            . $this->name, 'woocommerce-heidelpay');
+        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');
+        $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
+        $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
+        $this->form_fields['user_password']['default'] = '93167DE7';
+        $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
 	}
 
-	/**
-	 * Output for the order received page.
-	 *
-	 * @param int $order_id
-	 */
-	public function thankyou_page( $order_id ) {
+    /**
+     * Output for the order received page.
+     *
+     * @param int $order_id
+     */
+    public function thankyou_page($order_id) {
 
-		if ( $this->instructions ) {
-			echo wpautop( wptexturize( wp_kses_post( $this->instructions ) ) );
-		}
-		$this->bank_details( $order_id );
+        if ($this->instructions) {
+            echo wpautop(wptexturize(wp_kses_post($this->instructions)));
+        }
+        $this->bank_details($order_id);
+    }
 
-	}
-
-	/**
+    /**
 	 * Add content to the WC emails.
 	 */
 	public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
@@ -125,88 +96,44 @@ class WC_Gateway_HP_CC extends WC_Payment_Gateway {
 			}
 			$this->bank_details( $order->get_id() );
 		}
-
 	}
 
-	/**
-	 * Process the payment and return the result.
-	 *
-	 * @param int $order_id
-	 * @return array
-	 */
-	public function process_payment( $order_id ) {
+    protected function performRequest()
+    {
+        $logger = wc_get_logger();
+        try {
+            $this->payMethod->registration(
+                'http://qa.heidelpay.intern',
+                'FALSE'
+            );
+        } catch(\Exception $exception) {
+            $logger->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found',1));
+            // TODO: redirect to errorpage
+        }
 
-		$order = wc_get_order( $order_id );
+        //logging and debug
+        $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
+        mail('david.owusu@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(),1));
 
-		// Mark as on-hold (we're awaiting the payment)
-		$order->update_status( 'on-hold', __( 'Awaiting HP_CC payment', 'woocommerce-heidelpay' ) );
+        if($this->payMethod->getResponse()->isSuccess()) {
+            return [
+                'result' => 'success',
+                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
+            ];
+        }
 
-		// Reduce stock levels
-		wc_reduce_stock_levels( $order_id );
+        return [
+            'result' => 'failed',
+            'redirect' => 'https://www.google.de/'
+        ];
+    }
 
-		// Remove cart
-		WC()->cart->empty_cart();
 
-        /**
-         * Set up your authentification data for Heidepay api
-         */
-        $this->CreditCard->getRequest()->authentification(
-            '31HA07BC8142C5A171745D00AD63D182',  // SecuritySender
-            '31ha07bc8142c5a171744e5aef11ffd3',  // UserLogin
-            '93167DE7',                          // UserPassword
-            '31HA07BC8142C5A171744F3D6D155865',  // TransactionChannel credit card without 3d secure
-            true                                 // Enable sandbox mode
-        );
-        /**
-         * Set up asynchronous request parameters
-         */
-        $this->CreditCard->getRequest()->async(
-            'EN', // Language code for the Frame
-            HEIDELPAY_PHP_PAYMENT_API_URL .
-            HEIDELPAY_PHP_PAYMENT_API_FOLDER .
-            'HeidelpayResponse.php'  // Response url from your application
-        );
-
-        /**
-         * Set up customer information required for risk checks
-         */
-        $this->CreditCard->getRequest()->customerAddress(
-            'Heidel',                  // Given name
-            'Berger-Payment',           // Family name,
-            null,                     // Company Name
-            '12344',                   // Customer id of your application
-            'Vagerowstr. 18',          // Billing address street
-            'DE-BW',                   // Billing address state
-            '69115',                   // Billing address post code
-            'Heidelberg',              // Billing address city
-            'DE',                      // Billing address country code
-            'support@heidelpay.com'     // Customer mail address
-        );
-
-        /**
-         * Set up basket or transaction information
-         */
-        $this->CreditCard->getRequest()->basketData(
-            '2843294932', // Reference Id of your application
-            23.12,                         // Amount of this request
-            'EUR',                         // Currency code of this request
-            '39542395235ßfsokkspreipsr'    // A secret passphrase from your application
-        );
-
-        /**
-         * Set necessary parameters for Heidelpay payment Frame and send a registration request
-         */
-        $this->CreditCard->debit(
-            HEIDELPAY_PHP_PAYMENT_API_URL,                        // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
-            'FALSE',                                   // PreventAsyncRedirect - this will tell the payment weather it should redirect the customer or not
-            HEIDELPAY_PHP_PAYMENT_API_URL .
-            HEIDELPAY_PHP_PAYMENT_API_FOLDER   // CSSPath - css url to style the Heidelpay payment frame
-        );
 
         /*
          * <html>
 <head>
-	<title>Debit card debit example</title>
+	<title>credit card debit example</title>
 </head>
 <body>
 <form method="post" class="formular" id="paymentFrameForm">
@@ -223,7 +150,5 @@ class WC_Gateway_HP_CC extends WC_Payment_Gateway {
  </body>
  </html>
 
-
          */
-	}
 }

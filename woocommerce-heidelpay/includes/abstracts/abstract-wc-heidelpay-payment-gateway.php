@@ -7,6 +7,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
 
     public $payMethod;
+    protected $name;
 
     public function __construct()
     {
@@ -40,8 +41,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     abstract protected function performRequest();
 
-    public function init_form_fields()
-    {
+    public function init_form_fields() {
 
         $this->form_fields = array(
             'enabled' => array(
@@ -62,7 +62,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'title' => __('Description', 'woocommerce-heidelpay'),
                 'type' => 'textarea',
                 'description' => __('Payment method description that the customer will see on your checkout.', 'woocommerce-heidelpay'),
-                'default' => __('Insert payment data for Sofort', 'woocommerce-heidelpay'),
+                'default' => __('', 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'instructions' => array(
@@ -110,8 +110,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
-    public function process_payment($order_id)
-    {
+    public function process_payment($order_id) {
         $order = wc_get_order($order_id);
 
         // Mark as on-hold (we're awaiting the payment)
@@ -134,8 +133,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * Set up your authentification data for Heidepay api
      */
-    protected function setAuthentification()
-    {
+    protected function setAuthentification() {
         $this->payMethod->getRequest()->authentification(
             $this->get_option('security_sender'),
             $this->get_option('user_login'),
@@ -148,16 +146,14 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * Set up asynchronous request parameters
      */
-    protected function setAsync()
-    {
+    protected function setAsync() {
         $this->payMethod->getRequest()->async(
             'EN', // Language code for the Frame
             'https://www.google.de/'
         );
     }
 
-    protected function setCustomer($order)
-    {
+    protected function setCustomer($order) {
         $this->payMethod->getRequest()->customerAddress(
             $order->get_billing_first_name(),                  // Given name
             $order->get_billing_last_name(),           // Family name
@@ -172,8 +168,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
-    protected function setBasket($order_id)
-    {
+    protected function setBasket($order_id) {
         $order = wc_get_order($order_id);
         $this->payMethod->getRequest()->basketData(
             $order_id, //order id

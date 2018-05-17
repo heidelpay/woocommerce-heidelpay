@@ -17,11 +17,13 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
 
 	/** @var array Array of locales */
 	public $locale;
+	protected $name;
 
 	public function setPayMethod()
     {
         $this->payMethod = new SofortPaymentMethod();
         $this->id                 = 'hp_so';
+        $this->name = 'Sofort';
         $this->has_fields         = false;
         $this->method_description = __('heidelpay sofort', 'woocommerce-heidelpay');
     }
@@ -33,7 +35,9 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
     {
         parent::init_form_fields();
 
-        $this->form_fields['transaction_channel']['default'] = __('Sofort', 'woocommerce-heidelpay');
+        $this->form_fields['description']['default'] = __('Insert payment data for'
+            . $this->name, 'woocommerce-heidelpay');
+        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';

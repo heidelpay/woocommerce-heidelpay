@@ -100,6 +100,10 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 add_action( 'admin_init', array( $this, 'check_environment' ) );
                 add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
                 add_action( 'plugins_loaded', array( $this, 'init' ) );
+
+                wp_register_script('heidelpay-iFrame',
+            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js'
+                );
             }
 
             /**
@@ -129,6 +133,12 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
                 add_filter( 'woocommerce_get_sections_checkout', array( $this, 'filter_gateway_order_admin' ) );
             }
+
+            /*public function enqueue_scripts() {
+
+                wp_register_script( 'creditCardFrame', WC_HEIDELPAY_PLUGIN_URL . 'includes/js/creditCardFrame.js', array( 'jquery' ), '1.0' , true );
+
+            }*/
 
             /**
              * Add the gateways to WooCommerce.
