@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Prepayment
  */
-require_once ( dirname(__DIR__) . '../../vendor/autoload.php');
 use Heidelpay\PhpPaymentApi\PaymentMethods\PrepaymentPaymentMethod;
 
 class WC_Gateway_HP_PP extends WC_Payment_Gateway {

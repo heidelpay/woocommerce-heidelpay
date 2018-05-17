@@ -3,6 +3,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once dirname(__DIR__) . '../../vendor/autoload.php';
+
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
 

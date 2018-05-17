@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Sofort
  */
-require_once ( dirname(__DIR__) . '../../vendor/autoload.php');
 require_once (WC_HEIDELPAY_PLUGIN_PATH.'/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\SofortPaymentMethod;
