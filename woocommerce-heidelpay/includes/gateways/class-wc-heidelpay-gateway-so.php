@@ -170,7 +170,7 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
          */
         $this->payMethod->getRequest()->async(
             'EN', // Language code for the Frame
-            wc_get_page_id('shop') . 'wc-api' . strtolower(get_class($this)) //
+            get_permalink( wc_get_page_id( 'shop' ) ) . '/wc-api/' . strtolower(get_class($this)) //
             /*HEIDELPAY_PHP_PAYMENT_API_URL .
             HEIDELPAY_PHP_PAYMENT_API_FOLDER .
             'HeidelpayResponse.php'  // Response url from your application*/
@@ -234,6 +234,6 @@ class WC_Gateway_HP_SO extends WC_Payment_Gateway {
         $response = new WC_Heidelpay_Response();
 
         //echoes response URL
-        $response->init($_POST);
+        $response->init($_POST, '');
     }
 }
