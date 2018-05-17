@@ -32,8 +32,11 @@ class WC_Heidelpay_Response {
         }
 
         $orderId = self::$response->getIdentification()->getTransactionId();
-        wc_get_logger()->debug('callback-response' . print_r(self::$response, 1)); // TODO: remove debugging
-        wc_get_logger()->debug('callback-response' . print_r($orderId, 1));
+        wc_get_logger()->debug('response' . print_r(self::$response, 1)); // TODO: remove debugging
+        wc_get_logger()->debug('response-order_id' . print_r($orderId, 1));
+        wc_get_logger()->debug('response-dirname' . print_r( dirname(__DIR__), 1));
+
+
 
         $this->handleResult($post_data, $orderId);
 
@@ -62,8 +65,10 @@ class WC_Heidelpay_Response {
 
                 //show thank you page
                 echo $order->get_checkout_order_received_url();
+                wc_get_logger()->debug('response-success_case: ' . print_r( $order->get_checkout_payment_url(), 1));
+
             } else {
-                echo $order->get_checkout_payment_url( $on_checkout = false );
+                echo $order->get_checkout_payment_url();
             }
 
             /* redirect customer to success page */
@@ -74,19 +79,21 @@ class WC_Heidelpay_Response {
             $error = self::$response->getError();
 
             //haven't really figured out error notices yet
-            wc_add_notice( __('Payment error:', 'woothemes') . $error, 'error' );
+            //wc_add_notice( __('Payment error:', 'woothemes') . $error, 'error' );
 
             echo $order->get_checkout_payment_url();
+            wc_get_logger()->debug('response-error_case: ' . print_r( $order->get_checkout_payment_url(), 1));
         } elseif (self::$response->isPending()) {
             //update status to on hold
             $order->update_status( 'on-hold', __( 'Awaiting payment', 'woocommerce-heidelpay' ) );
 
             //empty cart
-            WC()->cart->empty_cart();
+            wc()->cart->empty_cart();
 
             //show thank you page
             echo $order->get_checkout_order_received_url();;
         }
+
     }
 
     /*

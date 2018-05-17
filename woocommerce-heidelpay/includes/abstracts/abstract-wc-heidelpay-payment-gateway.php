@@ -207,8 +207,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     public function callback_handler()
     {
         $response = new WC_Heidelpay_Response();
-
-        //echoes response URL
-        $response->init($_POST, '');
+        if(!empty($_POST)){
+            //echoes response URL
+            $response->init($_POST, '');
+        }
     }
 }
