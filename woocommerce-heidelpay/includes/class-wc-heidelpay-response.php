@@ -7,8 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Direct debit
  */
-require_once ( WC_HEIDELPAY_PLUGIN_PATH . '/vendor/autoload.php');
-
+require_once ( dirname(__DIR__) . '/vendor/autoload.php');
 use Heidelpay\PhpPaymentApi\Response;
 
 class WC_Heidelpay_Response {
@@ -79,7 +78,7 @@ class WC_Heidelpay_Response {
             $error = self::$response->getError();
 
             //haven't really figured out error notices yet
-            //wc_add_notice( __('Payment error:', 'woothemes') . $error, 'error' );
+            wc_add_notice( __('Payment error:', 'woothemes') . $error, 'error' );
 
             echo $order->get_checkout_payment_url();
             wc_get_logger()->debug('response-error_case: ' . print_r( $order->get_checkout_payment_url(), 1));

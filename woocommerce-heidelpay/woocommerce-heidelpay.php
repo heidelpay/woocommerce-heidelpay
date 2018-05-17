@@ -107,10 +107,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 add_action('admin_init', array($this, 'check_environment'));
                 add_action('admin_notices', array($this, 'admin_notices'), 15);
                 add_action('plugins_loaded', array($this, 'init'));
-
-                wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js'
-                );
             }
 
             /**

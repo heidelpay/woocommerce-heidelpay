@@ -22,7 +22,7 @@ var targetOrigin = getDomainFromUrl($('#paymentIframe').attr('src'));
  * Get the form element
  */
 
-paymentFrameForm = document.getElementById('place_order');
+paymentFrameForm = document.getElementsByName('paymentFrameForm');
 
 
 /**
