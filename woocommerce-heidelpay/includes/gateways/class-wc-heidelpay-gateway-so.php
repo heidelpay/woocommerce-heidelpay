@@ -69,19 +69,22 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
         //logging and debug
         $logger = wc_get_logger();
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
-        $logger->log(WC_Log_Levels::DEBUG, print_r($this->settings['security_sender'],1));
+        $logger->log(WC_Log_Levels::DEBUG,
+            print_r(get_permalink( wc_get_page_id( 'shop' ) ) . 'wc-api' . strtolower(get_class($this)),1));
 
         if($this->payMethod->getResponse()->isSuccess()) {
             return [
                 'result' => 'success',
                 'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
             ];
-        } else {
-            return [
-                'result' => 'success',
-                'redirect' => 'https://www.google.de/'
-            ];
         }
+
+        wc_add_notice(
+            __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+            'error'
+        );
+
+        return null;
 	}
 
 	/*
