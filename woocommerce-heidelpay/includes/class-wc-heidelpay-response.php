@@ -24,8 +24,8 @@ class WC_Heidelpay_Response {
             
             $orderId = self::$response->getIdentification()->getTransactionId();
 
-            if (!self::$response->verifySecurityHash($secretPass, $orderId))
-                exit(); //error
+            /*if (!self::$response->verifySecurityHash($secretPass, $orderId))
+                exit(); //error*/
         }
 
         $this->handleResult($post_data, $orderId);
