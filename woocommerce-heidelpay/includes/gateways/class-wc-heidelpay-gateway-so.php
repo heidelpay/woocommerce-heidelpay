@@ -63,23 +63,31 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
         }
 
         //logging and debug
+        $logger = wc_get_logger();
         $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
-        mail('david.owusu@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(),1));
+        $logger->log(WC_Log_Levels::DEBUG, print_r($this->settings['security_sender'],1));
 
         if($this->payMethod->getResponse()->isSuccess()) {
             return [
                 'result' => 'success',
                 'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
             ];
+        } else {
+            return [
+                'result' => 'success',
+                'redirect' => 'https://www.google.de/'
+            ];
         }
+	}
 
-        return [
-            'result' => 'failed',
-            'redirect' => 'https://www.google.de/'
-        ];
-    }
-
+	/*
+	 * callback handler for response and push
+	 */
     public function callback_handler() {
-	    //callback stuff
+
+        $response = new WC_Heidelpay_Response();
+
+        //echoes response URL
+        $response->init($_POST);
     }
 }
