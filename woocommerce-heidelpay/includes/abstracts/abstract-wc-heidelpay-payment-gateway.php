@@ -35,8 +35,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function enqueue_scripts() {
         wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js',
-            array('jQuery')
+            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js'
         );
 
         wp_enqueue_script('heidelpay-iFrame');
@@ -141,7 +140,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->setCustomer($order);
         $this->setBasket($order_id);
 
-        return $this->performRequest();
+        return $this->performRequest($order_id);
     }
 
     /**
@@ -216,10 +215,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function callback_handler()
     {
+        wc_get_logger()->debug('callback-start: ' . print_r( 'callback started', 1));
+        wc_get_logger()->debug('callback-post: ' . print_r( $_POST, 1));
         $response = new WC_Heidelpay_Response();
-        if(!empty($_POST)){
-            //echoes response URL
+        if(!empty($_POST)) {
             $response->init($_POST, '');
         }
+        exit();
     }
 }
