@@ -85,9 +85,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
      */
     protected function performRequest()
     {
-        $logger = wc_get_logger();
         $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
-
 
         /**
          * Set necessary parameters for Heidelpay payment Frame and send a registration request
@@ -95,22 +93,23 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         try {
             $this->payMethod->authorize();
         } catch (Exception $e) {
-            $logger->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
             // TODO: redirect to errorpage
+            wc_add_notice(
+                __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+                'error'
+            );
+            return null;
         }
-
-        //logging and debug
-        $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(), 1));
-        $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse(), 1));
 
         if ($this->payMethod->getResponse()->isSuccess()) {
             return [
                 'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
+                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
             ];
         }
         wc_add_notice(
-            __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+            __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woothemes'),
             'error'
         );
         return null;
