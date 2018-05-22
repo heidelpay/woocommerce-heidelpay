@@ -1,16 +1,18 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
 /**
  * Direct debit
  */
-require_once ( dirname(__DIR__) . '/vendor/autoload.php');
+require_once(dirname(__DIR__) . '/vendor/autoload.php');
+
 use Heidelpay\PhpPaymentApi\Response;
 
-class WC_Heidelpay_Response {
+class WC_Heidelpay_Response
+{
 
     public static $response;
 
@@ -19,23 +21,19 @@ class WC_Heidelpay_Response {
         self::$response = new Response($post_data);
     }*/
 
-    public function init (array $post_data, $secret) {
+    public function init(array $post_data, $secret)
+    {
 
         $secretPass = 'secret';
         //TODO
-        
-        if ( empty( self::$response ) ) {
+
+        if (empty(self::$response)) {
             self::$response = new Response($post_data);
             /*if (!self::$response->verifySecurityHash($secretPass, $orderId))
                 exit(); //error*/
         }
 
         $orderId = self::$response->getIdentification()->getTransactionId();
-        wc_get_logger()->debug('response' . print_r(self::$response, 1)); // TODO: remove debugging
-        wc_get_logger()->debug('response-order_id' . print_r($orderId, 1));
-        wc_get_logger()->debug('response-dirname' . print_r( dirname(__DIR__), 1));
-
-
 
         $this->handleResult($post_data, $orderId);
 
@@ -46,60 +44,68 @@ class WC_Heidelpay_Response {
      * handle result post
      */
 
-    public function handleResult($post_data, $orderId) {
+    public function handleResult($post_data, $orderId)
+    {
 
         $uid = self::$response->getIdentification()->getUniqueId();;
 
         //$this->saveTransaction($post_data, $orderId, $uid);
 
-        $order = wc_get_order( $orderId );
+        $order = wc_get_order($orderId);
 
         if (self::$response->isSuccess()) {
             $payCode = explode('.', $post_data ['PAYMENT_CODE']);
 
             if (strtoupper($payCode [0]) != 'PP' AND strtoupper($payCode [0]) != 'IV') {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Success - no PP/IV');
 
                 //let wc take care of it
                 $order->payment_complete();
+                wc_get_logger()->log(WC_Log_Levels::INFO, 'called payment_complete()');
 
                 //show thank you page
                 echo $order->get_checkout_order_received_url();
-                wc_get_logger()->debug('response-success_case: ' . print_r( $order->get_checkout_payment_url(), 1));
+                wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_checkout_order_received_url()');
 
             } else {
-                echo $order->get_checkout_payment_url();
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Success - PP/IV');
+                echo $order->get_checkout_order_received_url();
+                wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_checkout_order_received_url()');
             }
-
             /* redirect customer to success page */
             //echo $this->getReturnURL($order);
-
-
         } elseif (self::$response->isError()) {
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Error');
             $error = self::$response->getError();
 
-            //haven't really figured out error notices yet
-            wc_add_notice( __('Payment error:', 'woothemes') . $error, 'error' );
+            wc_add_notice(
+                __('Payment error: ' . $error['message'], 'woothemes'),
+                'error'
+            );
 
-            echo $order->get_checkout_payment_url();
-            wc_get_logger()->debug('response-error_case: ' . print_r( $order->get_checkout_payment_url(), 1));
+            //haven't really figured out error notices yet
+            echo $order->get_cancel_order_url();
+            wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_cancel_order_url()');
         } elseif (self::$response->isPending()) {
             //update status to on hold
-            $order->update_status( 'on-hold', __( 'Awaiting payment', 'woocommerce-heidelpay' ) );
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Is-Pending');
+            $order->update_status('on-hold', __('Awaiting payment', 'woocommerce-heidelpay'));
 
             //empty cart
             wc()->cart->empty_cart();
 
             //show thank you page
-            echo $order->get_checkout_order_received_url();;
+            echo $order->get_checkout_order_received_url();
+            wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_checkout_order_received_url()');
         }
-
     }
 
     /*
      * handle push post
      */
-    
-    public function handlePush () {
+
+    public function handlePush()
+    {
         //TODO
     }
 
@@ -107,7 +113,8 @@ class WC_Heidelpay_Response {
      * save a transaction in the transaction table
      */
 
-    public function saveTransaction ($post_data, $orderId, $uid) {
+    public function saveTransaction($post_data, $orderId, $uid)
+    {
 
         global $wpdb;
 
