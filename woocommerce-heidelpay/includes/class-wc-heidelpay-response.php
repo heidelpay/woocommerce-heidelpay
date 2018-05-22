@@ -75,16 +75,17 @@ class WC_Heidelpay_Response
             /* redirect customer to success page */
             //echo $this->getReturnURL($order);
         } elseif (self::$response->isError()) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Error');
             $error = self::$response->getError();
 
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Error: ' . $error['message']);
+
+            //haven't really figured out error notices yet
             wc_add_notice(
                 __('Payment error: ' . $error['message'], 'woothemes'),
                 'error'
             );
 
-            //haven't really figured out error notices yet
-            echo $order->get_cancel_order_url();
+            echo $order->get_cancel_order_url_raw();
             wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_cancel_order_url()');
         } elseif (self::$response->isPending()) {
             //update status to on hold
