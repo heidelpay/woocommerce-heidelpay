@@ -128,15 +128,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $order = wc_get_order($order_id);
 
-        // Mark as on-hold (we're awaiting the payment)
-        $order->update_status('on-hold', __('Awaiting ' . strtoupper($this->id) . ' payment', 'woocommerce-heidelpay'));
-
-        // Reduce stock levels
-        wc_reduce_stock_levels($order_id);
-
-        // Remove cart
-        //wc()->cart->empty_cart();
-
         $this->setAuthentification();
         $this->setAsync();
         $this->setCustomer($order);
@@ -217,8 +208,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function callback_handler()
     {
-        wc_get_logger()->debug('callback-start: ' . print_r( 'callback started', 1));
-        wc_get_logger()->debug('callback-post: ' . print_r( $_POST, 1));
         $response = new WC_Heidelpay_Response();
         if(!empty($_POST)) {
             $response->init($_POST, '');
