@@ -79,7 +79,15 @@ class WC_Heidelpay_Response
                 'error'
             );
 
-            echo $order->get_cancel_order_url_raw();
+            //echo $order->get_cancel_order_url_raw();
+
+            echo apply_filters( 'woocommerce_get_cancel_order_url_raw', add_query_arg( array(
+                'cancel_order' => 'true',
+                'order'        => $order->get_order_key(),
+                'order_id'     => $order->get_id(),
+                '_wpnonce'     => wp_create_nonce( 'woocommerce-cancel_order' ),
+                'errorCode'    => $error['code'],
+            ), $order->get_cancel_endpoint() ) );
         } elseif (self::$response->isPending()) {
             //update status to on hold
             $order->update_status('on-hold', __('Awaiting payment', 'woocommerce-heidelpay'));
