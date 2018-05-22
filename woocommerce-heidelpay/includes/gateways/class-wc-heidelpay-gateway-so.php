@@ -55,7 +55,7 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
     public function payment_fields() {
     }
 
-    protected function performRequest()
+    protected function performRequest($order_id)
     {
         $logger = wc_get_logger();
         try {
@@ -67,9 +67,9 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
 
         //logging and debug
         $logger = wc_get_logger();
-        $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
-        $logger->log(WC_Log_Levels::DEBUG,
-            print_r(get_permalink( wc_get_page_id( 'shop' ) ) . 'wc-api' . strtolower(get_class($this)),1));
+        //$logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
+        //$logger->log(WC_Log_Levels::DEBUG,
+            //print_r(get_permalink( wc_get_page_id( 'shop' ) ) . 'wc-api' . strtolower(get_class($this)),1));
 
         if($this->payMethod->getResponse()->isSuccess()) {
             return [

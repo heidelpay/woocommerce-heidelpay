@@ -16,6 +16,20 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
 	/** @var array Array of locales */
 	public $locale;
 
+    public function __construct()
+    {
+        parent::__construct();
+        add_action('after_woocommerce_pay',  array($this,'getIFrame'));
+
+        //add_plugins_page( 'hp_card_payment', 'card payment', 'None', 'None', 'form');
+    }
+
+    public function process_payment($order_id)
+    {
+        return $this->performRequest($order_id);
+    }
+
+
     public function setPayMethod()
     {
         $this->payMethod = new CreditCardPaymentMethod();
@@ -27,17 +41,24 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
 
     public function payment_fields()
     {
+    }
 
-        /*wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . 'includes/js/creditCardFrame.js'
-        );*/
-
+    public function getIFrame()
+    {
         wp_enqueue_script('heidelpay-iFrame');
+        $order_id = wc_get_order_id_by_order_key($_GET['key']);
+        $order = wc_get_order($order_id);
 
         $this->setAuthentification();
         $this->setAsync();
+        $this->setCustomer($order);
+        $this->setBasket($order_id);
 
-        $this->payMethod->registration(
+        wc_get_logger()->debug('after_wc_pay - GET: ' . print_r($_GET, 1));
+        wc_get_logger()->debug('after_wc_pay - order_id: ' . print_r($order_id, 1));
+
+
+        $this->payMethod->debit(
             'http://qa.heidelpay.intern',
             // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
             'FALSE'
@@ -49,9 +70,10 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
                 . $this->payMethod->getResponse()->getPaymentFormUrl()
                 . '" frameborder="0" scrolling="no" style="height:250px;"></iframe><br />';
         } else {
-            echo get_home_url().'/wp-content/plugins/woocommerce-heidelpay/vendor/';
+            echo get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
             echo '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
         }
+        echo '<button type="submit">Pay Now</button>';
         echo '</form>';
     }
 
@@ -97,57 +119,14 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
 		}
 	}
 
-    protected function performRequest()
+    protected function performRequest($order_id)
     {
-        $logger = wc_get_logger();
-        try {
-            $this->payMethod->registration(
-                'http://qa.heidelpay.intern',
-                'FALSE'
-            );
-        } catch(\Exception $exception) {
-            $logger->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found',1));
-            // TODO: redirect to errorpage
-        }
+        $order = wc_get_order($order_id);
 
-        //logging and debug
-        $logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
-        mail('david.owusu@heidelpay.de', 'woo-request', print_r($this->payMethod->getResponse(),1));
-
-        if($this->payMethod->getResponse()->isSuccess()) {
-            return [
-                'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
-            ];
-        }
-
+        $order->update_status( 'pending', __( 'Awaiting payment', 'woocommerce-heidelpay' ) );
         return [
-            'result' => 'failed',
-            'redirect' => 'https://www.google.de/'
+            'result' => 'success',
+            'redirect' => $order->get_checkout_payment_url(true)
         ];
     }
-
-
-
-        /*
-         * <html>
-<head>
-	<title>credit card debit example</title>
-</head>
-<body>
-<form method="post" class="formular" id="paymentFrameForm">
-<?php
-    if ($DebitCard->getResponse()->isSuccess()) {
-        echo '<iframe id="paymentIframe" src="'.$DebitCard->getResponse()->getPaymentFormUrl().'" style="height:250px;"></iframe><br />';
-    } else {
-        echo '<pre>'. print_r($DebitCard->getResponse()->getError(), 1).'</pre>';
-    }
- ?>
- <button type="submit">Submit data</button>
- </form>
- <script type="text/javascript" src="./js/creditCardFrame.js"></script>
- </body>
- </html>
-
-         */
 }

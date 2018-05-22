@@ -83,7 +83,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
      * Send payment request
      * @return mixed
      */
-    protected function performRequest()
+    protected function performRequest($order_id)
     {
         $logger = wc_get_logger();
         $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);

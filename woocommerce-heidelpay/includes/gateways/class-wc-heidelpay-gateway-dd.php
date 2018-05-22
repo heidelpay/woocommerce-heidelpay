@@ -61,7 +61,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
      * Send payment request
      * @return mixed
      */
-    protected function performRequest()
+    protected function performRequest($order_id)
     {
         $logger = wc_get_logger();
         try {

@@ -35,7 +35,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function enqueue_scripts() {
         wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js'
+            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js',
+            [],
+        false,
+        true
         );
 
         wp_enqueue_script('heidelpay-iFrame');
@@ -199,7 +202,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * Send payment request
      * @return mixed
      */
-    abstract protected function performRequest();
+    abstract protected function performRequest($order_id);
 
     public function admin_options()
     {

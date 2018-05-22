@@ -4,35 +4,51 @@
  * DESC
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright � 2016-present heidelpay GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  * @link https://dev.heidelpay.de/JTL
- * @author Ronja Wann
+ * @author David Owusu
  * @category WOOCOMMERCE
  */
 
+/*var paymentFrameForm;
+var targetOrigin;*/
 
-var paymentFrameIframe = document.getElementById('paymentIframe');
 
 /**
  * Get hostname and protocol from paymentIframe
  */
-var targetOrigin = getDomainFromUrl($('#paymentIframe').attr('src'));
+
+jQuery(function () {
+        paymentFrameForm = document.getElementById('paymentFrameForm');
+        if(paymentFrameForm != null) {
+            console.log(paymentFrameForm);
+
+            var paymentFrameIframe = document.getElementById('paymentFrameIframe');
+
+            if (paymentFrameForm.addEventListener) {// W3C DOM
+                paymentFrameForm.addEventListener('submit', sendMessage);
+            }
+            else if (paymentFrameForm.attachEvent) { // IE DOM
+                paymentFrameForm.attachEvent('onsubmit', sendMessage);
+            }
+		}
+    }
+)
+
+
+
 
 /**
  * Get the form element
  */
 
-paymentFrameForm = document.getElementsByName('paymentFrameForm');
+
 
 
 /**
  * Add an event listener to from submit, which will execute the sendMessage function
  */
-if (paymentFrameForm.addEventListener) {// W3C DOM 
-	paymentFrameForm.addEventListener('submit', sendMessage); }
-else if (paymentFrameForm.attachEvent) { // IE DOM 
-	paymentFrameForm.attachEvent('onsubmit', sendMessage); 
-	}
+
 
 /**
  * Define send Message function
@@ -45,7 +61,7 @@ function sendMessage(e) {
 	
 	if(e.preventDefault) { e.preventDefault(); } 
 	else { e.returnValue = false; }
-	
+
 	var data = {}; 
 	
 	/**
@@ -56,6 +72,7 @@ function sendMessage(e) {
 	/**
 	 * Send html postmessage to payment frame
 	 */
+	targetOrigin = getDomainFromUrl(jQuery('#paymentFrameIframe').attr('src'));
 	paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
 }
 
