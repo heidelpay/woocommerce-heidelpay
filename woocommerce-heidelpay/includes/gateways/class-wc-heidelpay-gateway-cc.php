@@ -19,7 +19,7 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
     public function __construct()
     {
         parent::__construct();
-        add_action('after_woocommerce_pay',  array($this,'getIFrame'));
+        add_action('after_woocommerce_pay',  array($this,'after_pay'));
 
         //add_plugins_page( 'hp_card_payment', 'card payment', 'None', 'None', 'form');
     }
@@ -33,30 +33,46 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
     public function setPayMethod()
     {
         $this->payMethod = new CreditCardPaymentMethod();
-        $this->id                 = 'hp_cc';
+        $this->id   = 'hp_cc';
         $this->name = 'Credit Card';
-        $this->has_fields         = false;
         $this->method_description = __('heidelpay credit card', 'woocommerce-heidelpay');
+    }
+
+    /**
+     * Initialise Gateway Settings Form Fields.
+     */
+    public function init_form_fields() {
+
+        parent::init_form_fields();
+
+/*        $this->form_fields['description']['default'] = __('Insert payment data for '
+            . $this->name, 'woocommerce-heidelpay');
+        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');*/
+        $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
+        $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
+        $this->form_fields['user_password']['default'] = '93167DE7';
+        $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
     }
 
     public function payment_fields()
     {
     }
 
-    public function getIFrame()
-    {
-        wp_enqueue_script('heidelpay-iFrame');
+    public function after_pay() {
         $order_id = wc_get_order_id_by_order_key($_GET['key']);
         $order = wc_get_order($order_id);
+        if ($order->get_payment_method() === $this->id) {
+            $this->getIFrame($order_id, $order);
+        }
+    }
+
+    protected function getIFrame($order_id, $order) {
+        wp_enqueue_script('heidelpay-iFrame');
 
         $this->setAuthentification();
         $this->setAsync();
         $this->setCustomer($order);
         $this->setBasket($order_id);
-
-        wc_get_logger()->debug('after_wc_pay - GET: ' . print_r($_GET, 1));
-        wc_get_logger()->debug('after_wc_pay - order_id: ' . print_r($order_id, 1));
-
 
         $this->payMethod->debit(
             'http://qa.heidelpay.intern',
@@ -73,25 +89,9 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
             echo get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
             echo '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
         }
-        echo '<button type="submit">Pay Now</button>';
+        echo '<button type="submit">Jetzt bezahlen</button>';
         echo '</form>';
     }
-
-    /**
-	 * Initialise Gateway Settings Form Fields.
-	 */
-	public function init_form_fields() {
-
-        parent::init_form_fields();
-
-        $this->form_fields['description']['default'] = __('Insert payment data for '
-            . $this->name, 'woocommerce-heidelpay');
-        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');
-        $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
-        $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
-        $this->form_fields['user_password']['default'] = '93167DE7';
-        $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
-	}
 
     /**
      * Output for the order received page.
@@ -119,8 +119,7 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
 		}
 	}
 
-    protected function performRequest($order_id)
-    {
+    protected function performRequest($order_id) {
         $order = wc_get_order($order_id);
 
         $order->update_status( 'pending', __( 'Awaiting payment', 'woocommerce-heidelpay' ) );

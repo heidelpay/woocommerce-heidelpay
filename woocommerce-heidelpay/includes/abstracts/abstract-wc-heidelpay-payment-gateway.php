@@ -51,7 +51,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function init_form_fields()
     {
-
         $this->form_fields = array(
             'enabled' => array(
                 'title' => __('Enable/Disable', 'woocommerce-heidelpay'),
@@ -64,7 +63,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'type' => 'text',
                 'description' =>
                     __('This controls the title which the user sees during checkout.', 'woocommerce-heidelpay'),
-                'default' => __('', 'woocommerce-heidelpay'),
+                'default' => __($this->name, 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'description' => array(
@@ -74,7 +73,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                     'Payment method description that the customer will see on your checkout.',
                     'woocommerce-heidelpay'
                 ),
-                'default' => __('', 'woocommerce-heidelpay'),
+                'default' => __('Insert payment data for ' . $this->name, 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'instructions' => array(

@@ -126,7 +126,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 require_once(dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
                 require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
-                //require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
+                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-pp.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
@@ -154,7 +154,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             public function add_gateways($methods)
             {
                 $methods[] = 'WC_Gateway_HP_CC';
-                //$methods[] = 'WC_Gateway_HP_DC';
+                $methods[] = 'WC_Gateway_HP_DC';
                 $methods[] = 'WC_Gateway_HP_DD';
                 $methods[] = 'WC_Gateway_HP_PP';
                 $methods[] = 'WC_Gateway_HP_IVPG';
@@ -170,7 +170,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             {
                 //unset( $sections['heidelpay'] );
                 unset($sections['hp_cc']);
-                //unset($sections['hp_dc']);
+                unset($sections['hp_dc']);
                 unset($sections['hp_dd']);
                 unset($sections['hp_so']);
                 unset($sections['heidelpay_pp']);
@@ -178,7 +178,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
                 //$sections['heidelpay']            = 'heidelpay';
                 $sections['hp_cc'] = __('heidelpay CC', 'woocommerce-heidelpay');
-                //$sections['hp_dc'] = __('heidelpay DC', 'woocommerce-heidelpay');
+                $sections['hp_dc'] = __('heidelpay DC', 'woocommerce-heidelpay');
                 $sections['hp_dd'] = __('heidelpay DD', 'woocommerce-heidelpay');
                 $sections['hp_pp'] = __('heidelpay PP', 'woocommerce-heidelpay');
                 $sections['hp_ivpg'] = __('heidelpay IVPG', 'woocommerce-heidelpay');
