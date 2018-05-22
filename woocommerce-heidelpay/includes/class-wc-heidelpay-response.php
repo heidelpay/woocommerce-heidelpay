@@ -57,27 +57,21 @@ class WC_Heidelpay_Response
             $payCode = explode('.', $post_data ['PAYMENT_CODE']);
 
             if (strtoupper($payCode [0]) != 'PP' AND strtoupper($payCode [0]) != 'IV') {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Success - no PP/IV');
 
                 //let wc take care of it
                 $order->payment_complete();
-                wc_get_logger()->log(WC_Log_Levels::INFO, 'called payment_complete()');
 
                 //show thank you page
                 echo $order->get_checkout_order_received_url();
-                wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_checkout_order_received_url()');
 
             } else {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Success - PP/IV');
                 echo $order->get_checkout_order_received_url();
-                wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_checkout_order_received_url()');
             }
             /* redirect customer to success page */
             //echo $this->getReturnURL($order);
         } elseif (self::$response->isError()) {
             $error = self::$response->getError();
 
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Error: ' . $error['message']);
 
             //haven't really figured out error notices yet
             wc_add_notice(
@@ -86,10 +80,8 @@ class WC_Heidelpay_Response
             );
 
             echo $order->get_cancel_order_url_raw();
-            wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_cancel_order_url()');
         } elseif (self::$response->isPending()) {
             //update status to on hold
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Is-Pending');
             $order->update_status('on-hold', __('Awaiting payment', 'woocommerce-heidelpay'));
 
             //empty cart
@@ -97,7 +89,6 @@ class WC_Heidelpay_Response
 
             //show thank you page
             echo $order->get_checkout_order_received_url();
-            wc_get_logger()->log(WC_Log_Levels::INFO, 'echoed get_checkout_order_received_url()');
         }
     }
 
