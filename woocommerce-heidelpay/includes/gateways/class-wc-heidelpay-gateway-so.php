@@ -34,9 +34,6 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
     {
         parent::init_form_fields();
 
-        $this->form_fields['description']['default'] = __('Insert payment data for'
-            . $this->name, 'woocommerce-heidelpay');
-        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
@@ -51,25 +48,16 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
         </table> <?php
     }
 
-	//payment form
     public function payment_fields() {
     }
 
     protected function performRequest($order_id)
     {
-        $logger = wc_get_logger();
         try {
             $this->payMethod->authorize();
         } catch(\Exception $exception) {
-            $logger->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found',1));
-            // TODO: redirect to errorpage
+            wc_get_logger()->logger->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found',1));
         }
-
-        //logging and debug
-        $logger = wc_get_logger();
-        //$logger->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(),1));
-        //$logger->log(WC_Log_Levels::DEBUG,
-            //print_r(get_permalink( wc_get_page_id( 'shop' ) ) . 'wc-api' . strtolower(get_class($this)),1));
 
         if($this->payMethod->getResponse()->isSuccess()) {
             return [

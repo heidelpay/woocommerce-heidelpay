@@ -45,9 +45,6 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
 
         parent::init_form_fields();
 
-/*        $this->form_fields['description']['default'] = __('Insert payment data for '
-            . $this->name, 'woocommerce-heidelpay');
-        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');*/
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
@@ -61,6 +58,7 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
     public function after_pay() {
         $order_id = wc_get_order_id_by_order_key($_GET['key']);
         $order = wc_get_order($order_id);
+
         if ($order->get_payment_method() === $this->id) {
             $this->getIFrame($order_id, $order);
         }
@@ -74,9 +72,10 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
         $this->setCustomer($order);
         $this->setBasket($order_id);
 
+        $protocol = $_SERVER['HTTPS']?'https':'http';
+
         $this->payMethod->debit(
-            'http://qa.heidelpay.intern',
-            // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
+            $protocol.'://'.$_SERVER['SERVER_NAME'], // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
             'FALSE'
         );
 
