@@ -48,9 +48,9 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         echo
             '<label for="salutation">Salutation:</label>' .
             '<select name="salutation" id="salutation">' .
-            '<option selected disabled>Anrede</option>' .
-            '<option>Herr</option>' .
-            '<option>Frau</option>' .
+            '<option selected disabled>Salutation</option>' .
+            '<option value="MR">Mr</option>' .
+            '<option value="MRS">Mrs</option>' .
             '</select>' .
             '<br/>' .
             '<label for="date">Birthdate:</label>' .
