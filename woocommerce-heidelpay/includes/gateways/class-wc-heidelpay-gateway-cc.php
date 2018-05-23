@@ -35,7 +35,6 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_Payment_Gateway {
         $this->payMethod = new CreditCardPaymentMethod();
         $this->id   = 'hp_cc';
         $this->name = 'Credit Card';
-        $this->method_description = __('heidelpay credit card', 'woocommerce-heidelpay');
     }
 
     /**

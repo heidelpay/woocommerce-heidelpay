@@ -32,7 +32,6 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_Payment_Gateway {
         $this->payMethod = new DebitCardPaymentMethod();
         $this->id = 'hp_dc';
         $this->name = 'Debit Card';
-        $this->method_description = __('heidelpay debit card', 'woocommerce-heidelpay');
     }
 
     /**

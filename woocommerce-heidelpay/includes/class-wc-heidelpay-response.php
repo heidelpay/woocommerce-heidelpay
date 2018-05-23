@@ -16,21 +16,23 @@ class WC_Heidelpay_Response
 
     public static $response;
 
-    /*public function __construct($post_data)
-    {
-        self::$response = new Response($post_data);
-    }*/
-
     public function init(array $post_data, $secret)
     {
-
-        $secretPass = 'secret';
-        //TODO
-
         if (empty(self::$response)) {
             self::$response = new Response($post_data);
-            /*if (!self::$response->verifySecurityHash($secretPass, $orderId))
-                exit(); //error*/
+        }
+
+        $identificationTransactionId = self::$response->getIdentification()->getTransactionId();
+
+
+        try {
+            self::$response->verifySecurityHash($secret, $identificationTransactionId);
+        } catch (\Exception $exception) {
+            $callers = debug_backtrace();
+            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r("Heidelpay - " .
+                $callers [0] ['function'] . ": Invalid response hash from ".
+                $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1));
+            exit(); //error
         }
 
         $orderId = self::$response->getIdentification()->getTransactionId();

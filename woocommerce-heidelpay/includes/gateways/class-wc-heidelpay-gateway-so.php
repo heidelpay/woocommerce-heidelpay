@@ -23,8 +23,6 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
         $this->payMethod = new SofortPaymentMethod();
         $this->id                 = 'hp_so';
         $this->name = 'Sofort';
-        $this->has_fields         = false;
-        $this->method_description = __('heidelpay sofort', 'woocommerce-heidelpay');
     }
 
     /**

@@ -17,6 +17,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
         $this->setPayMethod();
         $this->method_title = __(strtoupper($this->id), 'woocommerce-heidelpay');
+        $this->method_description = __('heidelpay ' . $this->name, 'woocommerce-heidelpay');
 
         // Load the settings.
         $this->init_form_fields();
@@ -55,7 +56,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'enabled' => array(
                 'title' => __('Enable/Disable', 'woocommerce-heidelpay'),
                 'type' => 'checkbox',
-                'label' => __('Enable Sofort', 'woocommerce-heidelpay'),
+                'label' => __('Enable '. $this->name, 'woocommerce-heidelpay'),
                 'default' => 'yes',
             ),
             'title' => array(
@@ -113,6 +114,14 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'id' => $this->id . '_transaction_channel',
                 'description' => 'Transaction Channel',
                 'default' => ''
+            ),
+            'secret' => array(
+                'title' => __('Secret', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'id' => $this->id . '_secret',
+                'description' => 'A secret passphrase from your application',
+                'default' => 'secret',
+                'desc_tip' => true
             ),
             'sandbox' => array(
                 'title' => __('Sandbox', 'woocommerce-heidelpay'),
@@ -184,7 +193,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $order_id, //order id
             $order->get_total(),                         //cart amount
             'EUR',                         // Currency code of this request
-            'secret'    // A secret passphrase from your application
+            $this->get_option('secret')    // A secret passphrase from your application
         );
     }
 
@@ -196,8 +205,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function admin_options()
     {
-        //$header = ;
-
         echo '<h2>';
         _e('heidelpay ' . strtoupper($this->id), 'woocommerce');
         echo '</h2>';
@@ -210,7 +217,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $response = new WC_Heidelpay_Response();
         if(!empty($_POST)) {
-            $response->init($_POST, '');
+            $response->init($_POST, $this->get_option('secret'));
         }
         exit();
     }
