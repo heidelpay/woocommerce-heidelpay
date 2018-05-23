@@ -88,12 +88,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             }
 
             /**
-             * Flag to indicate whether or not we need to load code for / support subscriptions.
-             *
-             * @var bool
-             */
-
-            /**
              * Notices (array)
              * @var array
              */
@@ -138,26 +132,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php');
-                //require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-pp.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php');
                 require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php');
 
-                //require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-payment-request.php');
-
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
                 add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'plugin_action_links'));
                 add_filter('woocommerce_get_sections_checkout', array($this, 'filter_gateway_order_admin'));
-
-                register_activation_hook(__FILE__, 'create_table');
             }
-
-            /*public function enqueue_scripts() {
-
-                wp_register_script( 'creditCardFrame', WC_HEIDELPAY_PLUGIN_URL . 'includes/js/creditCardFrame.js', array( 'jquery' ), '1.0' , true );
-
-            }*/
 
             /**
              * Add the gateways to WooCommerce.
@@ -166,8 +148,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             {
                 $methods[] = 'WC_Gateway_HP_CC';
                 $methods[] = 'WC_Gateway_HP_DC';
-                $methods[] = 'WC_Gateway_HP_DD';
-                //$methods[] = 'WC_Gateway_HP_PP';
                 $methods[] = 'WC_Gateway_HP_IVPG';
                 $methods[] = 'WC_Gateway_HP_SO';
 
@@ -179,19 +159,13 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              */
             public function filter_gateway_order_admin($sections)
             {
-                //unset( $sections['heidelpay'] );
                 unset($sections['hp_cc']);
                 unset($sections['hp_dc']);
-                unset($sections['hp_dd']);
                 unset($sections['hp_so']);
-                //unset($sections['heidelpay_pp']);
                 unset($sections['hp_ivpg']);
 
-                //$sections['heidelpay']            = 'heidelpay';
                 $sections['hp_cc'] = __('heidelpay CC', 'woocommerce-heidelpay');
                 $sections['hp_dc'] = __('heidelpay DC', 'woocommerce-heidelpay');
-                $sections['hp_dd'] = __('heidelpay DD', 'woocommerce-heidelpay');
-                //$sections['hp_pp'] = __('heidelpay PP', 'woocommerce-heidelpay');
                 $sections['hp_ivpg'] = __('heidelpay IVPG', 'woocommerce-heidelpay');
                 $sections['hp_so'] = __('heidelpay SO', 'woocommerce-heidelpay');
 
@@ -252,36 +226,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 }
 
                 $this->_update_plugin_version();
-            }
-
-            /*
-             * create transaction table
-             *
-             */
-
-            public function create_table()
-            {
-                global $wpdb;
-
-                $table_name = $wpdb->prefix . 'heidelpay_transactions';
-
-                $charset_collate = $wpdb->get_charset_collate();
-
-                $sql = "CREATE TABLE IF NOT EXISTS `$table_name` (
-                    `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-                    `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-                    `orderid` tinytext NOT NULL,
-                    `uuid` tinytext NOT NULL,
-                    `json` text NOT NULL,
-                    PRIMARY KEY  (`id`)
-                ) $charset_collate;";
-
-                require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-                dbDelta($sql);
-
-                add_option('hp_db_version', '1.0');
-
-                mail('daniel.kraut@heidelpay.de', 'woocommerce-heidelpay 242', print_r($wpdb->print_error(), 1));
             }
 
             /**

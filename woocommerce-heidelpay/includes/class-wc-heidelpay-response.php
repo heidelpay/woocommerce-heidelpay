@@ -51,8 +51,6 @@ class WC_Heidelpay_Response
 
         $uid = self::$response->getIdentification()->getUniqueId();;
 
-        //$this->saveTransaction($post_data, $orderId, $uid);
-
         $order = wc_get_order($orderId);
 
         if (self::$response->isSuccess()) {
@@ -109,33 +107,5 @@ class WC_Heidelpay_Response
     public function handlePush()
     {
         //TODO
-    }
-
-    /*
-     * save a transaction in the transaction table
-     */
-
-    public function saveTransaction($post_data, $orderId, $uid)
-    {
-
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'heidelpay_transactions';
-
-        $json = json_encode($post_data);
-
-        $wpdb->insert(
-            $table_name, //Tabellenname
-            array(
-                'orderid' => $orderId,
-                'uid' => $uid,
-                'json' => $json
-            ),
-            array(
-                '%s',
-                '%s',
-                '%s'
-            )
-        );
     }
 }
