@@ -126,7 +126,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 load_plugin_textdomain('woocommerce-heidelpay', false, plugin_basename(dirname(__FILE__)) . '/languages');
 
                 require_once(dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
-                require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
@@ -252,23 +251,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 }
 
                 return false;
-            }
-
-            /**
-             * Adds plugin action links
-             *
-             * @since 1.0.0
-             */
-            public function plugin_action_links($links)
-            {
-                $y_link = $this->get_setting_link();
-
-                $plugin_links = array(
-                    '<a href="' . $setting_link . '">' . __('Settings', 'woocommerce-heidelpay') . '</a>',
-                    '<a href="https://docs.woocommerce.com/document/heidelpay/">' . __('Docs', 'woocommerce-heidelpay') . '</a>',
-                    '<a href="https://woocommerce.com/contact-us/">' . __('Support', 'woocommerce-heidelpay') . '</a>',
-                );
-                return array_merge($plugin_links, $links);
             }
 
             /**

@@ -10,8 +10,6 @@ Payment extension for WooCommerce
 ## NOTICE
 To use this extension please paste the folder "woocommerce-heidelpay" into your WordPress "wp-content"/plugins directory
 
-Documentation can be found at https://dev.heidelpay.com/woocommerce
-
 ## Currently supported payment methods:
 
 * credit card
