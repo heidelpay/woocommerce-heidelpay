@@ -68,7 +68,6 @@ class WC_Heidelpay_Response
                 echo $order->get_checkout_order_received_url();
             }
             /* redirect customer to success page */
-            //echo $this->getReturnURL($order);
         } elseif (self::$response->isError()) {
             $error = self::$response->getError();
 
@@ -79,7 +78,6 @@ class WC_Heidelpay_Response
                 'error'
             );
 
-            //echo $order->get_cancel_order_url_raw();
 
             echo apply_filters( 'woocommerce_get_cancel_order_url_raw', add_query_arg( array(
                 'cancel_order' => 'true',

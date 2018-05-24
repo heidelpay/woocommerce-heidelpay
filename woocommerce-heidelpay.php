@@ -5,24 +5,21 @@ if (!defined('ABSPATH')) {
 }
 
 use Heidelpay\MessageCodeMapper\MessageCodeMapper;
+
 /**
  * Plugin Name: heidelpay WooCommerce
  * Plugin URI: https://dev.heidelpay.com
  * Description: heidelpay payment integration for WooCommerce
  * Version: 1.0.0
  * Author: heidelpay
- * Author URI: http://woocommerce.com/
+ * Author URI: htts://www.heidelpay.com
  * Developer: heidelpay
  * Developer URI: https://dev.heidelpay.com
  * Text Domain: woocommerce-heidelpay
  * Domain Path: /languages
  *
- * WC requires at least: 2.2
- * WC tested up to: 2.3
- *
- * Copyright: © 2009-2015 WooCommerce.
- * License: GNU General Public License v3.0
- * License URI: http://www.gnu.org/licenses/gpl-3.0.html
+ * Copyright: © 2018 heidelpay GmbH
+ * License: see LICENSE.txt
  */
 
 /**
@@ -102,10 +99,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 add_action('admin_init', array($this, 'check_environment'));
                 add_action('admin_notices', array($this, 'admin_notices'), 15);
                 add_action('plugins_loaded', array($this, 'init'));
-                add_action('woocommerce_before_cart', array($this, 'test'));
+                add_action('woocommerce_before_cart', array($this, 'errorNotice'));
             }
 
-            public function test()
+            public function errorNotice()
             {
                 if (isset($_GET['errorCode'])) {
                     $mapper = new MessageCodeMapper();
