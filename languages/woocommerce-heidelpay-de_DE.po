@@ -13,9 +13,25 @@ msgstr ""
 "Last-Translator: DANIEL KRAUT <DANIEL.KRAUT@HEIDELPAY.DE>\n"
 "Language-Team: GERMAN\n"
 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:19
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:56
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:33
+msgid "%s"
+msgstr "%s"
+
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:20
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:220
+msgid "heidelpay %s"
+msgstr "heidelpay %s"
+
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:46
 msgid "Enable/Disable"
-msgstr "Aktivieren/Deaktivieren"
+msgstr "Aktivieren"
+
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:48
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:36
+msgid "Enable %s"
+msgstr "%s aktivieren"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:52
 msgid "Title"
@@ -33,13 +49,18 @@ msgstr "Beschreibung"
 msgid "Payment method description that the customer will see on your checkout."
 msgstr "Beschreibung der Zahlart im Checkout"
 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:66
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:34
+msgid "Insert payment data for %s"
+msgstr "Zahlungsdaten für %s einfügen"
+
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:70
 msgid "Instructions"
 msgstr "Anweisungen"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:72
 msgid "Instructions that will be added to the thank you page and emails."
-msgstr "Anweisungen für die Bestellbestätigungsseite und E-Mails"
+msgstr "Anweisungen in der Bestellbestätigungsseite und in E-Mails"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:80
 msgid "Security Sender"
@@ -70,14 +91,27 @@ msgid "Enable sandbox mode"
 msgstr "Sandbox-Modus aktivieren"
 
 #: includes/class-wc-heidelpay-response.php:91
-#: includes/gateways/class-wc-heidelpay-gateway-cc.php:123
-#: includes/gateways/class-wc-heidelpay-gateway-dc.php:121
+#: includes/gateways/class-wc-heidelpay-gateway-cc.php:37
+#: includes/gateways/class-wc-heidelpay-gateway-dc.php:122
 msgid "Awaiting payment"
 msgstr "Auf Zahlung warten"
 
+#: includes/gateways/class-wc-heidelpay-gateway-cc.php:48
+msgid "Credit Card"
+msgstr "Kreditkarte"
+
+#: includes/gateways/class-wc-heidelpay-gateway-cc.php:104
+#: includes/gateways/class-wc-heidelpay-gateway-dc.php:88
+msgid "Pay Now"
+msgstr "Jetzt bezahlen"
+
+#: includes/gateways/class-wc-heidelpay-gateway-dc.php:34
+msgid "Debit Card"
+msgstr "Debitkarte"
+
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:35
 msgid "please send the money to IBAN BIC "
-msgstr "Bitte überweisen Sie an IBAN BIC"
+msgstr "Bitte überweisen Sie an IBAN BIC "
 
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:45
 msgid "Salutation"
@@ -95,58 +129,46 @@ msgstr "Frau"
 msgid "Birthdate"
 msgstr "Geburtsdatum"
 
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:81
+msgid "Secured Invoice"
+msgstr "Versicherter Rechnungskauf"
+
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:102
-#: includes/gateways/class-wc-heidelpay-gateway-so.php:68
+#: includes/gateways/class-wc-heidelpay-gateway-so.php:60
 msgid "Payment error: "
 msgstr "Zahlungsfehler: "
 
-#: includes/gateways/class-wc-heidelpay-gateway-so.php:43
-msgid "heidelpay DD"
-msgstr "heidelpay Lastschrift"
-
-#: woocommerce-heidelpay.php:164
+#: woocommerce-heidelpay.php:161
 msgid "heidelpay CC"
 msgstr "heidelpay Kreditkarte"
 
-#: woocommerce-heidelpay.php:165
+#: woocommerce-heidelpay.php:162
 msgid "heidelpay DC"
 msgstr "heidelpay Debitkarte"
 
-#: woocommerce-heidelpay.php:166
+#: woocommerce-heidelpay.php:163
 msgid "heidelpay IVPG"
 msgstr "heidelpay Versicherter Rechnungskauf"
 
-#: woocommerce-heidelpay.php:167
+#: woocommerce-heidelpay.php:164
 msgid "heidelpay SO"
 msgstr "heidelpay Sofort"
 
-#: woocommerce-heidelpay.php:235
+#: woocommerce-heidelpay.php:232
 msgid "minimal PHP version error"
 msgstr "PHP-Version zu niedrig"
 
-#: woocommerce-heidelpay.php:241
+#: woocommerce-heidelpay.php:238
 msgid "WooCommerce plugin not activated"
 msgstr "Das WooCommerce Plug-In ist nicht aktiviert"
 
-#: woocommerce-heidelpay.php:245
+#: woocommerce-heidelpay.php:242
 msgid "minimal WC version error"
 msgstr "WooCommerce-Version zu niedrig"
 
-#: woocommerce-heidelpay.php:251
+#: woocommerce-heidelpay.php:248
 msgid "cURL is not installed."
 msgstr "cURL ist nicht installiert"
-
-#: woocommerce-heidelpay.php:267
-msgid "Settings"
-msgstr "Einstellungen"
-
-#: woocommerce-heidelpay.php:268
-msgid "Docs"
-msgstr "Dokumentation"
-
-#: woocommerce-heidelpay.php:269
-msgid "Support"
-msgstr "Support"
 
 #. Plugin Name of the plugin/theme
 msgid "heidelpay WooCommerce"
