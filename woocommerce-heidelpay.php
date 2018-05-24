@@ -105,7 +105,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             public function errorNotice()
             {
                 if (isset($_GET['errorCode'])) {
-                    $mapper = new MessageCodeMapper();
+                    $mapper = new MessageCodeMapper(get_locale());
                     $message = $mapper->getMessage($_GET['errorCode']);
                     wc_print_notice($message, 'error');
                 }
