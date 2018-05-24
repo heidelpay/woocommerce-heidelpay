@@ -166,9 +166,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     protected function setAsync()
     {
         $this->payMethod->getRequest()->async(
-            'EN', // Language code for the Frame
+            $this->getLanguage(), // Language code for the Frame
             get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))
         );
+    }
+
+    public function getLanguage() {
+        return strpos(get_locale(), 'de_')?'de':'en';
     }
 
     protected function setCustomer($order)
