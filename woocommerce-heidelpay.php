@@ -116,8 +116,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              */
             public function init()
             {
-                require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-logger.php');
-
                 // Don't hook anything else in the plugin if we're in an incompatible environment
                 if (self::get_environment_warning()) {
                     return;
