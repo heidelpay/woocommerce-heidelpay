@@ -30,11 +30,10 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     {
         parent::init_form_fields();
 
-        $title = 'Secured Invoice';
-        $this->form_fields['title']['default'] = __($title, 'woocommerce-heidelpay');
-        $this->form_fields['description']['default'] = __('Insert payment data for ' . $title, 'woocommerce-heidelpay');
-        $this->form_fields['instructions']['default'] = __('Bitte überweisen sie den Betrag innerhalb der nächsten 14 Tage an Folgendes Konto: EMPFÄNGER IBAN BIC', 'woocommerce-heidelpay');
-        $this->form_fields['enabled']['label'] = __('Enable ' . $title, 'woocommerce-heidelpay');
+        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');
+        $this->form_fields['description']['default'] = __('Insert payment data for ' . $this->name, 'woocommerce-heidelpay');
+        $this->form_fields['instructions']['default'] = __('please send the money to IBAN BIC ', 'woocommerce-heidelpay');
+        $this->form_fields['enabled']['label'] = __('Enable ' . $this->name, 'woocommerce-heidelpay');
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
@@ -43,17 +42,22 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
     public function payment_fields()
     {
+        $salutationText = __('Salutation', 'woocommerce-heidelpay');
+        $salutationMText = __('Mr', 'woocommerce-heidelpay');
+        $salutationWText = __('Mrs', 'woocommerce-heidelpay');
+        $birthdateText = __('Birthdate', 'woocommerce-heidelpay');
+
         echo '<div>';
 
         echo
-            '<label for="salutation">Salutation:</label>' .
+            '<label for="salutation">' . $salutationText . ':</label>' .
             '<select name="salutation" id="salutation">' .
-            '<option selected disabled>Salutation</option>' .
-            '<option value="MR">Mr</option>' .
-            '<option value="MRS">Mrs</option>' .
+            '<option selected disabled>' . $salutationText . '</option>' .
+            '<option value="' . $salutationMText . '">' . $salutationMText . '</option>' .
+            '<option value="' . $salutationWText . '">' . $salutationWText . '</option>' .
             '</select>' .
             '<br/>' .
-            '<label for="date">Birthdate:</label>' .
+            '<label for="date">' . $birthdateText . ':</label>' .
             '<input type="date" name="birthdate" id="date" value="" />' .
             '<br/>';
 
@@ -67,7 +71,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         }
     }
 
-
     /**
      * Set the id and PaymenMethod
      */
@@ -75,8 +78,8 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     {
         $this->payMethod = new InvoiceB2CSecuredPaymentMethod();
         $this->id = 'hp_ivpg';
+        $this->name = 'Secured Invoice';
         $this->has_fields = true;
-        $this->method_description = __('heidelpay Secured Invoice', 'woocommerce-heidelpay');
     }
 
     /**
