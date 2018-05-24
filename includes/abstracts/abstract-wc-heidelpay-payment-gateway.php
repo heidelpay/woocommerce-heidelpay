@@ -16,8 +16,8 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->has_fields = false;
 
         $this->setPayMethod();
-        $this->method_title = __(strtoupper($this->id), 'woocommerce-heidelpay');
-        $this->method_description = __('heidelpay ' . $this->name, 'woocommerce-heidelpay');
+        $this->method_title = sprintf(__('%s', 'woocommerce-heidelpay'), strtoupper($this->id));
+        $this->method_description = sprintf(__('heidelpay %s', 'woocommerce-heidelpay'), $this->name);
 
         // Load the settings.
         $this->init_form_fields();
@@ -45,7 +45,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'enabled' => array(
                 'title' => __('Enable/Disable', 'woocommerce-heidelpay'),
                 'type' => 'checkbox',
-                'label' => __('Enable ' . $this->name, 'woocommerce-heidelpay'),
+                'label' => sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name),
                 'default' => 'yes',
             ),
             'title' => array(
@@ -53,7 +53,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'type' => 'text',
                 'description' =>
                     __('This controls the title which the user sees during checkout.', 'woocommerce-heidelpay'),
-                'default' => __($this->name, 'woocommerce-heidelpay'),
+                'default' => sprintf(__('%s', 'woocommerce-heidelpay'), $this->name),
                 'desc_tip' => true,
             ),
             'description' => array(
@@ -63,7 +63,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                     'Payment method description that the customer will see on your checkout.',
                     'woocommerce-heidelpay'
                 ),
-                'default' => __('Insert payment data for ' . $this->name, 'woocommerce-heidelpay'),
+                'default' => sprintf(__('Insert payment data for %s', 'woocommerce-heidelpay'), $this->name),
                 'desc_tip' => true,
             ),
             'instructions' => array(
@@ -217,7 +217,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     public function admin_options()
     {
         echo '<h2>';
-        _e('heidelpay ' . strtoupper($this->id), 'woocommerce');
+        printf(__('heidelpay %s', 'woocommerce'), strtoupper($this->id));
         echo '</h2>';
         echo '<table class="form-table">';
         $this->generate_settings_html();

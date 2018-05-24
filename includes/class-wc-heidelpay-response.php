@@ -71,14 +71,6 @@ class WC_Heidelpay_Response
         } elseif (self::$response->isError()) {
             $error = self::$response->getError();
 
-
-            //haven't really figured out error notices yet
-            wc_add_notice(
-                __('Payment error: ' . $error['message'], 'woocommerce-heidelpay'),
-                'error'
-            );
-
-
             echo apply_filters( 'woocommerce_get_cancel_order_url_raw', add_query_arg( array(
                 'cancel_order' => 'true',
                 'order'        => $order->get_order_key(),

@@ -31,7 +31,7 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_Payment_Gateway {
     {
         $this->payMethod = new DebitCardPaymentMethod();
         $this->id = 'hp_dc';
-        $this->name = 'Debit Card';
+        $this->name = __('Debit Card', 'woocommerce-heidelpay');
     }
 
     /**
@@ -67,6 +67,7 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_Payment_Gateway {
         $this->setAsync();
         $this->setCustomer($order);
         $this->setBasket($order_id);
+        $this->setBasket($order_id);
 
         $protokoll = $protokoll = $_SERVER['HTTPS']?'https':'http';
 
@@ -84,7 +85,7 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_Payment_Gateway {
             echo get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
             echo '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
         }
-        echo '<button type="submit">Jetzt bezahlen</button>';
+        echo '<button type="submit">'. __('Pay Now', 'woocommerce-heidelpay') .'</button>';
         echo '</form>';
     }
 
