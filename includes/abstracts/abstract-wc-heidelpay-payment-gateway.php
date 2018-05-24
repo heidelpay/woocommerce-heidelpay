@@ -34,18 +34,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
     }
 
-    public function enqueue_scripts()
-    {
-        wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js',
-            [],
-            false,
-            true
-        );
-
-        wp_enqueue_script('heidelpay-iFrame');
-    }
-
     /**
      * Set the id and PaymenMethod
      */
@@ -134,6 +122,18 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    public function enqueue_scripts()
+    {
+        wp_register_script('heidelpay-iFrame',
+            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js',
+            [],
+            false,
+            true
+        );
+
+        wp_enqueue_script('heidelpay-iFrame');
+    }
+
     public function process_payment($order_id)
     {
         $order = wc_get_order($order_id);
@@ -165,14 +165,20 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function setAsync()
     {
+
+        wc_get_logger()->log(WC_Log_Levels::DEBUG, $this->getLanguage());
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
             get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))
         );
     }
 
-    public function getLanguage() {
-        return strpos(get_locale(), 'de_')?'de':'en';
+    public function getLanguage()
+    {
+        if (strpos(get_locale(), 'de_') !== false) {
+            return 'de';
+        }
+        return 'en';
     }
 
     protected function setCustomer($order)

@@ -65,7 +65,7 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
         }
 
         wc_add_notice(
-            __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+            __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
             'error'
         );
 

@@ -99,7 +99,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
             // TODO: redirect to errorpage
             wc_add_notice(
-                __('Payment error: ', 'woothemes') . $this->payMethod->getResponse()->getError()['message'],
+                __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
                 'error'
             );
             return null;
@@ -112,7 +112,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             ];
         }
         wc_add_notice(
-            __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woothemes'),
+            __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woocommerce-heidelpay'),
             'error'
         );
         return null;

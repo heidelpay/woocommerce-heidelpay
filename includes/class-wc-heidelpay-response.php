@@ -74,7 +74,7 @@ class WC_Heidelpay_Response
 
             //haven't really figured out error notices yet
             wc_add_notice(
-                __('Payment error: ' . $error['message'], 'woothemes'),
+                __('Payment error: ' . $error['message'], 'woocommerce-heidelpay'),
                 'error'
             );
 
