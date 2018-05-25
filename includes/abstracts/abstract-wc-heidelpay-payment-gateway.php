@@ -73,7 +73,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                     'Instructions that will be added to the thank you page and emails.',
                     'woocommerce-heidelpay'
                 ),
-                'default' => 'The following acount will be billed:',
+                'default' => __('The following acount will be billed:', 'woocommerce-heidelpay'),
                 'desc_tip' => true,
             ),
             'security_sender' => array(
