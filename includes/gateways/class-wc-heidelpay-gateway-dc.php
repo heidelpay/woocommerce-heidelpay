@@ -45,6 +45,8 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_Payment_Gateway {
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
+
+        $this->form_fields['bookingmode'] = $this->getBookingSelection();
     }
 
     public function payment_fields()
@@ -69,12 +71,26 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_Payment_Gateway {
         $this->setBasket($order_id);
         $this->setBasket($order_id);
 
-        $protokoll = $protokoll = $_SERVER['HTTPS']?'https':'http';
+        $protocol = $_SERVER['HTTPS'] ? 'https' : 'http';
+        $host = $protocol.'://'.$_SERVER['SERVER_NAME'];
+        $cssPath = WC_HEIDELPAY_PLUGIN_URL . '/assets/css/creditCardFrame.css';
 
-        $this->payMethod->debit(
-            $protokoll.'://'.$_SERVER['SERVER_NAME'], // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
-            'FALSE'
-        );
+
+        if($this->get_option('bookingmode') === 'PA') {
+            $this->payMethod->authorize(
+                $host, // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
+                'FALSE',
+                $cssPath
+            );
+        } else {
+            $this->payMethod->debit(
+                $host, // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
+                'FALSE',
+                $cssPath
+            );
+        }
+
+
 
         echo '<form method="post" class="formular" id="paymentFrameForm">';
         if ($this->payMethod->getResponse()->isSuccess()) {

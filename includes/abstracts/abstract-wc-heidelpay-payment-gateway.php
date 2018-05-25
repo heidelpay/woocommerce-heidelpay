@@ -7,7 +7,9 @@ require_once dirname(__DIR__) . '../../vendor/autoload.php';
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
-
+    /**
+     * @var $payMethod
+     */
     public $payMethod;
     protected $name;
 
@@ -31,7 +33,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         // Actions
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action('woocommerce_api_' . strtolower(get_class($this)), array($this, 'callback_handler'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
     }
 
     /**
@@ -122,16 +124,17 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
-    public function enqueue_scripts()
+    public function enqueue_assets()
     {
         wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/creditCardFrame.js',
+            WC_HEIDELPAY_PLUGIN_URL . '/assets/js/creditCardFrame.js',
             [],
             false,
             true
         );
-
-        wp_enqueue_script('heidelpay-iFrame');
+        /*wp_register_style('heidelpay-iFrame',
+            WC_HEIDELPAY_PLUGIN_URL . '/assets/css/creditCardFrame.css'
+        );*/
     }
 
     public function process_payment($order_id)
@@ -231,5 +234,22 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $response->init($_POST, $this->get_option('secret'));
         }
         exit();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getBookingSelection () {
+        return array(
+            'title' => __('Bookingmode', 'woocommerce-heidelpay'),
+            'type' => 'select',
+            'options' => array(
+                'DB' => __('Direct debit', 'woocommerce-heidelpay'),
+                'PA' => __('Reservation', 'woocommerce-heidelpay')
+            ),
+            'id' => $this->id . '_bookingmode',
+            'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
+            'default' => 'DB'
+        );
     }
 }
