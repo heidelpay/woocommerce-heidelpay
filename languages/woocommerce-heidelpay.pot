@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: heidelpay WooCommerce 1.0.0\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/woocommerce-"
 "heidelpay\n"
-"POT-Creation-Date: 2018-05-24 12:14:27+00:00\n"
+"POT-Creation-Date: 2018-05-25 10:47:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -60,6 +60,10 @@ msgstr ""
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:72
 msgid "Instructions that will be added to the thank you page and emails."
+msgstr ""
+
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:76
+msgid "The following acount will be billed:"
 msgstr ""
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:80

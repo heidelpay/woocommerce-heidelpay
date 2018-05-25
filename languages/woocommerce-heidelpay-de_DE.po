@@ -62,6 +62,10 @@ msgstr "Anweisungen"
 msgid "Instructions that will be added to the thank you page and emails."
 msgstr "Anweisungen in der Bestellbestätigungsseite und in E-Mails"
 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:76
+msgid "The following acount will be billed:"
+msgstr "Das folgende Konto wird belastet:"
+
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:80
 msgid "Security Sender"
 msgstr "Security Sender"
