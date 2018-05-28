@@ -38,6 +38,22 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
         $this->form_fields['transaction_channel']['default'] = '31HA07BC81856CAD6D8E05CDDE7E2AC8';
+
+        $this->form_fields['min'] = array(
+            'title' => __('Minimum Value', 'woocommerce-heidelpay'),
+            'type' => 'text',
+            'default' => 100,
+            'desc_tip' => true,
+
+        );
+
+        $this->form_fields['max'] = array(
+            'title' => __('Maxmimum Value', 'woocommerce-heidelpay'),
+            'type' => 'text',
+            'default' => 1000,
+            'desc_tip' => true,
+        );
+
     }
 
     public function payment_fields()
