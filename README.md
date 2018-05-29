@@ -15,7 +15,7 @@ To use this extension please paste the contents of the folder "woocommerce"" int
 * credit card
 * debit card
 * Sofort
-* invoice secured b2c
+* secured invoice b2c
 
 ### SYSTEM REQUIREMENTS
 
