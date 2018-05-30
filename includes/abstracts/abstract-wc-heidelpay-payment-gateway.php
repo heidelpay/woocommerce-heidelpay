@@ -32,6 +32,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action('woocommerce_api_' . strtolower(get_class($this)), array($this, 'callback_handler'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+
+        // Filter
+        add_filter('woocommerce_available_payment_gateways', array($this, 'setAvailability'));
     }
 
     /**
@@ -238,6 +241,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $response->init($_POST, $this->get_option('secret'));
         }
         exit();
+    }
+
+    public function setAvailability($available_gateways)
+    {
+        return $available_gateways;
     }
 
     protected function getBookingSelection () {

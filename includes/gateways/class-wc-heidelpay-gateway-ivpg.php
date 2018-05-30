@@ -21,8 +21,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         parent::__construct();
 
         add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
-
-        add_filter('woocommerce_available_payment_gateways', array($this, 'unsetIVPG'));
     }
 
     /**
@@ -57,7 +55,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         );
     }
 
-    public function unsetIVPG($available_gateways)
+    public function setAvailability($available_gateways)
     {
         $security = true;
         if (!empty(wc()->customer->get_billing_company())) {
@@ -76,13 +74,13 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             $security = false;
         }
 
-        if (wc()->cart->get_totals()['total'] > $this->settings['max'] ||
-            wc()->cart->get_totals()['total'] < $this->settings['min']) {
+        if (wc()->cart->get_totals()['total'] > $this->get_option('max') ||
+            wc()->cart->get_totals()['total'] < $this->get_option('min')) {
             $security = false;
         }
 
         if (!$security) {
-            unset($available_gateways['hp_ivpg']);
+            unset($available_gateways[$this->id]);
         }
         return $available_gateways;
     }
@@ -144,7 +142,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             $this->payMethod->authorize();
         } catch (Exception $e) {
             wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
-            // TODO: redirect to errorpage
+
             wc_add_notice(
                 __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
                 'error'

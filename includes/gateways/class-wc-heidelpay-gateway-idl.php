@@ -54,6 +54,10 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
      */
     public function payment_fields()
     {
+        $countries = new WC_Countries();
+
+        $billingCountry = $countries->get_address_fields( $countries->get_base_country(),'billing_');
+
         // declare text
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
         $bankNameLabel = __('Bank', 'woocommerce-heidelpay');
@@ -63,9 +67,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         $this->payMethod->authorize();
 
         $brands = (array) $this->payMethod->getResponse()->getConfig()->getBrands();
-
-       /* wc_get_logger()->log(WC_Log_Levels::DEBUG, 'form-request response: '
-            . print_r($this->payMethod->getResponse(), 1));*/
 
         echo '<div>';
         echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
@@ -83,8 +84,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
 
     protected function performRequest($order_id)
     {
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, 'post data' . print_r($_POST, 1));
-        //TODO: get bankname dynamically
         $this->payMethod->getRequest()->getAccount()->setBankName($_POST['bankname']);
 
         try {
@@ -92,8 +91,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         } catch (\Exception $exception) {
             wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found', 1));
         }
-
-        wc_get_logger()->log(WC_Log_Levels::DEBUG,'iDeal request ' . print_r( $this->payMethod->getResponse(),1));
 
         if ($this->payMethod->getResponse()->isSuccess()) {
             return [
@@ -108,6 +105,21 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         );
 
         return null;
+    }
+
+    public function setAvailability($available_gateways)
+    {
+        $available = true;
+
+        if (wc()->customer->get_billing_country() !== 'NL') {
+            $available = false;
+        }
+
+        if (!$available) {
+            unset($available_gateways[$this->id]);
+        }
+
+        return $available_gateways;
     }
 
     public function getBookingAction() {

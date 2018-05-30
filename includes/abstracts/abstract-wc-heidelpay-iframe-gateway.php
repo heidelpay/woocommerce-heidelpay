@@ -7,7 +7,6 @@ require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelp
 
 abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 {
-    public $locale;
     protected $bookingModes;
 
     public function __construct()
@@ -52,13 +51,17 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['bookingmode'] = $this->getBookingSelection();
     }
 
+    /**
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
+     */
     public function after_pay()
     {
         $order_id = wc_get_order_id_by_order_key($_GET['key']);
         $order = wc_get_order($order_id);
 
         if ($order->get_payment_method() === $this->id) {
-            $this->getIFrame($order_id, $order);
+            $this->getIFrame($order);
         }
     }
 
