@@ -155,12 +155,16 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function setAuthentification()
     {
+        $isSandbox = false;
+        if ($this->get_option('sandbox') === 'yes') {
+            $isSandbox = true;
+        }
         $this->payMethod->getRequest()->authentification(
             $this->get_option('security_sender'),
             $this->get_option('user_login'),
             $this->get_option('user_password'),
             $this->get_option('transaction_channel'),
-            $this->get_option('sandbox')
+            $isSandbox
         );
     }
 
