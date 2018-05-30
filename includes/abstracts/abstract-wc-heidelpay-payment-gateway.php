@@ -132,21 +132,29 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             false,
             true
         );
-        /*wp_register_style('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/assets/css/creditCardFrame.css'
-        );*/
     }
 
+    /**
+     * @param int $order_id
+     * @return array|mixed
+     */
     public function process_payment($order_id)
     {
         $order = wc_get_order($order_id);
+        $this->prepareRequest($order);
 
+        return $this->performRequest($order_id);
+    }
+
+    /**
+     * @param $order WC_Order
+     */
+    public function prepareRequest(WC_Order $order)
+    {
         $this->setAuthentification();
         $this->setAsync();
         $this->setCustomer($order);
-        $this->setBasket($order_id);
-
-        return $this->performRequest($order_id);
+        $this->setBasket($order->get_id());
     }
 
     /**
@@ -168,8 +176,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function setAsync()
     {
-
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, $this->getLanguage());
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
             get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))
@@ -184,7 +190,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         return 'en';
     }
 
-    protected function setCustomer($order)
+    protected function setCustomer(WC_Order $order)
     {
         $this->payMethod->getRequest()->customerAddress(
             $order->get_billing_first_name(),                  // Given name
@@ -236,16 +242,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         exit();
     }
 
-    /**
-     * @return array
-     */
     protected function getBookingSelection () {
         return array(
             'title' => __('Bookingmode', 'woocommerce-heidelpay'),
             'type' => 'select',
             'options' => array(
                 'DB' => __('Direct debit', 'woocommerce-heidelpay'),
-                'PA' => __('Reservation', 'woocommerce-heidelpay')
+                'PA' => __('Authorization', 'woocommerce-heidelpay')
             ),
             'id' => $this->id . '_bookingmode',
             'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
