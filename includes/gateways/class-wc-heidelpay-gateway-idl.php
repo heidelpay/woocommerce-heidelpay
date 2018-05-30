@@ -27,11 +27,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         $this->id = 'hp_idl';
         $this->name = __('iDeal', 'woocommerce-heidelpay');
         $this->has_fields = true;
-
-        $this->bookingModes = array(
-            'PA' => 'authorize',
-            'DB' => 'debit'
-        );
     }
 
     /**
@@ -45,8 +40,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['user_login']['default']             = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default']          = '93167DE7';
         $this->form_fields['transaction_channel']['default']    = '31HA07BC8142C5A171744B56E61281E5';
-
-        $this->form_fields['bookingmode'] = $this->getBookingSelection();
     }
 
     /**
@@ -61,6 +54,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         // declare text
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
         $bankNameLabel = __('Bank', 'woocommerce-heidelpay');
+
         // Performe Authorize request to get paymethod config
         $this->setAuthentification();
         $this->setAsync();
@@ -122,7 +116,4 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         return $available_gateways;
     }
 
-    public function getBookingAction() {
-        return $this->bookingModes[$this->get_option('bookingmode')];
-    }
 }
