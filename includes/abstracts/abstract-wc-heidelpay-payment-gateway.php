@@ -29,9 +29,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->instructions = $this->get_option('instructions');
 
         // Actions
+
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action('woocommerce_api_' . strtolower(get_class($this)), array($this, 'callback_handler'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+
     }
 
     /**
@@ -122,6 +124,8 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+
+
     public function enqueue_scripts()
     {
         wp_register_script('heidelpay-iFrame',
@@ -165,8 +169,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function setAsync()
     {
-
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, $this->getLanguage());
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
             get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))
@@ -232,4 +234,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         }
         exit();
     }
+
+
 }

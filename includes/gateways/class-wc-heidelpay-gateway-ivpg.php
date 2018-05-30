@@ -21,6 +21,8 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         parent::__construct();
 
         add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
+
+        add_filter('woocommerce_available_payment_gateways', array($this, 'unsetIVPG'));
     }
 
     /**
@@ -53,7 +55,36 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             'default' => 1000,
             'desc_tip' => true,
         );
+    }
 
+    public function unsetIVPG($available_gateways)
+    {
+        $security = true;
+        if (!empty(wc()->customer->get_billing_company())) {
+            $security = false;
+        }
+
+        if (wc()->customer->get_billing_country() !== 'DE') {
+            $security = false;
+        }
+
+        if (wc()->customer->get_billing_address_1() !== wc()->customer->get_shipping_address_1() ||
+            wc()->customer->get_billing_address_2() !== wc()->customer->get_shipping_address_2() ||
+            wc()->customer->get_billing_city() !== wc()->customer->get_shipping_city() ||
+            wc()->customer->get_billing_postcode() !== wc()->customer->get_shipping_postcode()
+        ) {
+            $security = false;
+        }
+
+        if (wc()->cart->get_totals()['total'] > $this->settings['max'] ||
+            wc()->cart->get_totals()['total'] < $this->settings['min']) {
+            $security = false;
+        }
+
+        if (!$security) {
+            unset($available_gateways['hp_ivpg']);
+        }
+        return $available_gateways;
     }
 
     public function payment_fields()
