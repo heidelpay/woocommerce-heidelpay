@@ -151,12 +151,16 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function setAuthentification()
     {
+        $isSandbox = false;
+        if ($this->get_option('sandbox') === 'yes') {
+            $isSandbox = true;
+        }
         $this->payMethod->getRequest()->authentification(
             $this->get_option('security_sender'),
             $this->get_option('user_login'),
             $this->get_option('user_password'),
             $this->get_option('transaction_channel'),
-            $this->get_option('sandbox')
+            $isSandbox
         );
     }
 
@@ -165,8 +169,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function setAsync()
     {
-
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, $this->getLanguage());
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
             get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))
