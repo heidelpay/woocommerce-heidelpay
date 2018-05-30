@@ -134,7 +134,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
                 add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'plugin_action_links'));
-                add_filter('woocommerce_get_sections_checkout', array($this, 'filter_gateway_order_admin'));
             }
 
             /**
@@ -150,28 +149,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 $methods[] = 'WC_Gateway_HP_VA';
 
                 return $methods;
-            }
-
-            /**
-             * Modifies the order of the gateways displayed in admin.
-             */
-            public function filter_gateway_order_admin($sections)
-            {
-                unset($sections['hp_cc']);
-                unset($sections['hp_dc']);
-                unset($sections['hp_idl']);
-                unset($sections['hp_ivpg']);
-                unset($sections['hp_so']);
-                unset($sections['hp_va']);
-
-                $sections['hp_cc'] = __('heidelpay CC', 'woocommerce-heidelpay');
-                $sections['hp_dc'] = __('heidelpay DC', 'woocommerce-heidelpay');
-                $sections['hp_idl'] = __('heidelpay IDL', 'woocommerce-heidelpay');
-                $sections['hp_ivpg'] = __('heidelpay IVPG', 'woocommerce-heidelpay');
-                $sections['hp_so'] = __('heidelpay SO', 'woocommerce-heidelpay');
-                $sections['hp_va'] = __('heidelpay VA', 'woocommerce-heidelpay');
-
-                return $sections;
             }
 
             /**
