@@ -149,24 +149,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             }
 
             /**
-             * Modifies the order of the gateways displayed in admin.
-             */
-            public function filter_gateway_order_admin($sections)
-            {
-                unset($sections['hp_cc']);
-                unset($sections['hp_dc']);
-                unset($sections['hp_so']);
-                unset($sections['hp_ivpg']);
-
-                $sections['hp_cc'] = __('heidelpay CC', 'woocommerce-heidelpay');
-                $sections['hp_dc'] = __('heidelpay DC', 'woocommerce-heidelpay');
-                $sections['hp_ivpg'] = __('heidelpay IVPG', 'woocommerce-heidelpay');
-                $sections['hp_so'] = __('heidelpay SO', 'woocommerce-heidelpay');
-
-                return $sections;
-            }
-
-            /**
              * The backup sanity check, in case the plugin is activated in a weird way,
              * or the environment changes after activation. Also handles upgrade routines.
              */
