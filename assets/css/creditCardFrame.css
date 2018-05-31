@@ -1,42 +1,58 @@
 #paymentFrameForm {
-    background-color: pink;
+    background: #fff;
 }
 
 .form-row {
-
+    margin: 0 0 1.5em;
+    padding: 0;
+    display: block;
 }
 
 .form-label {
+    color: #333;
+    margin-bottom: 0.5em;
+    position: relative;
+    word-wrap: break-word;
+    line-height: 1.66;
+    font: 800 15px Arial;
 
+}
+
+.form-input, .form-select{
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    display: block;
+    width: 90%;
+    box-sizing: content-box;
+    padding: 0.7em;
+    font: 400 15px Arial;
+    color: #666;
+}
+
+.form-select {
+    width: 75%;
 }
 
 .verificationInlineHintWrapper {
-
+    width: 62%;
 }
 
-.form-input fullWidth {
+.form-input fullWidth {}
 
+.form-select fullWidth {}
+
+.creditCardSymbols {}
+
+.creditCardImage {}
+
+.fillWidth {}
+
+.halfWidth{}
+
+#verificationInlineHint {
+    right: -15px;
 }
 
-.form-select fullWidth {
-
-}
-
-.creditCardSymbols {
-
-}
-
-.creditCardImage {
-
-}
-
-.fillWidth {
-
-}
-
-.halfWidth {
-
-}
 
 
 

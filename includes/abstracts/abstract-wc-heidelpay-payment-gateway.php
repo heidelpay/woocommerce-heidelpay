@@ -49,7 +49,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'title' => __('Enable/Disable', 'woocommerce-heidelpay'),
                 'type' => 'checkbox',
                 'label' => sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name),
-                'default' => 'yes',
+                'default' => 'no',
             ),
             'title' => array(
                 'title' => __('Title', 'woocommerce-heidelpay'),

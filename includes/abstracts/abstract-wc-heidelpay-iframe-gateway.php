@@ -48,6 +48,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['user_password']['default'] = '93167DE7';
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
 
+        $this->form_fields['description']['default'] = '';
         $this->form_fields['bookingmode'] = $this->getBookingSelection();
     }
 
@@ -75,10 +76,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     {
         wp_enqueue_script('heidelpay-iFrame');
 
-        $this->setAuthentification();
-        $this->setAsync();
-        $this->setCustomer($order);
-        $this->setBasket($order->get_id());
+        $this->prepareRequest($order);
 
         $protocol = $_SERVER['HTTPS'] ? 'https' : 'http';
         $host = $protocol . '://' . $_SERVER['SERVER_NAME'];
@@ -96,7 +94,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         if ($this->payMethod->getResponse()->isSuccess()) {
             echo '<iframe id="paymentFrameIframe" src="'
                 . $this->payMethod->getResponse()->getPaymentFormUrl()
-                . '" frameborder="0" scrolling="no" style="height:250px;"></iframe><br />';
+                . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
         } else {
             echo get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
             echo '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';

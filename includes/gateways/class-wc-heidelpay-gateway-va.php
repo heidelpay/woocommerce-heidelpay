@@ -70,6 +70,9 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
         return null;
     }
 
+    /**
+     * @return String get the transaction type to use for payment
+     */
     public function getBookingAction() {
         return $this->bookingModes[$this->get_option('bookingmode')];
     }
