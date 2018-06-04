@@ -1,30 +1,27 @@
 /**
- *  SUMMARY
+ * Script to handle the communication with the iFrame in order to submit the form from outside the iFrame
  *
  * DESC
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
- * @link https://dev.heidelpay.de/JTL
+ * @link https://dev.heidelpay.de/woocommerce
  * @author David Owusu
  * @category WOOCOMMERCE
  */
 
-/*var paymentFrameForm;
-var targetOrigin;*/
-
-
-/**
- * Get hostname and protocol from paymentIframe
- */
 
 jQuery(function () {
+    /**
+     * Get the form element
+     */
         paymentFrameForm = document.getElementById('paymentFrameForm');
         if(paymentFrameForm != null) {
-            console.log(paymentFrameForm);
-
             var paymentFrameIframe = document.getElementById('paymentFrameIframe');
 
+            /**
+             * Add an event listener to from submit, which will execute the sendMessage function
+             */
             if (paymentFrameForm.addEventListener) {// W3C DOM
                 paymentFrameForm.addEventListener('submit', sendMessage);
             }
@@ -34,21 +31,6 @@ jQuery(function () {
 		}
     }
 )
-
-
-
-
-/**
- * Get the form element
- */
-
-
-
-
-/**
- * Add an event listener to from submit, which will execute the sendMessage function
- */
-
 
 /**
  * Define send Message function
