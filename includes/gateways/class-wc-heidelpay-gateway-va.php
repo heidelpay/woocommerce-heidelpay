@@ -52,7 +52,7 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
         try {
             $this->payMethod->$bookingAction();
         } catch (\Exception $exception) {
-            wc_get_logger()->logger->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found', 1));
+            wc_get_logger()->logger->log(WC_Log_Levels::DEBUG, print_r('Paymentmethod not found', 1));
         }
 
         if ($this->payMethod->getResponse()->isSuccess()) {

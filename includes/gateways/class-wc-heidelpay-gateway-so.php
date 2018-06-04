@@ -37,10 +37,6 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171749CDAA43365D2';
     }
 
-    public function payment_fields()
-    {
-    }
-
     protected function performRequest($order_id)
     {
         try {

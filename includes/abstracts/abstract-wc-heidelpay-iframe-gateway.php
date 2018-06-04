@@ -5,6 +5,10 @@ if (!defined('ABSPATH')) {
 
 require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
 
+/**
+ * Class WC_Heidelpay_IFrame_Gateway
+ * Provide payment using an iFrame.
+ */
 abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 {
     protected $bookingModes;
@@ -53,6 +57,19 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
+     * register scripts and stylesheets for your payment gateway
+     */
+    public function enqueue_assets()
+    {
+        wp_register_script('heidelpay-iFrame',
+            WC_HEIDELPAY_PLUGIN_URL . '/assets/js/creditCardFrame.js',
+            [],
+            false,
+            true
+        );
+    }
+
+    /**
      * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
      */
@@ -62,15 +79,16 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $order = wc_get_order($order_id);
 
         if ($order->get_payment_method() === $this->id) {
-            $this->getIFrame($order);
+            echo $this->getIFrame($order);
         }
     }
 
     /**
-     * @param $order_id
+     * Build the Iframe and return the String
      * @param $order
      * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
+     * @return String
      */
     protected function getIFrame( WC_Order $order)
     {
@@ -90,20 +108,23 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
             $cssPath
         );
 
-        echo '<form method="post" class="formular" id="paymentFrameForm">';
+        $iFrame = '<form method="post" class="formular" id="paymentFrameForm">';
         if ($this->payMethod->getResponse()->isSuccess()) {
-            echo '<iframe id="paymentFrameIframe" src="'
+            $iFrame .=  '<iframe id="paymentFrameIframe" src="'
                 . $this->payMethod->getResponse()->getPaymentFormUrl()
                 . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
         } else {
-            echo get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
-            echo '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
+            $iFrame .= get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
+            $iFrame .= '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
         }
-        echo '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
-        echo '</form>';
+        $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
+        $iFrame .=  '</form>';
+
+        return $iFrame;
     }
 
-    public function getBookingAction() {
+    public function getBookingAction()
+    {
         return $this->bookingModes[$this->get_option('bookingmode')];
     }
 }

@@ -38,7 +38,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Set the id and PaymenMethod
+     * Set the id and PaymentMethod
      */
     abstract protected function setPayMethod();
 
@@ -125,15 +125,14 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    /**
+     * register scripts and stylesheets for your payment gateway
+     */
     public function enqueue_assets()
     {
-        wp_register_script('heidelpay-iFrame',
-            WC_HEIDELPAY_PLUGIN_URL . '/assets/js/creditCardFrame.js',
-            [],
-            false,
-            true
-        );
+
     }
+
 
     public function process_payment($order_id)
     {
@@ -152,6 +151,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->setAsync();
         $this->setCustomer($order);
         $this->setBasket($order->get_id());
+        $this->setCriterions();
     }
 
     /**
@@ -215,6 +215,22 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $order->get_total(),                         //cart amount
             'EUR',                         // Currency code of this request
             $this->get_option('secret')    // A secret passphrase from your application
+        );
+    }
+
+    /**
+     * @global string $wp_version
+     */
+    protected function setCriterions()
+    {
+        global $wp_version;
+
+        $shopType = 'WordPress: '. $wp_version . ' - ' .'WooCommerce: '. wc()->version ;
+        $this->payMethod->getRequest()->getCriterion()->set('PUSH_URL', 'push-url for testing'); //TODO insert URL
+        $this->payMethod->getRequest()->getCriterion()->set('SHOP.TYPE', $shopType);
+        $this->payMethod->getRequest()->getCriterion()->set(
+            'SHOPMODULE.VERSION',
+            'heidelpay gateway '. WC_HEIDELPAY_VERSION
         );
     }
 
