@@ -21,8 +21,8 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         parent::__construct();
 
         add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
-
         add_filter('woocommerce_available_payment_gateways', array($this, 'unsetIVPG'));
+
     }
 
     /**
@@ -41,30 +41,69 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['user_password']['default'] = '93167DE7';
         $this->form_fields['transaction_channel']['default'] = '31HA07BC81856CAD6D8E05CDDE7E2AC8';
 
+        $this->form_fields['advanced'] = array(
+            'title' => __('Advanced options', 'woocommerce-heidelpay'),
+            'type' => 'title',
+            'description' => ''
+        );
+
         $this->form_fields['min'] = array(
-            'title' => __('Minimum Value', 'woocommerce-heidelpay'),
+            'title' => __('Minimum Amount', 'woocommerce-heidelpay'),
             'type' => 'text',
             'default' => 100,
             'desc_tip' => true,
-
         );
 
         $this->form_fields['max'] = array(
-            'title' => __('Maxmimum Value', 'woocommerce-heidelpay'),
+            'title' => __('Maxmimum Amount', 'woocommerce-heidelpay'),
             'type' => 'text',
             'default' => 1000,
             'desc_tip' => true,
         );
+
+        $this->form_fields['availableCountries'] = array(
+            'title' => __('Available Countries for secured invoice', 'woocommerce-heidelpay'),
+            'type' => 'title',
+            'description' => 'Here you can enable secured Invoice for specific countries. 
+            Be aware that this will not enable the country in your WooCommerce settings 
+            and you have to enable them seperately.'
+        );
+
+        $this->form_fields['availableDE'] = array(
+            'title' => __('Enable Germany', 'woocommerce-heidelpay'),
+            'type' => 'checkbox',
+            'default' => 'yes',
+        );
+
+        $this->form_fields['availableAT'] = array(
+            'title' => __('Enable Austria', 'woocommerce-heidelpay'),
+            'type' => 'checkbox',
+            'default' => 'no',
+        );
+
+        //Switzerland not working yet
+        /*
+        $this->form_fields['availableCH'] = array(
+            'title' => __('Enable Switzerland', 'woocommerce-heidelpay'),
+            'type' => 'checkbox',
+            'default' => 'no',
+        );
+        */
     }
 
+    /**
+     * @param $available_gateways
+     * @return mixed
+     */
     public function unsetIVPG($available_gateways)
     {
         $security = true;
+
         if (!empty(wc()->customer->get_billing_company())) {
             $security = false;
         }
 
-        if (wc()->customer->get_billing_country() !== 'DE') {
+        if (!in_array(wc()->customer->get_billing_country(), $this->getEnabledCountries(), true)) {
             $security = false;
         }
 
@@ -76,8 +115,8 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             $security = false;
         }
 
-        if (wc()->cart->get_totals()['total'] > $this->settings['max'] ||
-            wc()->cart->get_totals()['total'] < $this->settings['min']) {
+        if (wc()->cart->get_totals()['total'] > $this->get_option('max') ||
+            wc()->cart->get_totals()['total'] < $this->get_option('min')) {
             $security = false;
         }
 
@@ -87,8 +126,32 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         return $available_gateways;
     }
 
+    /**
+     * This function checks which countries are enabled for secured invoice
+     * and returns an array containing these country short codes
+     *
+     * @return array
+     */
+    private function getEnabledCountries()
+    {
+        $availableCountries = array();
+
+        if ($this->get_option('availableDE') === 'yes') {
+            $availableCountries[] = 'DE';
+        }
+        if ($this->get_option('availableAT') === 'yes') {
+            $availableCountries[] = 'AT';
+        }
+        if ($this->get_option('availableCH') === 'yes') {
+            $availableCountries[] = 'CH';
+        }
+
+        return $availableCountries;
+    }
+
     public function payment_fields()
     {
+        $apiLink = get_permalink(wc_get_page_id('shop')) . 'wc-api/validation_IV';
         $salutationText = __('Salutation', 'woocommerce-heidelpay');
         $salutationMText = __('Mr', 'woocommerce-heidelpay');
         $salutationWText = __('Mrs', 'woocommerce-heidelpay');
@@ -97,18 +160,42 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         echo '<div>';
 
         echo
-            '<label for="salutation">' . $salutationText . ':</label>' .
-            '<select name="salutation" id="salutation">' .
+            '<label for="hp_salutation">' . $salutationText . ':</label>' .
+            '<select name="salutation" id="hp_salutation" class="form-row-wide">' .
             '<option selected disabled>' . $salutationText . '</option>' .
             '<option value="' . $salutationMText . '">' . $salutationMText . '</option>' .
             '<option value="' . $salutationWText . '">' . $salutationWText . '</option>' .
             '</select>' .
             '<br/>' .
-            '<label for="date">' . $birthdateText . ':</label>' .
-            '<input type="date" name="birthdate" id="date" value="" />' .
+            '<label for="hp_date">' . $birthdateText . ':</label>' .
+            '<input type="date" name="birthdate" id="hp_date" value="" class="form-row-wide"/>' .
             '<br/>';
 
         echo '</div>';
+        echo '<script>
+                var date_input = document.getElementById("hp_date");
+                
+                date_input.reportValidity = function() {
+                    var inputDate = this.valueAsDate;
+                    var currentDate = new Date();
+                    if(new Date(currentDate-inputDate).getFullYear() - new Date(0).getFullYear() < 18){
+                        console.log("i dun know what to do D:");
+                        return false;
+                    }
+                    return true;
+                };
+                
+                date_input.onchange = function () {
+                    //Dieser Block wird zwar nicht ignoriert
+                    //aber sämtliche Validity Bubbles werden von Wordpress/woocommerce verschluckt
+                    if(!this.reportValidity()){
+                        this.validationError = "blögh";
+                        this.validationMessage ="noch mehr blögh" ;
+                        this.setCustomValidity("tot");
+                        this.valid = false;
+                    }
+                };
+              </script>';
     }
 
     public function email_instructions($order, $sent_to_admin, $plain_text = false)
@@ -131,35 +218,45 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
     /**
      * Send payment request
+     * @param $order_id
      * @return mixed
      */
     protected function performRequest($order_id)
     {
+        $order = wc_get_order($order_id);
         $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
 
-        /**
-         * Set necessary parameters for Heidelpay payment Frame and send a registration request
-         */
-        try {
-            $this->payMethod->authorize();
-        } catch (Exception $e) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
-            // TODO: redirect to errorpage
+        if ($order->get_billing_company() === '') {
+            /**
+             * Set necessary parameters for Heidelpay payment Frame and send a registration request
+             */
+            try {
+                $this->payMethod->authorize();
+            } catch (Exception $e) {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
+                // TODO: redirect to errorpage
+                wc_add_notice(
+                    __('Payment error: ', 'woocommerce-heidelpay') .
+                    $this->payMethod->getResponse()->getError()['message'],
+                    'error'
+                );
+                return null;
+            }
+
+            if ($this->payMethod->getResponse()->isSuccess()) {
+                return [
+                    'result' => 'success',
+                    'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
+                ];
+            }
             wc_add_notice(
-                __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
+                __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woocommerce-heidelpay'),
                 'error'
             );
             return null;
         }
-
-        if ($this->payMethod->getResponse()->isSuccess()) {
-            return [
-                'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
-            ];
-        }
         wc_add_notice(
-            __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woocommerce-heidelpay'),
+            __('You are not allowed to use secured invoice with a company name', 'woocommerce-heidelpay'),
             'error'
         );
         return null;
