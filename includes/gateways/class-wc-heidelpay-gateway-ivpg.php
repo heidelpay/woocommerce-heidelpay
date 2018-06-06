@@ -151,7 +151,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
     public function payment_fields()
     {
-        $apiLink = get_permalink(wc_get_page_id('shop')) . 'wc-api/validation_IV';
         $salutationText = __('Salutation', 'woocommerce-heidelpay');
         $salutationMText = __('Mr', 'woocommerce-heidelpay');
         $salutationWText = __('Mrs', 'woocommerce-heidelpay');
@@ -161,14 +160,14 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
         echo
             '<label for="hp_salutation">' . $salutationText . ':</label>' .
-            '<select name="salutation" id="hp_salutation" class="form-row-wide">' .
+            '<select name="salutation" id="hp_salutation" class="form-row-wide validate-required">' .
             '<option selected disabled>' . $salutationText . '</option>' .
             '<option value="' . $salutationMText . '">' . $salutationMText . '</option>' .
             '<option value="' . $salutationWText . '">' . $salutationWText . '</option>' .
             '</select>' .
             '<br/>' .
             '<label for="hp_date">' . $birthdateText . ':</label>' .
-            '<input type="date" name="birthdate" id="hp_date" value="" class="form-row-wide"/>' .
+            '<input type="date" name="birthdate" id="hp_date" value="" class="form-row-wide validate-required"/>' .
             '<br/>';
 
         echo '</div>';
@@ -179,23 +178,30 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
                     var inputDate = this.valueAsDate;
                     var currentDate = new Date();
                     if(new Date(currentDate-inputDate).getFullYear() - new Date(0).getFullYear() < 18){
-                        console.log("i dun know what to do D:");
                         return false;
                     }
                     return true;
                 };
                 
                 date_input.onchange = function () {
-                    //Dieser Block wird zwar nicht ignoriert
-                    //aber sämtliche Validity Bubbles werden von Wordpress/woocommerce verschluckt
-                    if(!this.reportValidity()){
-                        this.validationError = "blögh";
-                        this.validationMessage ="noch mehr blögh" ;
-                        this.setCustomValidity("tot");
-                        this.valid = false;
+                    if(!this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] == undefined){
+                        jQuery("form[name=checkout]").prepend(\''. $this->ErrorHtml().'\');
+                        jQuery("ul[class=woocommerce-error]")[0].scrollIntoView({behavior : "smooth"})
+                    }else{
+                        if(this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] !== undefined){
+                            jQuery("ul[class=woocommerce-error]").remove();
+                        }
                     }
                 };
               </script>';
+    }
+
+    public function ErrorHtml()
+    {
+        $errorText = __('You have to be at least 18 years old in order to use secured invoice', 'woocommerce-heidelpay');
+        return '<ul class="woocommerce-error" role="alert">'.
+            '<li>'. $errorText . '</li>' .
+            '</ul>';
     }
 
     public function email_instructions($order, $sent_to_admin, $plain_text = false)
