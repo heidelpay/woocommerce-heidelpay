@@ -22,7 +22,33 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
         add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
         add_filter('woocommerce_available_payment_gateways', array($this, 'unsetIVPG'));
+        add_action('woocommerce_after_checkout_validation', array($this, 'validateInvoice'));
+    }
 
+    public function validateInvoice()
+    {
+        if (!$this->is18($_POST['birthdate']) || empty($_POST['birthdate'])) {
+            wc_add_notice(
+                __('You have to be at least 18 years old in order to use secured invoice', 'woocommerce-heidelpay'),
+                'error'
+            );
+        }
+        if(empty($_POST['salutation'])){
+            wc_add_notice(
+                __('You have to enter your salutation', 'woocommerce-heidelpay'),
+                'error'
+            );
+        }
+    }
+
+    private function is18($given)
+    {
+        $given = strtotime($given);
+        $min = strtotime('+18 years', $given);
+        if (time() < $min) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -185,7 +211,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
                 
                 date_input.onchange = function () {
                     if(!this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] == undefined){
-                        jQuery("form[name=checkout]").prepend(\''. $this->ErrorHtml().'\');
+                        jQuery("form[name=checkout]").prepend(\'' . $this->ErrorHtml() . '\');
                         jQuery("ul[class=woocommerce-error]")[0].scrollIntoView({behavior : "smooth"})
                     }else{
                         if(this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] !== undefined){
@@ -199,8 +225,8 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     public function ErrorHtml()
     {
         $errorText = __('You have to be at least 18 years old in order to use secured invoice', 'woocommerce-heidelpay');
-        return '<ul class="woocommerce-error" role="alert">'.
-            '<li>'. $errorText . '</li>' .
+        return '<ul class="woocommerce-error" role="alert">' .
+            '<li>' . $errorText . '</li>' .
             '</ul>';
     }
 
