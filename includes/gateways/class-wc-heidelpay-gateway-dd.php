@@ -5,25 +5,56 @@ if (!defined('ABSPATH')) {
 /**
  * Direct debit
  */
+
+/**
+ * Plugin Name: heidelpay WooCommerce
+ * Plugin URI: https://dev.heidelpay.com
+ * Description: heidelpay payment integration for WooCommerce
+ * Author: heidelpay
+ * Author URI: htts://www.heidelpay.com
+ * Developer: heidelpay
+ * Developer URI: https://dev.heidelpay.com
+ * Text Domain: woocommerce-heidelpay
+ *
+ * Copyright: © 2018 heidelpay GmbH
+ * License: see LICENSE.txt
+ */
 require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
+
 use Heidelpay\PhpPaymentApi\PaymentMethods\DirectDebitPaymentMethod;
+
 class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
 {
     /** @var array Array of locales */
     public $locale;
+
     /**
      * Initialise Gateway Settings Form Fields.
      */
     public function init_form_fields()
     {
         parent::init_form_fields();
-        $this->form_fields['description']['default'] = __('Insert payment data for'
-            . $this->name, 'woocommerce-heidelpay');
-        $this->form_fields['title']['default'] = __($this->name, 'woocommerce-heidelpay');
+
+        $this->form_fields['title']['default'] = sprintf(__('%s', 'woocommerce-heidelpay'), $this->name);
+        $this->form_fields['description']['default'] = sprintf(__('Insert payment data for %s', 'woocommerce-heidelpay'), $this->name);
+        $this->form_fields['enabled']['label'] = sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
-        $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
+        $this->form_fields['transaction_channel']['default'] = '31HA07BC81856CAD6D8E05CDDE7E2AC8';
+
+        $this->form_fields['advanced'] = array(
+            'title' => __('Advanced options', 'woocommerce-heidelpay'),
+            'type' => 'title',
+            'description' => ''
+        );
+
+        $this->form_fields['min'] = array(
+            'title' => __('Minimum Amount', 'woocommerce-heidelpay'),
+            'type' => 'text',
+            'default' => 1,
+            'desc_tip' => true,
+        );
     }
 
     public function payment_fields()
@@ -56,8 +87,17 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
      */
     protected function performRequest($order_id)
     {
-        $this->payMethod->getRequest()->getAccount()->setHolder($_POST['holder']);
-        $this->payMethod->getRequest()->getAccount()->setIban($_POST['iban']);
+        if (isset($_POST['holder'] && isset($_POST['iban'])) {
+            $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['holder']));
+            $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['iban']));
+        } else {
+            wc_add_notice(
+                __('Payment error: ', 'woocommerce-heidelpay') . 'Not all fields set',
+                'error'
+            );
+            return null;
+        }
+
 
         /**
          * Set necessary parameters for Heidelpay payment Frame and send a registration request
@@ -65,8 +105,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         try {
             $this->payMethod->debit();
         } catch (Exception $e) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
-            // TODO: redirect to errorpage
             wc_add_notice(
                 __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
                 'error'
