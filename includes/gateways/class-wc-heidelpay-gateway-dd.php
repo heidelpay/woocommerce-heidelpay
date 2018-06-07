@@ -41,7 +41,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
-        $this->form_fields['transaction_channel']['default'] = '31HA07BC81856CAD6D8E05CDDE7E2AC8';
+        $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
 
         $this->form_fields['advanced'] = array(
             'title' => __('Advanced options', 'woocommerce-heidelpay'),
@@ -81,13 +81,14 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $this->has_fields = true;
         $this->name = __('Direct Debit', 'woocommerce-heidelpay');
     }
+
     /**
      * Send payment request
      * @return mixed
      */
     protected function performRequest($order_id)
     {
-        if (isset($_POST['holder'] && isset($_POST['iban'])) {
+        if (isset($_POST['holder']) && isset($_POST['iban'])) {
             $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['holder']));
             $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['iban']));
         } else {
