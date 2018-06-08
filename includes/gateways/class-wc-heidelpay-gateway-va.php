@@ -45,35 +45,12 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['bookingmode'] = $this->getBookingSelection();
     }
 
-    protected function performRequest($order_id)
-    {
-        $bookingAction = $this->getBookingAction();
 
-        try {
-            $this->payMethod->$bookingAction();
-        } catch (\Exception $exception) {
-            wc_get_logger()->logger->log(WC_Log_Levels::DEBUG, print_r('Paymentmethod not found', 1));
-        }
-
-        if ($this->payMethod->getResponse()->isSuccess()) {
-            return [
-                'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
-            ];
-        }
-
-        wc_add_notice(
-            __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
-            'error'
-        );
-
-        return null;
-    }
 
     /**
      * @return String get the transaction type to use for payment
      */
     public function getBookingAction() {
-        return $this->bookingModes[$this->get_option('bookingmode')];
+        return (string) $this->bookingModes[$this->get_option('bookingmode')];
     }
 }

@@ -125,41 +125,25 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->id = 'hp_ivpg';
         $this->name = __('Secured Invoice', 'woocommerce-heidelpay');
         $this->has_fields = true;
+        $this->bookingAction = 'authorize';
     }
 
-    /**
-     * Send payment request
-     * @return mixed
-     */
-    protected function performRequest($order_id)
+    public function checkoutValidation()
     {
+        parent::checkoutValidation();
+
+        if($this->isGatewayActive() === false) {
+            return true;
+        }
+
+        // TODO: Do validation here
+    }
+
+    protected function handleFormPost()
+    {
+        parent::handleFormPost();
+
+        // TODO check array keys set
         $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
-
-        /**
-         * Set necessary parameters for Heidelpay payment Frame and send a registration request
-         */
-        try {
-            $this->payMethod->authorize();
-        } catch (Exception $e) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
-
-            wc_add_notice(
-                __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
-                'error'
-            );
-            return null;
-        }
-
-        if ($this->payMethod->getResponse()->isSuccess()) {
-            return [
-                'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
-            ];
-        }
-        wc_add_notice(
-            __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woocommerce-heidelpay'),
-            'error'
-        );
-        return null;
     }
 }

@@ -26,10 +26,15 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 
     public function process_payment($order_id)
     {
-        return $this->performRequest($order_id);
+        return $this->toCheckoutPayment($order_id);
     }
 
-    protected function performRequest($order_id)
+    /**
+     * Redirect to an extra Checkoutpage.
+     * @param $order_id
+     * @return array
+     */
+    public function toCheckoutPayment($order_id)
     {
         $order = wc_get_order($order_id);
 
@@ -38,6 +43,14 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
             'result' => 'success',
             'redirect' => $order->get_checkout_payment_url(true)
         ];
+    }
+
+    protected function performRequest($order_id)
+    {
+        $order = wc_get_order($order_id);
+        if ($order->get_payment_method() === $this->id) {
+            echo $this->getIFrame($order);
+        }
     }
 
     /**
@@ -76,11 +89,8 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     public function after_pay()
     {
         $order_id = wc_get_order_id_by_order_key($_GET['key']);
-        $order = wc_get_order($order_id);
 
-        if ($order->get_payment_method() === $this->id) {
-            echo $this->getIFrame($order);
-        }
+        $this->performRequest($order_id);
     }
 
     /**
@@ -125,6 +135,9 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 
     public function getBookingAction()
     {
-        return $this->bookingModes[$this->get_option('bookingmode')];
+        if(!empty($this->bookingModes[$this->get_option('bookingmode')])) {
+            return $this->bookingModes[$this->get_option('bookingmode')];
+        }
+        return $this->bookingAction;
     }
 }

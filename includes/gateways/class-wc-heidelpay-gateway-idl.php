@@ -19,7 +19,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
     public $payMethod;
     /** @var array Array of locales */
     public $locale;
-    protected $bookingModes;
 
     public function setPayMethod()
     {
@@ -27,6 +26,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         $this->id = 'hp_idl';
         $this->name = __('iDeal', 'woocommerce-heidelpay');
         $this->has_fields = true;
+        $this->bookingAction = 'authorize';
     }
 
     /**
@@ -58,13 +58,16 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         // Performe Authorize request to get paymethod config
         $this->setAuthentification();
         $this->setAsync();
+
         $this->payMethod->authorize();
 
         $brands = (array) $this->payMethod->getResponse()->getConfig()->getBrands();
 
+        $accoungHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
+
         echo '<div>';
         echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
-        echo '<input type="text" id="accountholder" name="accountholder"/>';
+        echo '<input type="text" id="accountholder" name="accountholder" value="'. $accoungHolder .'"> ';
         echo '<br/>';
         echo '<label for="bankname">' . $accountHolderLabel . ':</label>';
         echo '<select name ="bankname" id="bankname">';
@@ -76,29 +79,38 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         echo '</div>';
     }
 
-    protected function performRequest($order_id)
+    /**
+     * @return false Returns false if the handling failed
+     */
+    protected function handleFormPost()
     {
-        $this->payMethod->getRequest()->getAccount()->setBankName($_POST['bankname']);
+        parent::handleFormPost();
 
-        try {
-            $this->payMethod->authorize();
-        } catch (\Exception $exception) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r('Paymethod not found', 1));
+        if (!empty($_POST['bankname'])) {
+            $this->payMethod->getRequest()->getAccount()->setBankName(htmlspecialchars($_POST['bankname']));
+        }
+        return false;
+    }
+
+
+    public function checkoutValidation()
+    {
+        $isValid = parent::checkoutValidation();
+
+        // If gateway is not active no validation is necessary.
+        if($this->isGatewayActive() === false) {
+            return true;
         }
 
-        if ($this->payMethod->getResponse()->isSuccess()) {
-            return [
-                'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl()
-            ];
+        if(empty($_POST['bankname'])) {
+            wc_add_notice(
+                __('Payment error: ', 'woocommerce-heidelpay') . __('Chose a bank please', 'woocommerce-heidelpay'),
+                'error'
+            );
+            $isValid = false;
         }
 
-        wc_add_notice(
-            __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
-            'error'
-        );
-
-        return null;
+        return $isValid;
     }
 
     public function setAvailability($available_gateways)
