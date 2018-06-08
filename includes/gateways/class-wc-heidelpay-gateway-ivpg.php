@@ -1,12 +1,24 @@
 <?php
+/**
+ * Secured Invoice
+ *
+ * WooCommerce payment gateway for Secured Invoice
+ *
+ * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ * @copyright Copyright © 2018-present heidelpay GmbH. All rights reserved.
+ *
+ * @link  http://dev.heidelpay.com/
+ *
+ * @author  Daniel Kraut, David Owusu, Florian Evertz
+ *
+ * @package  woocommerce-heidelpay
+ * @category WooCommerce
+ */
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-/**
- * Rechnugskauf gesichert
- */
 require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\InvoiceB2CSecuredPaymentMethod;
@@ -33,7 +45,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
                 'error'
             );
         }
-        if(empty($_POST['salutation'])){
+        if (empty($_POST['salutation'])) {
             wc_add_notice(
                 __('You have to enter your salutation', 'woocommerce-heidelpay'),
                 'error'
