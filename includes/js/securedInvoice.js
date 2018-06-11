@@ -9,6 +9,16 @@
  * @category WOOCOMMERCE
  */
 
-function(
-
-);
+/**
+ * This function checks if the billing_company is empty
+ */
+jQuery(function () {
+    jQuery('#billing_company').change(function () {
+        if (jQuery('#billing_company').val() !== '') {
+            jQuery('li.payment_method_hp_ivpg').hide();
+        } else {
+            jQuery('li.payment_method_hp_ivpg').show();
+        }
+        ;
+    });
+});

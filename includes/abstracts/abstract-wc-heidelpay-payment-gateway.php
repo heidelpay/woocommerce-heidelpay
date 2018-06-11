@@ -162,8 +162,15 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function enqueue_assets()
     {
-    }
+        wp_register_script('heidelpay-secured',
+            WC_HEIDELPAY_PLUGIN_URL . '/includes/js/securedInvoice.js',
+            [],
+            false,
+            true
+        );
 
+        wp_enqueue_script('heidelpay-secured');
+    }
 
     public function process_payment($order_id)
     {
