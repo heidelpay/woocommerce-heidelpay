@@ -30,7 +30,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * Redirect to an extra Checkoutpage.
+     * Redirect to an extra Checkout page.
      * @param $order_id
      * @return array
      */
@@ -48,9 +48,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     protected function performRequest($order_id)
     {
         $order = wc_get_order($order_id);
-        if ($order->get_payment_method() === $this->id) {
-            echo $this->getIFrame($order);
-        }
+        echo $this->getIFrame($order);
     }
 
     /**
@@ -89,8 +87,11 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     public function after_pay()
     {
         $order_id = wc_get_order_id_by_order_key($_GET['key']);
+        $order = wc_get_order($order_id);
 
-        $this->performRequest($order_id);
+        if ($order->get_payment_method() === $this->id) {
+            $this->performRequest($order_id);
+        }
     }
 
     /**
@@ -102,35 +103,55 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
      */
     protected function getIFrame( WC_Order $order)
     {
+        // Load script for payment cards
         wp_enqueue_script('heidelpay-iFrame');
 
         $this->prepareRequest($order);
 
+        // build host url and css path
         $protocol = $_SERVER['HTTPS'] ? 'https' : 'http';
         $host = $protocol . '://' . $_SERVER['SERVER_NAME'];
         $cssPath = WC_HEIDELPAY_PLUGIN_URL . '/assets/css/creditCardFrame.css';
 
-        $bookingaction = $this->getBookingAction();
+        $bookingAction = $this->getBookingAction();
 
-        $this->payMethod->$bookingaction(
-            $host, // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
-            'FALSE',
-            $cssPath
-        );
+        if (method_exists($this->payMethod, $bookingAction)) {
+            $this->payMethod->$bookingAction(
+                $host, // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
+                'FALSE',
+                $cssPath
+            );
 
-        $iFrame = '<form method="post" class="formular" id="paymentFrameForm">';
-        if ($this->payMethod->getResponse()->isSuccess()) {
-            $iFrame .=  '<iframe id="paymentFrameIframe" src="'
-                . $this->payMethod->getResponse()->getPaymentFormUrl()
-                . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
-        } else {
-            $iFrame .= get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
-            $iFrame .= '<pre>' . print_r($this->payMethod->getResponse()->getError(), 1) . '</pre>';
+            $iFrame = '<form method="post" class="formular" id="paymentFrameForm">';
+            if ($this->payMethod->getResponse()->isSuccess()) {
+                $iFrame .=  '<iframe id="paymentFrameIframe" src="'
+                    . $this->payMethod->getResponse()->getPaymentFormUrl()
+                    . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
+            } else {
+                $iFrame .= get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
+                $iFrame .= '<pre>' . print_r($this->getErrorMessage(), 1) . '</pre>';
+            }
+            $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
+            $iFrame .=  '</form>';
+
+            return $iFrame;
         }
-        $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
-        $iFrame .=  '</form>';
 
-        return $iFrame;
+        $this->addPaymentError($this->getErrorMessage());
+        wc_print_notices();
+
+        wc_get_logger()->log(
+            WC_Log_Levels::ERROR,
+            htmlspecialchars(
+                print_r(
+                    $this->plugin_id . ' - ' . $this->id . __(
+                        ' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay'
+                    ) . $bookingAction,
+                    1
+                )
+            )
+        );
+        return null;
     }
 
     public function getBookingAction()

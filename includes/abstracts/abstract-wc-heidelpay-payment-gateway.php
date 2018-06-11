@@ -54,6 +54,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
     }
 
+    /**
+     * Check whether this paymethod was selected based on
+     * @return bool
+     */
     public function isGatewayActive()
     {
         if(!empty($_POST['payment_method'])) {
@@ -273,7 +277,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             } catch (Exception $e) {
                 wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
 
-                $this->addPaymentError(__('Payment error: ', 'woocommerce-heidelpay') . $this->getErrorMessage());
+                $this->addPaymentError($this->getErrorMessage());
 
                 return null;
             }
@@ -285,15 +289,16 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 ];
             }
 
-            $this->addPaymentError(__('Payment error: ', 'woocommerce-heidelpay') . $this->getErrorMessage());
+            $this->addPaymentError($this->getErrorMessage());
         }
 
-        $this->addPaymentError(__('Payment error: ', 'woocommerce-heidelpay') . $this->getErrorMessage());
+        $this->addPaymentError($this->getErrorMessage());
+
         wc_get_logger()->log(
             WC_Log_Levels::ERROR,
             htmlspecialchars(
                 print_r(
-                    $this->plugin_id . ' - ' . $this->id . ' Error: Paymentmethod was not found "' . $this->bookingAction,
+                    $this->plugin_id . ' - ' . $this->id . __(' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay') . $this->bookingAction,
                     1
                 )
             )
@@ -310,10 +315,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         return $this->bookingAction;
     }
 
+    /**
+     * @param String $message
+     */
     public function addPaymentError(String $message)
     {
         wc_add_notice(
-            $message,
+            __('Payment error: ', 'woocommerce-heidelpay') . htmlspecialchars($message),
             'error'
         );
     }
