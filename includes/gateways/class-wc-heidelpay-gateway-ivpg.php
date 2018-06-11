@@ -55,12 +55,12 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             );
         }
 
-        /*if (!empty(wc()->customer->get_billing_company())) {
+        if (!empty(wc()->customer->get_billing_company())) {
             wc_add_notice(
                 __('You are not allowed to use secured invoice with a company name', 'woocommerce-heidelpay'),
                 'error'
             );
-        }*/
+        }
 
     }
 
@@ -278,8 +278,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     protected function handleFormPost()
     {
         parent::handleFormPost();
-
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($_POST, 1)));
 
         if (!empty($_POST['salutation']) AND !empty($_POST['birthdate'])) {
             $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
