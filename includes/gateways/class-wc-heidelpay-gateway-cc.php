@@ -7,7 +7,8 @@ if (!defined('ABSPATH')) {
 /**
  * credit card
  */
-require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-iframe-gateway.php');
+require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php');
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod;
 

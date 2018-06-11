@@ -7,7 +7,8 @@ if (!defined('ABSPATH')) {
 /**
  * IDeal
  */
-require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
+require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\IDealPaymentMethod;
 
@@ -104,7 +105,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
 
         if(empty($_POST['bankname'])) {
             wc_add_notice(
-                __('Payment error: ', 'woocommerce-heidelpay') . __('Chose a bank please', 'woocommerce-heidelpay'),
+                __('Payment error: ', 'woocommerce-heidelpay') . __('Chose a bank please.', 'woocommerce-heidelpay'),
                 'error'
             );
             $isValid = false;

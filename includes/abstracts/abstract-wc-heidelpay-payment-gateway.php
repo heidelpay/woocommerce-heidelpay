@@ -3,7 +3,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once dirname(__DIR__) . '../../vendor/autoload.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' .
+    DIRECTORY_SEPARATOR . 'autoload.php';
 
 use Heidelpay\MessageCodeMapper\MessageCodeMapper;
 use Heidelpay\PhpPaymentApi\Response;
@@ -50,8 +51,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     abstract protected function setPayMethod();
 
+    /**
+     * Validate the customer input coming from checkout.
+     * @return boolean
+     */
     public function checkoutValidation()
     {
+        //return true;
     }
 
     /**
@@ -326,6 +332,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    /**
+     * process the Form input from customer comimg from checkout.
+     */
     protected function handleFormPost()
     {
     }

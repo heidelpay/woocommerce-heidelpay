@@ -3,7 +3,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
+require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
 
 /**
  * Class WC_Heidelpay_IFrame_Gateway
