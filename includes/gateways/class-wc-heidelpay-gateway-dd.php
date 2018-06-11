@@ -3,21 +3,19 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 /**
- * Direct debit
- */
-
-/**
- * Plugin Name: heidelpay WooCommerce
- * Plugin URI: https://dev.heidelpay.com
- * Description: heidelpay payment integration for WooCommerce
- * Author: heidelpay
- * Author URI: htts://www.heidelpay.com
- * Developer: heidelpay
- * Developer URI: https://dev.heidelpay.com
- * Text Domain: woocommerce-heidelpay
+ * Direct Debit
  *
- * Copyright: © 2018 heidelpay GmbH
- * License: see LICENSE.txt
+ * WooCommerce payment gateway for Direct Debit
+ *
+ * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ * @copyright Copyright © 2018-present heidelpay GmbH. All rights reserved.
+ *
+ * @link  http://dev.heidelpay.com/
+ *
+ * @author  Daniel Kraut, David Owusu, Florian Evertz
+ *
+ * @package  woocommerce-heidelpay
+ * @category WooCommerce
  */
 require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
 
