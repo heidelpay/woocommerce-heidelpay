@@ -272,9 +272,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->bookingAction = 'authorize';
     }
 
-    /**
-     * @return false Returns false if the handling failed
-     */
     protected function handleFormPost()
     {
         parent::handleFormPost();
@@ -282,7 +279,5 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         if (!empty($_POST['salutation']) AND !empty($_POST['birthdate'])) {
             $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
         }
-
-        return false;
     }
 }

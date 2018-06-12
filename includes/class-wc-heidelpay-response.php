@@ -18,9 +18,6 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-/**
- * Direct debit
- */
 require_once(dirname(__DIR__) . '/vendor/autoload.php');
 
 use Heidelpay\PhpPaymentApi\Response;

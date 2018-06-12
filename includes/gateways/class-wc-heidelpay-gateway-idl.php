@@ -63,10 +63,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
      */
     public function payment_fields()
     {
-        $countries = new WC_Countries();
-
-        $billingCountry = $countries->get_address_fields( $countries->get_base_country(),'billing_');
-
         // declare text
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
         $bankNameLabel = __('Bank', 'woocommerce-heidelpay');
@@ -74,25 +70,31 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         // Performe Authorize request to get paymethod config
         $this->setAuthentification();
         $this->setAsync();
+        $this->setCriterions();
 
         $this->payMethod->authorize();
 
         $brands = (array) $this->payMethod->getResponse()->getConfig()->getBrands();
 
-        $accoungHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
+        $accountHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
 
-        echo '<div>';
-        echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
-        echo '<input type="text" id="accountholder" name="accountholder" value="'. $accoungHolder .'"> ';
-        echo '<br/>';
-        echo '<label for="bankname">' . $accountHolderLabel . ':</label>';
-        echo '<select name ="bankname" id="bankname">';
-        echo '<option selected disabled>' . $bankNameLabel . '</option>';
-        foreach ($brands as $value => $brandName) {
-            echo '<option value="' . $value . '"> '.$brandName.' </option>';
+        if(!empty($brands)) {
+            echo '<div>';
+            echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
+            echo '<input type="text" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
+            echo '<br/>';
+            echo '<label for="bankname">' . $accountHolderLabel . ':</label>';
+            echo '<select name ="bankname" id="bankname">';
+            echo '<option selected disabled>' . $bankNameLabel . '</option>';
+            foreach ($brands as $value => $brandName) {
+                echo '<option value="' . $value . '"> '.$brandName.' </option>';
+            }
+            echo '</select>';
+            echo '</div>';
+        } else {
+            wc_print_notice($this->getErrorMessage(), 'error');
         }
-        echo '</select>';
-        echo '</div>';
+
     }
 
     /**
@@ -105,7 +107,6 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         if (!empty($_POST['bankname'])) {
             $this->payMethod->getRequest()->getAccount()->setBankName(htmlspecialchars($_POST['bankname']));
         }
-        return false;
     }
 
 
