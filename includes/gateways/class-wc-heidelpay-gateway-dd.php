@@ -63,7 +63,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         echo '<div>';
 
         echo $accountHolder . '<input type="text" name="holder" value="" /><br/>' .
--            $accountIban . '<input type="text" name="iban" value="" /><br/>';
+            $accountIban . '<input type="text" name="iban" value="" /><br/>';
 
         echo '</div>';
     }

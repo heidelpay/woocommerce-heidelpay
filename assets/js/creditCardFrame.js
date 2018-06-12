@@ -1,7 +1,7 @@
 /**
- * Script to handle the communication with the iFrame in order to submit the form from outside the iFrame
+ * Payment card script
  *
- * DESC
+ * Script to handle the communication with the iFrame in order to submit the form from outside the iFrame
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.

@@ -1,4 +1,19 @@
 <?php
+/**
+ * Abstract iFrame gateway
+ *
+ * WooCommerce base class for iFrame based payment methods like Credit Card and Debit Card
+ *
+ * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ * @copyright Copyright © 2018-present heidelpay GmbH. All rights reserved.
+ *
+ * @link  http://dev.heidelpay.com/
+ *
+ * @author  Daniel Kraut, David Owusu, Florian Evertz
+ *
+ * @package  woocommerce-heidelpay
+ * @category WooCommerce
+ */
 if (!defined('ABSPATH')) {
     exit;
 }
