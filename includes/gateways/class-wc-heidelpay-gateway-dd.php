@@ -1,7 +1,4 @@
 <?php
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
-}
 /**
  * Direct Debit
  *
@@ -17,7 +14,14 @@ if (!defined('ABSPATH')) {
  * @package  woocommerce-heidelpay
  * @category WooCommerce
  */
-require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
+
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
+
+require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
+
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\DirectDebitPaymentMethod;
 
@@ -38,14 +42,14 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
             return true;
         }
 
-        if (empty($_POST['holder'])) {
+        if (empty($_POST['accountholder'])) {
             wc_add_notice(
                 __('You have to enter the account holder', 'woocommerce-heidelpay'),
                 'error'
             );
         }
 
-        if (empty($_POST['iban'])) {
+        if (empty($_POST['accountiban'])) {
             wc_add_notice(
                 __('You have to enter the IBAN', 'woocommerce-heidelpay'),
                 'error'
@@ -71,13 +75,19 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
 
     public function payment_fields()
     {
-        $accountHolder = __('Holder:', 'woocommerce-heidelpay');
-        $accountIban = __('IBAN:', 'woocommerce-heidelpay');
+        $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
+        $accountIbanLabel = __('IBAN', 'woocommerce-heidelpay');
+
+        $accountHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
 
         echo '<div>';
 
-        echo $accountHolder . '<input type="text" name="holder" value="" /><br/>' .
-            $accountIban . '<input type="text" name="iban" value="" /><br/>';
+        echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
+        echo '<input type="text" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
+        echo '<br/>';
+
+        echo '<label for="accountiban">' . $accountIbanLabel . ':</label>';
+        echo '<input type="text" id="accountiban" name="accountiban" value=""> ';
 
         echo '</div>';
     }
@@ -101,11 +111,9 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     {
         parent::handleFormPost();
 
-        if (!empty($_POST['holder']) AND !empty($_POST['iban'])) {
-            $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['holder']));
-            $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['iban']));
+        if (!empty($_POST['accountholder']) AND !empty($_POST['accountiban'])) {
+            $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['accountholder']));
+            $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['accountiban']));
         }
-
-        return false;
     }
 }
