@@ -81,10 +81,10 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         if(!empty($brands)) {
             echo '<div>';
             echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
-            echo '<input type="text" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
+            echo '<input type="text" id="accountholder" name="accountholder" class="form-row-wide validate-required" value="'. $accountHolder .'"> ';
             echo '<br/>';
             echo '<label for="bankname">' . $accountHolderLabel . ':</label>';
-            echo '<select name ="bankname" id="bankname">';
+            echo '<select name ="bankname" id="bankname" class="form-row-wide validate-required">';
             echo '<option selected disabled>' . $bankNameLabel . '</option>';
             foreach ($brands as $value => $brandName) {
                 echo '<option value="' . $value . '"> '.$brandName.' </option>';
