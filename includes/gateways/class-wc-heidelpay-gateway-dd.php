@@ -1,7 +1,4 @@
 <?php
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
-}
 /**
  * Direct Debit
  *
@@ -17,7 +14,14 @@ if (!defined('ABSPATH')) {
  * @package  woocommerce-heidelpay
  * @category WooCommerce
  */
-require_once(WC_HEIDELPAY_PLUGIN_PATH . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
+
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
+
+require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
+
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\DirectDebitPaymentMethod;
 
@@ -25,6 +29,33 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
 {
     /** @var array Array of locales */
     public $locale;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function checkoutValidation()
+    {
+        // If gateway is not active no validation is necessary.
+        if($this->isGatewayActive() === false) {
+            return true;
+        }
+
+        if (empty($_POST['accountholder'])) {
+            wc_add_notice(
+                __('You have to enter the account holder', 'woocommerce-heidelpay'),
+                'error'
+            );
+        }
+
+        if (empty($_POST['accountiban'])) {
+            wc_add_notice(
+                __('You have to enter the IBAN', 'woocommerce-heidelpay'),
+                'error'
+            );
+        }
+    }
 
     /**
      * Initialise Gateway Settings Form Fields.
@@ -40,30 +71,23 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
-
-        $this->form_fields['advanced'] = array(
-            'title' => __('Advanced options', 'woocommerce-heidelpay'),
-            'type' => 'title',
-            'description' => ''
-        );
-
-        $this->form_fields['min'] = array(
-            'title' => __('Minimum Amount', 'woocommerce-heidelpay'),
-            'type' => 'text',
-            'default' => 1,
-            'desc_tip' => true,
-        );
     }
 
     public function payment_fields()
     {
-        $accountHolder = __('Holder:', 'woocommerce-heidelpay');
-        $accountIban = __('IBAN:', 'woocommerce-heidelpay');
+        $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
+        $accountIbanLabel = __('IBAN', 'woocommerce-heidelpay');
+
+        $accountHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
 
         echo '<div>';
 
-        echo $accountHolder . '<input type="text" name="holder" value="" /><br/>' .
-            $accountIban . '<input type="text" name="iban" value="" /><br/>';
+        echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
+        echo '<input type="text" class="form-row-wiede validate-required" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
+        echo '<br/>';
+
+        echo '<label for="accountiban">' . $accountIbanLabel . ':</label>';
+        echo '<input type="text" class="form-row-wiede validate-required" id="accountiban" name="accountiban" value=""> ';
 
         echo '</div>';
     }
@@ -81,46 +105,15 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * Send payment request
-     * @return mixed
+     * @return false Returns false if the handling failed
      */
-    protected function performRequest($order_id)
+    protected function handleFormPost()
     {
-        if (isset($_POST['holder']) && isset($_POST['iban'])) {
-            $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['holder']));
-            $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['iban']));
-        } else {
-            wc_add_notice(
-                __('Payment error: ', 'woocommerce-heidelpay') . 'Not all fields set',
-                'error'
-            );
-            return null;
-        }
+        parent::handleFormPost();
 
-
-        /**
-         * Set necessary parameters for Heidelpay payment Frame and send a registration request
-         */
-        try {
-            $this->payMethod->debit();
-        } catch (Exception $e) {
-            wc_add_notice(
-                __('Payment error: ', 'woocommerce-heidelpay') . $this->payMethod->getResponse()->getError()['message'],
-                'error'
-            );
-            return null;
+        if (!empty($_POST['accountholder']) AND !empty($_POST['accountiban'])) {
+            $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['accountholder']));
+            $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['accountiban']));
         }
-
-        if ($this->payMethod->getResponse()->isSuccess()) {
-            return [
-                'result' => 'success',
-                'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
-            ];
-        }
-        wc_add_notice(
-            __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woocommerce-heidelpay'),
-            'error'
-        );
-        return null;
     }
 }
