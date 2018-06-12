@@ -126,9 +126,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 require_once(dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
+                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-idl.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php');
+                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php');
                 require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php');
 
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
@@ -142,9 +144,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             {
                 $methods[] = 'WC_Gateway_HP_CC';
                 $methods[] = 'WC_Gateway_HP_DC';
+                $methods[] = 'WC_Gateway_HP_IDL';
                 $methods[] = 'WC_Gateway_HP_DD';
                 $methods[] = 'WC_Gateway_HP_IVPG';
                 $methods[] = 'WC_Gateway_HP_SO';
+                $methods[] = 'WC_Gateway_HP_VA';
 
                 return $methods;
             }

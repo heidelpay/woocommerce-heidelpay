@@ -33,12 +33,15 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         parent::__construct();
 
         add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
-        add_filter('woocommerce_available_payment_gateways', array($this, 'unsetIVPG'));
-        add_action('woocommerce_after_checkout_validation', array($this, 'validateInvoice'));
     }
 
-    public function validateInvoice()
+    public function checkoutValidation()
     {
+        // If gateway is not active no validation is necessary.
+        if($this->isGatewayActive() === false) {
+            return true;
+        }
+
         if (!$this->is18($_POST['birthdate']) || empty($_POST['birthdate'])) {
             wc_add_notice(
                 __('You have to be at least 18 years old in order to use secured invoice', 'woocommerce-heidelpay'),
@@ -51,6 +54,14 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
                 'error'
             );
         }
+
+        if (!empty(wc()->customer->get_billing_company())) {
+            wc_add_notice(
+                __('You are not allowed to use secured invoice with a company name', 'woocommerce-heidelpay'),
+                'error'
+            );
+        }
+
     }
 
     private function is18($given)
@@ -133,7 +144,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
      * @param $available_gateways
      * @return mixed
      */
-    public function unsetIVPG($available_gateways)
+    public function setAvailability($available_gateways)
     {
         $security = true;
 
@@ -159,7 +170,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         }
 
         if (!$security) {
-            unset($available_gateways['hp_ivpg']);
+            unset($available_gateways[$this->id]);
         }
         return $available_gateways;
     }
@@ -258,51 +269,15 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->id = 'hp_ivpg';
         $this->name = __('Secured Invoice', 'woocommerce-heidelpay');
         $this->has_fields = true;
+        $this->bookingAction = 'authorize';
     }
 
-    /**
-     * Send payment request
-     * @param $order_id
-     * @return mixed
-     */
-    protected function performRequest($order_id)
+    protected function handleFormPost()
     {
-        $order = wc_get_order($order_id);
-        $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
+        parent::handleFormPost();
 
-        if ($order->get_billing_company() === '') {
-            /**
-             * Set necessary parameters for Heidelpay payment Frame and send a registration request
-             */
-            try {
-                $this->payMethod->authorize();
-            } catch (Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($e->getMessage(), 1));
-                // TODO: redirect to errorpage
-                wc_add_notice(
-                    __('Payment error: ', 'woocommerce-heidelpay') .
-                    $this->payMethod->getResponse()->getError()['message'],
-                    'error'
-                );
-                return null;
-            }
-
-            if ($this->payMethod->getResponse()->isSuccess()) {
-                return [
-                    'result' => 'success',
-                    'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
-                ];
-            }
-            wc_add_notice(
-                __('Payment error: ' . $this->payMethod->getResponse()->getError()['message'], 'woocommerce-heidelpay'),
-                'error'
-            );
-            return null;
+        if (!empty($_POST['salutation']) AND !empty($_POST['birthdate'])) {
+            $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
         }
-        wc_add_notice(
-            __('You are not allowed to use secured invoice with a company name', 'woocommerce-heidelpay'),
-            'error'
-        );
-        return null;
     }
 }
