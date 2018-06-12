@@ -83,11 +83,11 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         echo '<div>';
 
         echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
-        echo '<input type="text" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
+        echo '<input type="text" class="form-row-wiede validate-required" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
         echo '<br/>';
 
         echo '<label for="accountiban">' . $accountIbanLabel . ':</label>';
-        echo '<input type="text" id="accountiban" name="accountiban" value=""> ';
+        echo '<input type="text" class="form-row-wiede validate-required" id="accountiban" name="accountiban" value=""> ';
 
         echo '</div>';
     }
