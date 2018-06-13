@@ -319,21 +319,21 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             }
 
             $this->addPaymentError($this->getErrorMessage());
-        }
+        } else {
+            $this->addPaymentError($this->getErrorMessage());
 
-        $this->addPaymentError($this->getErrorMessage());
-
-        wc_get_logger()->log(
-            WC_Log_Levels::ERROR,
-            htmlspecialchars(
-                print_r(
-                    $this->plugin_id . ' - ' . $this->id . __(' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay') . $this->bookingAction,
-                    1
+            wc_get_logger()->log(
+                WC_Log_Levels::ERROR,
+                htmlspecialchars(
+                    print_r(
+                        $this->plugin_id . ' - ' . $this->id . __(' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay') . $this->bookingAction,
+                        1
+                    )
                 )
-            )
-        );
+            );
 
-        return null;
+            return null;
+        }
     }
 
     /**
