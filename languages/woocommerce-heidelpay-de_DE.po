@@ -120,12 +120,12 @@ msgid "Bookingmode"
 msgstr "Buchungsmodus"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:431
-msgid "Direct debit"
-msgstr "Lastschrift"
+msgid "Debit"
+msgstr "Direktbuchung"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:432
 msgid "Authorization"
-msgstr "Autorisierung"
+msgstr "Authorisierung"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:435
 msgid "Choose a bookingmode"
