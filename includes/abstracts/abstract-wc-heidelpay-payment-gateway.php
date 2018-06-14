@@ -51,7 +51,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->title = $this->get_option('title');
         $this->description = $this->get_option('description');
         $this->instructions = $this->get_option('instructions');
-        //$this->update_option('title', $this->name);
+        
         // Actions
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action('woocommerce_api_' . strtolower(get_class($this)), array($this, 'callback_handler'));
