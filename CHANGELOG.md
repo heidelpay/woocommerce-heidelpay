@@ -17,9 +17,9 @@
 - Secured Invoice: added validation on checkout.
 
 ### Changed
-
+- payment methods will be deactivated by default.
 
 ## 1.0.1
 
 ### Fixed
-- A bug which caused that the sandbox mode was activated regadless of the state of the switch.
+- A bug which caused that the sandbox mode was activated regardless of the state of the switch.
