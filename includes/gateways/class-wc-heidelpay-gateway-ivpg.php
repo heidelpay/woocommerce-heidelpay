@@ -113,9 +113,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['availableCountries'] = array(
             'title' => __('Available Countries for secured invoice', 'woocommerce-heidelpay'),
             'type' => 'title',
-            'description' => __('Here you can enable secured Invoice for specific countries. 
-            Be aware that this will not enable the country in your WooCommerce settings 
-            and you have to enable them seperately.')
+            'description' => __('Here you can enable secured Invoice for specific countries. Be aware that this will not enable the country in your WooCommerce settings and you have to enable them seperately.', 'woocommerce-heidelpay')
         );
 
         $this->form_fields['availableDE'] = array(

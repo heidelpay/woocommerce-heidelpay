@@ -216,11 +216,11 @@ msgstr "Erlaubte Länder für den versicherten Rechnungskauf"
 
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:116
 msgid ""
-"Here you can enable secured Invoice for specific countries. \n"
-"Be aware that this will not enable the country in your WooCommerce settings "
-"and you have to enable them seperately."
+"Here you can enable secured Invoice for specific countries. Be aware that "
+"this will not enable the country in your WooCommerce settings and you have "
+"to enable them seperately."
 msgstr ""
-"Hier können Sie den versicherten Rechnungskauf auf bestimmte Länder beschränken.\n"
+"Hier können Sie den versicherten Rechnungskauf auf bestimmte Länder beschränken."
 "Bitte beachten Sie, dass sie entsprechende Länder weiterhin in den WooCommerce Einstellungen aktivieren müssen"
 
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:121
