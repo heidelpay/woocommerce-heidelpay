@@ -10,7 +10,7 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Plugin Name: heidelpay WooCommerce
  * Plugin URI: https://dev.heidelpay.com
  * Description: heidelpay payment integration for WooCommerce
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: heidelpay
  * Author URI: htts://www.heidelpay.com
  * Developer: heidelpay
@@ -18,7 +18,7 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Text Domain: woocommerce-heidelpay
  * Domain Path: /languages
  *
- * Copyright: © 2018 heidelpay GmbH
+ * Copyright: © 2018-present heidelpay GmbH
  * License: see LICENSE.txt
  */
 
@@ -29,7 +29,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     /**
      * Required minimums and constants
      */
-    define('WC_HEIDELPAY_VERSION', '1.0.1');
+    define('WC_HEIDELPAY_VERSION', '1.1.0');
     define('WC_HEIDELPAY_MIN_PHP_VER', '5.6.0');
     define('WC_HEIDELPAY_MIN_WC_VER', '3.0.0');
     define('WC_HEIDELPAY_MAIN_FILE', __FILE__);
@@ -126,13 +126,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 require_once(dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
+                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-idl.php');
+                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php');
+                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php');
                 require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php');
 
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
-                add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'plugin_action_links'));
-                add_filter('woocommerce_get_sections_checkout', array($this, 'filter_gateway_order_admin'));
             }
 
             /**
@@ -142,8 +143,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             {
                 $methods[] = 'WC_Gateway_HP_CC';
                 $methods[] = 'WC_Gateway_HP_DC';
+                $methods[] = 'WC_Gateway_HP_IDL';
+                $methods[] = 'WC_Gateway_HP_DD';
                 $methods[] = 'WC_Gateway_HP_IVPG';
                 $methods[] = 'WC_Gateway_HP_SO';
+                $methods[] = 'WC_Gateway_HP_VA';
 
                 return $methods;
             }
