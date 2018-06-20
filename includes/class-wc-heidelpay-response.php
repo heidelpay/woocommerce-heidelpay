@@ -50,7 +50,8 @@ class WC_Heidelpay_Response
         $order = wc_get_order($orderId);
 
 
-        $this->handleResult($post_data, $order);
+        //$this->handleResult($post_data, $order);
+        $this->handlePush($post_data);
 
         //TODO: if case for distinction between result and push
     }
@@ -111,8 +112,8 @@ class WC_Heidelpay_Response
      * handle push post
      */
 
-    public function handlePush()
+    public function handlePush($input)
     {
-        //TODO
+        wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($input, 1));
     }
 }
