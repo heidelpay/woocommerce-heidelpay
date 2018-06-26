@@ -121,7 +121,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                     return;
                 }
 
-                load_plugin_textdomain('woocommerce-heidelpay', false, plugin_basename(dirname(__FILE__)) . '/languages');
+                load_plugin_textdomain(
+                    'woocommerce-heidelpay',
+                    false,
+                    plugin_basename(dirname(__FILE__)) . '/languages'
+                );
 
                 require_once(dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
