@@ -132,6 +132,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php');
                 require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php');
                 require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php');
+                require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-push.php');
 
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
             }

@@ -27,6 +27,10 @@ class WC_Heidelpay_Response
 
     public static $response;
 
+    /**
+     * @param array $post_data
+     * @param $secret
+     */
     public function init(array $post_data, $secret)
     {
         if (empty(self::$response)) {
@@ -50,16 +54,15 @@ class WC_Heidelpay_Response
         $order = wc_get_order($orderId);
 
 
-        //$this->handleResult($post_data, $order);
-        $this->handlePush($post_data);
-
-        //TODO: if case for distinction between result and push
+        $this->handleResult($post_data, $order);
     }
 
     /**
      * handle result post
+     *
+     * @param $post_data
+     * @param WC_Order $order
      */
-
     public function handleResult($post_data, WC_Order $order)
     {
         $uid = self::$response->getIdentification()->getUniqueId();
@@ -106,14 +109,5 @@ class WC_Heidelpay_Response
             //show thank you page
             echo $order->get_checkout_order_received_url();
         }
-    }
-
-    /*
-     * handle push post
-     */
-
-    public function handlePush($input)
-    {
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($input, 1));
     }
 }
