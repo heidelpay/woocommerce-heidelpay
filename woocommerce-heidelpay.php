@@ -127,16 +127,16 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                     plugin_basename(dirname(__FILE__)) . '/languages'
                 );
 
-                require_once(dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-idl.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php');
-                require_once(dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php');
-                require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php');
-                require_once(dirname(__FILE__) . '/includes/class-wc-heidelpay-push.php');
+                require_once dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-idl.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php';
+                require_once dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php';
+                require_once dirname(__FILE__) . '/includes/class-wc-heidelpay-push.php';
 
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
             }
@@ -217,7 +217,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              * Checks the environment for compatibility problems.  Returns a string with the first incompatibility
              * found or false if the environment has no problems.
              */
-            static function get_environment_warning()
+            public static function get_environment_warning()
             {
                 if (version_compare(phpversion(), WC_HEIDELPAY_MIN_PHP_VER, '<')) {
                     $message = __('minimal PHP version error', 'woocommerce-heidelpay');
