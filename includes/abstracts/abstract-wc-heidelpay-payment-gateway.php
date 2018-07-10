@@ -403,7 +403,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         if (array_key_exists('<?xml_version', $_POST)) {
             $push = new WC_Heidelpay_Push();
-            $push->init(file_get_contents('php://input'));
+            $push->init(file_get_contents('php://input'), $this->get_option('secret'));
             exit;
         }
         if (!empty($_POST)) {

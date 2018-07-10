@@ -25,19 +25,38 @@ use Heidelpay\PhpPaymentApi\Push;
 
 class WC_Heidelpay_Push
 {
+    /** @var Heidelpay\PhpPaymentApi\Push */
     public static $push;
 
-    public function init($rawPayload)
+    public function init($rawPayload, $secret)
     {
         if (empty(self::$push)) {
             self::$push = new Push($rawPayload);
         }
+        $response = self::$push->getResponse();
 
-        $this->handlePush();
+        try {
+            $response->verifySecurityHash($secret, $response->getIdentification()->getTransactionId());
+        } catch (\Exception $e) {
+            $callers = debug_backtrace();
+            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r("Heidelpay - " .
+                $callers [0] ['function'] . ": Invalid push hash from " .
+                $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1));
+            exit(); //error
+        }
+
+        $this->handlePush($response);
     }
 
-    public function handlePush()
+    public function handlePush($response)
     {
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, 'PaUSH');
+        //TODO: HashSecurityCheck
+        //TODO: Amount mit OrderAmount abgleichen
+        //TODO: Push in Datenbank schreiben?
+
+        $orderID = $response->getIdentification()->getTransactionId();
+        $order = wc_get_order($orderID);
+
+        $order->update_status('processing', 'Bezahlung ist eingegangen');
     }
 }
