@@ -233,7 +233,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
-            get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))
+            get_home_url() . '/wc-api/' . strtolower(get_class($this))
         );
     }
 
@@ -371,7 +371,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function getErrorMessage(Response $response = null)
     {
-        if ($response !== null AND $this->payMethod->getResponse() !== null) {
+        if ($response !== null || $this->payMethod->getResponse() !== null) {
             if (!empty($response['code'])) {
                 return htmlspecialchars($this->messageMapper->getMessage($response->getError()['code']));
             }
