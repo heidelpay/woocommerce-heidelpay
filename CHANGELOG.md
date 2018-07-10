@@ -1,5 +1,10 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## 1.1.1
+
+### Fixed:
+- a bug that caused the payment requests to fail in some shops due to an invalid url.
+
 ## 1.1.0
 
 ### Added
