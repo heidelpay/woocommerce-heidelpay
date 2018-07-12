@@ -133,7 +133,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 
         if (method_exists($this->payMethod, $bookingAction)) {
             $this->payMethod->$bookingAction(
-                $host, // PaymentFrameOrigin - uri of your application like https://dev.heidelpay.com
+                $host,
                 'FALSE',
                 $cssPath
             );
@@ -144,7 +144,6 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
                     . $this->payMethod->getResponse()->getPaymentFormUrl()
                     . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
             } else {
-                $iFrame .= get_home_url() . '/wp-content/plugins/woocommerce-heidelpay/vendor/';
                 $iFrame .= '<pre>' . print_r($this->getErrorMessage(), 1) . '</pre>';
             }
             $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';

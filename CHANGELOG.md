@@ -7,6 +7,11 @@
 #### Features:
 - Support for push notifications
 
+## 1.1.1
+
+### Fixed:
+- a bug that caused the payment requests to fail in some shops due to an invalid url.
+
 ## 1.1.0
 
 ### Added
@@ -24,9 +29,9 @@
 - Secured Invoice: added validation on checkout.
 
 ### Changed
-
+- payment methods will be deactivated by default.
 
 ## 1.0.1
 
 ### Fixed
-- A bug which caused that the sandbox mode was activated regadless of the state of the switch.
+- A bug which caused that the sandbox mode was activated regardless of the state of the switch.
