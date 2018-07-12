@@ -55,6 +55,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         // Actions
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action('woocommerce_api_' . strtolower(get_class($this)), array($this, 'callback_handler'));
+        add_action('woocommerce_api_push', array($this, 'pushHandler'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
         add_action('woocommerce_after_checkout_validation', array($this, 'checkoutValidation'));
 
@@ -66,6 +67,16 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * Set the id and PaymentMethod
      */
     abstract protected function setPayMethod();
+
+
+    public function pushHandler()
+    {
+        if (array_key_exists('<?xml_version', $_POST)) {
+            $push = new WC_Heidelpay_Push();
+            $push->init(file_get_contents('php://input'), $this->get_option('secret'));
+        }
+        exit;
+    }
 
     public function init_form_fields()
     {
@@ -280,7 +291,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         global $wp_version;
 
         $shopType = 'WordPress: ' . $wp_version . ' - ' . 'WooCommerce: ' . wc()->version;
-        $this->payMethod->getRequest()->getCriterion()->set('PUSH_URL', get_permalink(wc_get_page_id('shop')) . 'wc-api/' . strtolower(get_class($this))); //TODO insert URL
+        $this->payMethod->getRequest()->getCriterion()->set('PUSH_URL', get_home_url() . '/wc-api/push');
         $this->payMethod->getRequest()->getCriterion()->set('SHOP.TYPE', $shopType);
         $this->payMethod->getRequest()->getCriterion()->set(
             'SHOPMODULE.VERSION',
@@ -401,11 +412,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function callback_handler()
     {
-        if (array_key_exists('<?xml_version', $_POST)) {
-            $push = new WC_Heidelpay_Push();
-            $push->init(file_get_contents('php://input'), $this->get_option('secret'));
-            exit;
-        }
         if (!empty($_POST)) {
             $response = new WC_Heidelpay_Response();
             $response->init($_POST, $this->get_option('secret'));
