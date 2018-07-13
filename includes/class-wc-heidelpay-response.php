@@ -25,6 +25,9 @@ use Heidelpay\PhpPaymentApi\Response;
 class WC_Heidelpay_Response
 {
 
+    /**
+     * @var Response
+     */
     public static $response;
 
     public function init(array $post_data, $secret)
@@ -68,14 +71,16 @@ class WC_Heidelpay_Response
             $note = '';
 
             // If no money has been payed yet.
-            if (strtoupper($payCode[1]) === 'PA' or strtoupper($payCode[1]) === 'RG') {
+            if (strtoupper($payCode[1]) === 'PA' || strtoupper($payCode[1]) === 'RG') {
                 // In not Prepayment and Invoice payment can be captured manually
-                if (strtoupper($payCode [0]) !== 'PP' and strtoupper($payCode [0]) !== 'IV') {
+                if (strtoupper($payCode [0]) !== 'PP' && strtoupper($payCode [0]) !== 'IV') {
                     $note = __(
                         'Payment reservation successful. Please use the hiP to check the payment.',
                         'woocommerce-heidelpay.'
                     );
                     $order->add_order_note($note, false);
+                } else {
+                    $order->add_meta_data('heidelpay-paymentInfo', $this->setPaymentInfo(self::$response));
                 }
 
                 $order->update_status('on-hold', __('Awaiting payment.', 'woocommerce-heidelpay')
@@ -105,6 +110,42 @@ class WC_Heidelpay_Response
             //show thank you page
             echo $order->get_checkout_order_received_url();
         }
+
+        $info = $order->get_meta('heidelpay-paymentInfo', true);
+        wc_get_logger()->log(
+            WC_Log_Levels::DEBUG,
+            'Payment - Meta ' . htmlspecialchars(print_r($info, 1))
+        );
+    }
+
+    public function setPaymentInfo(Response $response)
+    {
+        $payinfo = $response->getConnector();
+        $presentation = $response->getPresentation();
+
+
+        $payInfoTemplate = 'Zahlungsinformationen <br/>
+Bitte überweisen Sie uns den Betrag von %1$s %2$s nach Erhalt der Ware auf folgendes Konto:<br/>
+<br/>
+Kontoinhaber: %3$s<br/>
+IBAN: %4$s<br/>
+BIC: %5$s<br/>
+<br/>
+Geben Sie als Verwendungszweck bitte ausschließlich diese Identifikationsnummer an:<br/>
+<b>%6$s </b>';
+
+        $infoText = sprintf(
+            $payInfoTemplate,
+            $presentation->getAmount(),
+            $presentation->getCurrency(),
+            $payinfo->getAccountHolder(),
+            $payinfo->getAccountIBan(),
+            $payinfo->getAccountBic(),
+            self::$response->getIdentification()->getShortId()
+        );
+
+        wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Payment - info' . htmlspecialchars(print_r($infoText, 1)));
+        return $infoText;
     }
 
     /*

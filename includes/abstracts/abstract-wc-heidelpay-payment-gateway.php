@@ -436,4 +436,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'default' => 'DB'
         );
     }
+
+    public function getOrderFromKey()
+    {
+        $order_id = wc_get_order_id_by_order_key($_GET['key']);
+        $order = wc_get_order($order_id);
+
+        return $order;
+    }
 }

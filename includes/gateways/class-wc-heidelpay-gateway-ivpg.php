@@ -33,6 +33,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         parent::__construct();
 
         add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
+        add_filter('woocommerce_thankyou_order_received_text', array($this, 'printPayInfo'));
     }
 
     public function checkoutValidation()
@@ -146,24 +147,29 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     {
         $security = true;
 
-        if (!empty(wc()->customer->get_billing_company())) {
-            $security = false;
-        }
+        $isCustomer = wc()->customer !== null;
+        if ($isCustomer) {
+            if (!empty(wc()->customer->get_billing_company())) {
+                $security = false;
+            }
 
-        if (!in_array(wc()->customer->get_billing_country(), $this->getEnabledCountries(), true)) {
-            $security = false;
-        }
+            if (!in_array(wc()->customer->get_billing_country(), $this->getEnabledCountries(), true)) {
+                $security = false;
+            }
 
-        if (wc()->customer->get_billing_address_1() !== wc()->customer->get_shipping_address_1() ||
-            wc()->customer->get_billing_address_2() !== wc()->customer->get_shipping_address_2() ||
-            wc()->customer->get_billing_city() !== wc()->customer->get_shipping_city() ||
-            wc()->customer->get_billing_postcode() !== wc()->customer->get_shipping_postcode()
-        ) {
-            $security = false;
-        }
+            if (wc()->customer->get_billing_address_1() !== wc()->customer->get_shipping_address_1() ||
+                wc()->customer->get_billing_address_2() !== wc()->customer->get_shipping_address_2() ||
+                wc()->customer->get_billing_city() !== wc()->customer->get_shipping_city() ||
+                wc()->customer->get_billing_postcode() !== wc()->customer->get_shipping_postcode()
+            ) {
+                $security = false;
+            }
 
-        if (wc()->cart->get_totals()['total'] > $this->get_option('max') ||
-            wc()->cart->get_totals()['total'] < $this->get_option('min')) {
+            if (wc()->cart->get_totals()['total'] > $this->get_option('max') ||
+                wc()->cart->get_totals()['total'] < $this->get_option('min')) {
+                $security = false;
+            }
+        } else {
             $security = false;
         }
 
@@ -251,11 +257,18 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             '</ul>';
     }
 
-    public function email_instructions($order, $sent_to_admin, $plain_text = false)
+    public function email_instructions(WC_Order $order, $sent_to_admin, $plain_text = false)
     {
+
+        if ($order->get_payment_method() !== $this->id) {
+            return;
+        }
+
+
         if ($this->instructions) {
             echo wpautop(wptexturize($this->instructions)) . PHP_EOL;
         }
+            echo $order->get_meta('heidelpay-paymentInfo');
     }
 
     /**
@@ -277,5 +290,27 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         if (!empty($_POST['salutation']) AND !empty($_POST['birthdate'])) {
             $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
         }
+    }
+
+    public function printPayInfo($orderReceivedText)
+    {
+        wc_get_logger()->log(
+            WC_Log_Levels::DEBUG,
+            'Payment - Order received Text ' . htmlspecialchars(print_r($orderReceivedText, 1))
+        );
+
+        $order = $this->getOrderFromKey();
+
+        if ($order->get_payment_method() !== $this->id) {
+            return $orderReceivedText;
+        }
+
+        $paymentInfo = $order->get_meta('heidelpay-paymentInfo');
+
+        if(!empty($paymentInfo)) {
+            $orderReceivedText .= '<p>' . $paymentInfo . '</p>';
+        }
+
+        return $orderReceivedText;
     }
 }
