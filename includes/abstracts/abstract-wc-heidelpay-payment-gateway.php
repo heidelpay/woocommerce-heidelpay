@@ -461,7 +461,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $callers = debug_backtrace();
         wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
-            $callers [0] ['function'] .': '. print_r($logData, 1), 1));
+            $callers [1] ['function'] .': '. print_r($logData, 1), 1));
     }
 
     public function addPayInfo($orderReceivedText)
