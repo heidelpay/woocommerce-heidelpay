@@ -70,17 +70,17 @@ class WC_Heidelpay_Response
             $payCode = explode('.', $post_data ['PAYMENT_CODE']);
             $note = '';
 
+            $this->setPaymentInfo($order);
+
             // If no money has been payed yet.
             if (strtoupper($payCode[1]) === 'PA' || strtoupper($payCode[1]) === 'RG') {
                 // In not Prepayment and Invoice payment can be captured manually
                 if (strtoupper($payCode [0]) !== 'PP' && strtoupper($payCode [0]) !== 'IV') {
                     $note = __(
                         'Payment reservation successful. Please use the hiP to check the payment.',
-                        'woocommerce-heidelpay.'
+                        'woocommerce-heidelpay'
                     );
                     $order->add_order_note($note, false);
-                } else {
-                    $order->add_meta_data('heidelpay-paymentInfo', $this->setPaymentInfo(self::$response));
                 }
 
                 $order->update_status('on-hold', __('Awaiting payment.', 'woocommerce-heidelpay')
@@ -110,42 +110,59 @@ class WC_Heidelpay_Response
             //show thank you page
             echo $order->get_checkout_order_received_url();
         }
-
-        $info = $order->get_meta('heidelpay-paymentInfo', true);
-        wc_get_logger()->log(
-            WC_Log_Levels::DEBUG,
-            'Payment - Meta ' . htmlspecialchars(print_r($info, 1))
-        );
     }
 
-    public function setPaymentInfo(Response $response)
+    /**
+     * Add payment information to the order if available.
+     * Information usually are set for invoice, direct debit and prepayment.
+     * @param WC_Order $order
+     * @return null
+     */
+    public function setPaymentInfo(WC_Order $order)
     {
-        $payinfo = $response->getConnector();
+        // Load template text for Payment information
+        $payInfoTemplate = $this->getInfoTemplate();
+        if ($payInfoTemplate === null) {
+            return null;
+        }
+
+        $response = self::$response;
+        $payInfo = $response->getConnector();
         $presentation = $response->getPresentation();
 
-
-        $payInfoTemplate = 'Zahlungsinformationen <br/>
-Bitte überweisen Sie uns den Betrag von %1$s %2$s nach Erhalt der Ware auf folgendes Konto:<br/>
-<br/>
-Kontoinhaber: %3$s<br/>
-IBAN: %4$s<br/>
-BIC: %5$s<br/>
-<br/>
-Geben Sie als Verwendungszweck bitte ausschließlich diese Identifikationsnummer an:<br/>
-<b>%6$s </b>';
-
-        $infoText = sprintf(
-            $payInfoTemplate,
-            $presentation->getAmount(),
-            $presentation->getCurrency(),
-            $payinfo->getAccountHolder(),
-            $payinfo->getAccountIBan(),
-            $payinfo->getAccountBic(),
-            self::$response->getIdentification()->getShortId()
+        $paymentData = array(
+            '{AMOUNT}' => $presentation->getAmount(),
+            '{CURRENCY}' => $presentation->getCurrency(),
+            '{CONNECTOR_ACCOUNT_HOLDER}' => $payInfo->getAccountHolder(),
+            '{CONNECTOR_ACCOUNT_IBAN}' => $payInfo->getAccountIBan(),
+            '{CONNECTOR_ACCOUNT_BIC}' => $payInfo->getAccountBic(),
+            '{IDENTIFICATION_SHORTID}' => self::$response->getIdentification()->getShortId(),
+            '{Iban}' => $response->getAccount()->getIban(),
+            '{Ident}' => $response->getAccount()->getIdentification(),
+            '{CreditorId}' => $response->getIdentification()->getCreditorId(),
         );
 
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Payment - info' . htmlspecialchars(print_r($infoText, 1)));
-        return $infoText;
+        $paymentText = strtr($payInfoTemplate, $paymentData);
+
+        $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
+    }
+
+    public function getInfoTemplate()
+    {
+        $payCode = explode('.', self::$response->getPayment()->getCode());
+        switch (strtoupper($payCode[0])) {
+            case 'IV':
+                return __('invoice_info', 'woocommerce-heidelpay');
+                break;
+            case 'PP':
+                return __('prepayment_info', 'woocommerce-heidelpay');
+                break;
+            case 'DD':
+                return __('direct_debit_info', 'woocommerce-heidelpay');
+                break;
+            default:
+                return null;
+        }
     }
 
     /*

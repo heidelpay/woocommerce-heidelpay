@@ -13,6 +13,16 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
+#: includes/class-wc-heidelpay-response.php:134
+msgid "invoice_info"
+msgstr ""
+
+msgid "prepayment_info"
+msgstr ""
+
+msgid "direct_debit_info"
+msgstr ""
+
 #: includes/abstracts/abstract-wc-heidelpay-iframe-gateway.php:57
 msgid "Awaiting payment"
 msgstr ""
