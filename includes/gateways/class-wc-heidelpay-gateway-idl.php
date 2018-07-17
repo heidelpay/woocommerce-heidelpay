@@ -149,5 +149,4 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
 
         return $available_gateways;
     }
-
 }

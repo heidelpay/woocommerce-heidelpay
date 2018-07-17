@@ -443,6 +443,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    protected function paymentLog($logData)
+    {
+        $callers = debug_backtrace();
+        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
+            $callers [1] ['function'] .': '. print_r($logData, 1), 1));
+    }
+
     /**
      * Get the order using the Get parameter 'key'
      * @return bool|WC_Order|WC_Refund
@@ -455,13 +462,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         }
 
         return null;
-    }
-
-    protected function paymentLog($logData)
-    {
-        $callers = debug_backtrace();
-        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
-            $callers [1] ['function'] .': '. print_r($logData, 1), 1));
     }
 
     public function addPayInfo($orderReceivedText)
