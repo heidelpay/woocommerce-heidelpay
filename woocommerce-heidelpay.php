@@ -212,7 +212,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              * Checks the environment for compatibility problems.  Returns a string with the first incompatibility
              * found or false if the environment has no problems.
              */
-            static function get_environment_warning()
+            public static function get_environment_warning()
             {
                 if (version_compare(phpversion(), WC_HEIDELPAY_MIN_PHP_VER, '<')) {
                     $message = __('minimal PHP version error', 'woocommerce-heidelpay');

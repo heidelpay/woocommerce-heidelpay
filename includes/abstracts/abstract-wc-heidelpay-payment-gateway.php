@@ -57,9 +57,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         add_action('woocommerce_api_' . strtolower(get_class($this)), array($this, 'callback_handler'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
         add_action('woocommerce_after_checkout_validation', array($this, 'checkoutValidation'));
+        add_action('woocommerce_email_before_order_table', array($this, 'emailInstructions'), 10, 3);
 
         // Filter
         add_filter('woocommerce_available_payment_gateways', array($this, 'setAvailability'));
+        add_filter('woocommerce_thankyou_order_received_text', array($this, 'addPayInfo'));
     }
 
     /**
@@ -318,6 +320,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 ];
             }
 
+            $this->paymentLog($this->payMethod->getResponse()->getError());
             $this->addPaymentError($this->getErrorMessage());
         } else {
             $this->addPaymentError($this->getErrorMessage());
@@ -326,7 +329,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 WC_Log_Levels::ERROR,
                 htmlspecialchars(
                     print_r(
-                        $this->plugin_id . ' - ' . $this->id . __(' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay') . $this->bookingAction,
+                        $this->plugin_id . ' - ' . $this->id . __(
+                            ' Error: Paymentmethod was not found: ',
+                            'woocommerce-heidelpay'
+                        ) . $this->bookingAction,
                         1
                     )
                 )
@@ -435,5 +441,73 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
             'default' => 'DB'
         );
+    }
+
+    /**
+     * Funktion to log Events as a notice. It has a prefix to identify that the log entry is from heidelpay and which
+     * function has created it.
+     * @param  string|array $logData
+     */
+    protected function paymentLog($logData)
+    {
+        $callers = debug_backtrace();
+        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
+            $callers [1] ['function'] .': '. print_r($logData, 1), 1));
+    }
+
+    /**
+     * Get the order using the Get parameter 'key'
+     * @return bool|WC_Order|WC_Refund
+     */
+    public function getOrderFromKey()
+    {
+        if(isset($_GET['key'])) {
+            $order_id = wc_get_order_id_by_order_key($_GET['key']);
+            return wc_get_order($order_id);
+        }
+
+        return null;
+    }
+
+    /**
+     * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the successpage after
+     * payment.
+     * @param $orderReceivedText
+     * @return string
+     */
+    public function addPayInfo($orderReceivedText)
+    {
+        $order = $this->getOrderFromKey();
+
+        if ($order === null || $order->get_payment_method() !== $this->id) {
+            return $orderReceivedText;
+        }
+
+        $paymentInfo = $order->get_meta('heidelpay-paymentInfo');
+
+        if(!empty($paymentInfo)) {
+            $orderReceivedText .= '<p>' . $paymentInfo . '</p>';
+        }
+
+        return $orderReceivedText;
+    }
+
+    /**
+     * Hook - "woocommerce_email_before_order_table". Add heidelpay-paymentInfo text to "completed order" email.
+     * @param WC_Order $order
+     * @param $sent_to_admin
+     * @param bool $plain_text
+     * @return null
+     */
+    public function emailInstructions(WC_Order $order, $sent_to_admin, $plain_text = false)
+    {
+        if ($order->get_payment_method() !== $this->id) {
+            return null;
+        }
+
+        if ($this->instructions) {
+            echo wpautop(wptexturize($this->instructions)) . PHP_EOL;
+        }
+        echo $order->get_meta('heidelpay-paymentInfo');
     }
 }

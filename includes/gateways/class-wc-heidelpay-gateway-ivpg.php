@@ -31,14 +31,12 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     public function __construct()
     {
         parent::__construct();
-
-        add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
     }
 
     public function checkoutValidation()
     {
         // If gateway is not active no validation is necessary.
-        if($this->isGatewayActive() === false) {
+        if ($this->isGatewayActive() === false) {
             return true;
         }
 
@@ -61,7 +59,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
                 'error'
             );
         }
-
     }
 
     private function is18($given)
@@ -82,8 +79,14 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         parent::init_form_fields();
 
         $this->form_fields['title']['default'] = sprintf(__('%s', 'woocommerce-heidelpay'), $this->name);
-        $this->form_fields['description']['default'] = sprintf(__('Insert payment data for %s', 'woocommerce-heidelpay'), $this->name);
-        $this->form_fields['instructions']['default'] = __('please send the money to IBAN BIC ', 'woocommerce-heidelpay');
+        $this->form_fields['description']['default'] = sprintf(
+            __('Insert payment data for %s', 'woocommerce-heidelpay'),
+            $this->name
+        );
+        $this->form_fields['instructions']['default'] = __(
+            'please send the money to IBAN BIC ',
+            'woocommerce-heidelpay'
+        );
         $this->form_fields['enabled']['label'] = sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
@@ -113,7 +116,11 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['availableCountries'] = array(
             'title' => __('Available Countries for secured invoice', 'woocommerce-heidelpay'),
             'type' => 'title',
-            'description' => __('Here you can enable secured Invoice for specific countries. Be aware that this will not enable the country in your WooCommerce settings and you have to enable them seperately.', 'woocommerce-heidelpay')
+            'description' => __(
+                'Here you can enable secured Invoice for specific countries. Be aware that this will not enable the ' .
+                'country in your WooCommerce settings and you have to enable them seperately.',
+                'woocommerce-heidelpay'
+            )
         );
 
         $this->form_fields['availableDE'] = array(
@@ -145,25 +152,31 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     public function setAvailability($available_gateways)
     {
         $security = true;
+        $customer = wc()->customer;
+        $cart = wc()->cart;
 
-        if (!empty(wc()->customer->get_billing_company())) {
-            $security = false;
-        }
+        if ($customer !== null && $cart !== null) {
+            if (!empty($customer->get_billing_company())) {
+                $security = false;
+            }
 
-        if (!in_array(wc()->customer->get_billing_country(), $this->getEnabledCountries(), true)) {
-            $security = false;
-        }
+            if (!in_array($customer->get_billing_country(), $this->getEnabledCountries(), true)) {
+                $security = false;
+            }
 
-        if (wc()->customer->get_billing_address_1() !== wc()->customer->get_shipping_address_1() ||
-            wc()->customer->get_billing_address_2() !== wc()->customer->get_shipping_address_2() ||
-            wc()->customer->get_billing_city() !== wc()->customer->get_shipping_city() ||
-            wc()->customer->get_billing_postcode() !== wc()->customer->get_shipping_postcode()
-        ) {
-            $security = false;
-        }
+            if ($customer->get_billing_address_1() !== $customer->get_shipping_address_1() ||
+                $customer->get_billing_address_2() !== $customer->get_shipping_address_2() ||
+                $customer->get_billing_city() !== $customer->get_shipping_city() ||
+                $customer->get_billing_postcode() !== $customer->get_shipping_postcode()
+            ) {
+                $security = false;
+            }
 
-        if (wc()->cart->get_totals()['total'] > $this->get_option('max') ||
-            wc()->cart->get_totals()['total'] < $this->get_option('min')) {
+            if ($cart->get_totals()['total'] > $this->get_option('max') ||
+                $cart->get_totals()['total'] < $this->get_option('min')) {
+                $security = false;
+            }
+        } else {
             $security = false;
         }
 
@@ -245,17 +258,13 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
     public function ErrorHtml()
     {
-        $errorText = __('You have to be at least 18 years old in order to use secured invoice', 'woocommerce-heidelpay');
+        $errorText = __(
+            'You have to be at least 18 years old in order to use secured invoice',
+            'woocommerce-heidelpay'
+        );
         return '<ul class="woocommerce-error" role="alert">' .
             '<li>' . $errorText . '</li>' .
             '</ul>';
-    }
-
-    public function email_instructions($order, $sent_to_admin, $plain_text = false)
-    {
-        if ($this->instructions) {
-            echo wpautop(wptexturize($this->instructions)) . PHP_EOL;
-        }
     }
 
     /**
