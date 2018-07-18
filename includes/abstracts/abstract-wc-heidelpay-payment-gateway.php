@@ -320,7 +320,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 ];
             }
 
-            $this->paymentLog($this->getErrorMessage());
+            $this->paymentLog($this->payMethod->getResponse()->getError());
             $this->addPaymentError($this->getErrorMessage());
         } else {
             $this->addPaymentError($this->getErrorMessage());
@@ -443,10 +443,15 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    /**
+     * Funktion to log Events as a notice. It has a prefix to identify that the log entry is from heidelpay and which
+     * function has created it.
+     * @param  string|array $logData
+     */
     protected function paymentLog($logData)
     {
         $callers = debug_backtrace();
-        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
+        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
             $callers [1] ['function'] .': '. print_r($logData, 1), 1));
     }
 
@@ -464,6 +469,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         return null;
     }
 
+    /**
+     * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the successpage after
+     * payment.
+     * @param $orderReceivedText
+     * @return string
+     */
     public function addPayInfo($orderReceivedText)
     {
         $order = $this->getOrderFromKey();
@@ -481,6 +492,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         return $orderReceivedText;
     }
 
+    /**
+     * Hook - "woocommerce_email_before_order_table". Add heidelpay-paymentInfo text to "completed order" email.
+     * @param WC_Order $order
+     * @param $sent_to_admin
+     * @param bool $plain_text
+     * @return null
+     */
     public function emailInstructions(WC_Order $order, $sent_to_admin, $plain_text = false)
     {
         if ($order->get_payment_method() !== $this->id) {

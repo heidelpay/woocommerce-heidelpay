@@ -30,6 +30,11 @@ class WC_Heidelpay_Response
      */
     public static $response;
 
+    /**
+     * Setup for Response handling and security.
+     * @param array $post_data
+     * @param $secret
+     */
     public function init(array $post_data, $secret)
     {
         if (empty(self::$response)) {
@@ -147,6 +152,10 @@ class WC_Heidelpay_Response
         $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
     }
 
+    /**
+     * Provide the template text for payment information.
+     * @return null|string
+     */
     public function getInfoTemplate()
     {
         $payCode = explode('.', self::$response->getPayment()->getCode());

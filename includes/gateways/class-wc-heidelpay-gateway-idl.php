@@ -134,8 +134,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
     {
         $available = true;
 
-        $isCustomer = wc()->customer !== null;
-        if ($isCustomer) {
+        if (wc()->customer !== null) {
             if (wc()->customer->get_billing_country() !== 'NL') {
                 $available = false;
             }
