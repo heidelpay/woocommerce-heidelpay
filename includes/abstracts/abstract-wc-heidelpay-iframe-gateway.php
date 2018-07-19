@@ -102,11 +102,10 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
      */
     public function after_pay()
     {
-        $order_id = wc_get_order_id_by_order_key($_GET['key']);
-        $order = wc_get_order($order_id);
+        $order = $this->getOrderFromKey();
 
-        if ($order->get_payment_method() === $this->id) {
-            $this->performRequest($order_id);
+        if ($order !== null && $order->get_payment_method() === $this->id) {
+            $this->performRequest($order->get_id());
         }
     }
 
@@ -145,6 +144,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
                     . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
             } else {
                 $iFrame .= '<pre>' . print_r($this->getErrorMessage(), 1) . '</pre>';
+                $this->paymentLog($this->payMethod->getResponse()->getError());
             }
             $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
             $iFrame .=  '</form>';
