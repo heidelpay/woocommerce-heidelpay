@@ -61,16 +61,20 @@ class WC_Heidelpay_Push
         $orderID = $response->getIdentification()->getTransactionId();
         $order = wc_get_order($orderID);
 
-        if ($order->get_total() === $response->getPresentation()->getAmount()) {
-            $order->update_status(
-                'processing',
-                $this->getNote($response)
-            );
-        } else {
-            $order->add_order_note(
-                $this->getNote($response),
-                false
-            );
+        if ($response->isSuccess()) {
+            if ($order->get_total() === $response->getPresentation()->getAmount()) {
+                $order->update_status(
+                    'processing',
+                    $this->getNote($response)
+                );
+            } else {
+                $order->add_order_note(
+                    $this->getNote($response),
+                    false
+                );
+            }
+        } elseif ($response->isError()) {
+            $order->update_status('failed');
         }
     }
 
