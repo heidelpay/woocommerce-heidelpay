@@ -126,7 +126,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                     'Instructions that will be added to the thank you page and emails.',
                     'woocommerce-heidelpay'
                 ),
-                'default' => __('The following account will be billed:', 'woocommerce-heidelpay'),
+                'default' => '',
                 'desc_tip' => true,
             ),
             'security_sender' => array(
@@ -508,6 +508,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         if ($this->instructions) {
             echo wpautop(wptexturize($this->instructions)) . PHP_EOL;
         }
-        echo $order->get_meta('heidelpay-paymentInfo');
+
+        if($this->get_option('send_payment_info') === 'yes') {
+            if($order->get_status() === 'pending' || $order->get_status() === 'on-hold') {
+                echo $order->get_meta('heidelpay-paymentInfo');
+            }
+        }
     }
 }
