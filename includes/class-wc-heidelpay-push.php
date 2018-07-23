@@ -28,11 +28,17 @@ class WC_Heidelpay_Push
     /** @var Heidelpay\PhpPaymentApi\Push */
     public static $push;
 
+    /**
+     * @param $rawPayload
+     * @param $secret
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\XmlResponseParserException
+     */
     public function init($rawPayload, $secret)
     {
         if (empty(self::$push)) {
             self::$push = new Push($rawPayload);
         }
+        /** @var Heidelpay\PhpPaymentApi\Response $response */
         $response = self::$push->getResponse();
 
         try {
@@ -47,11 +53,38 @@ class WC_Heidelpay_Push
         $this->handlePush($response);
     }
 
+    /**
+     * @param Heidelpay\PhpPaymentApi\Response $response
+     */
     public function handlePush($response)
     {
         $orderID = $response->getIdentification()->getTransactionId();
         $order = wc_get_order($orderID);
 
-        $order->update_status('processing', 'Bezahlung ist eingegangen');
+        if ($order->get_total() === $response->getPresentation()->getAmount()) {
+            $order->update_status(
+                'processing',
+                $this->getNote($response)
+            );
+        } else {
+            $order->add_order_note(
+                $this->getNote($response),
+                false
+            );
+        }
+    }
+
+    /**
+     * @param Heidelpay\PhpPaymentApi\Response $response
+     * @return string
+     */
+    private function getNote($response)
+    {
+        return sprintf(
+            __('Payment of %s %s received. Heidelpay ShortID %s', 'woocommerce-heidelpay'),
+            $response->getPresentation()->getAmount(),
+            $response->getPresentation()->getCurrency(),
+            $response->getIdentification()->getShortId()
+        );
     }
 }
