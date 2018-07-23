@@ -88,8 +88,10 @@ class WC_Heidelpay_Response
                     $order->add_order_note($note, false);
                 }
 
-                $order->update_status('on-hold', __('Awaiting payment.', 'woocommerce-heidelpay')
-                . ' ' . $note) . ' ';
+                $order->update_status(
+                    'on-hold',
+                    __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
+                );
             } else {
                 $order->payment_complete();
             }
@@ -172,14 +174,5 @@ class WC_Heidelpay_Response
             default:
                 return null;
         }
-    }
-
-    /*
-     * handle push post
-     */
-
-    public function handlePush()
-    {
-        //TODO
     }
 }

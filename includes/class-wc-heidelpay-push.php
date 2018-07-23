@@ -44,16 +44,11 @@ class WC_Heidelpay_Push
                 $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1));
             exit(); //error
         }
-
         $this->handlePush($response);
     }
 
     public function handlePush($response)
     {
-        //TODO: HashSecurityCheck
-        //TODO: Amount mit OrderAmount abgleichen
-        //TODO: Push in Datenbank schreiben?
-
         $orderID = $response->getIdentification()->getTransactionId();
         $order = wc_get_order($orderID);
 
