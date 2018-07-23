@@ -105,7 +105,7 @@ msgid "Payment information mail"
 msgstr "Zahlungsdaten per mail"
 
 msgid "Add payment information to e-mail"
-msgstr "Fügt Zahlungsdaten der Bestätigungs-mail hinzu"
+msgstr "Fügt Zahlungsdaten der Bestätigungsmail hinzu"
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:127
 msgid "The following account will be billed:"
