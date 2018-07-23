@@ -101,6 +101,12 @@ msgstr "Anweisungen"
 msgid "Instructions that will be added to the thank you page and emails."
 msgstr "Anweisungen auf der Bestellbestätigungsseite und in E-Mails"
 
+msgid "Payment information mail"
+msgstr "Zahlungsdaten per mail"
+
+msgid "Add payment information to e-mail"
+msgstr "Fügt Zahlungsdaten der Bestätigungs-mail hinzu"
+
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:127
 msgid "The following account will be billed:"
 msgstr "Das folgende Konto wird belastet:"
