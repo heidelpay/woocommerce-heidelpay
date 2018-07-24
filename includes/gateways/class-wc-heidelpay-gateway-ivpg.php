@@ -109,7 +109,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['min'] = array(
             'title' => __('Minimum Amount', 'woocommerce-heidelpay'),
             'type' => 'text',
-            'default' => 100,
+            'default' => 10,
             'desc_tip' => true,
         );
 

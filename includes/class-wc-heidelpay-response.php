@@ -59,14 +59,14 @@ class WC_Heidelpay_Response
 
 
         $this->handleResult($post_data, $order);
-
-        //TODO: if case for distinction between result and push
     }
 
     /**
      * handle result post
+     *
+     * @param $post_data
+     * @param WC_Order $order
      */
-
     public function handleResult($post_data, WC_Order $order)
     {
         $uid = self::$response->getIdentification()->getUniqueId();
@@ -88,8 +88,10 @@ class WC_Heidelpay_Response
                     $order->add_order_note($note, false);
                 }
 
-                $order->update_status('on-hold', __('Awaiting payment.', 'woocommerce-heidelpay')
-                . ' ' . $note) . ' ';
+                $order->update_status(
+                    'on-hold',
+                    __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
+                );
             } else {
                 $order->payment_complete();
             }
@@ -172,14 +174,5 @@ class WC_Heidelpay_Response
             default:
                 return null;
         }
-    }
-
-    /*
-     * handle push post
-     */
-
-    public function handlePush()
-    {
-        //TODO
     }
 }
