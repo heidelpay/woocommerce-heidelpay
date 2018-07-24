@@ -30,11 +30,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     /** @var array Array of locales */
     public $locale;
 
-
-
-
-
-
     public function checkoutValidation()
     {
         // If gateway is not active no validation is necessary.
@@ -71,6 +66,16 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
         $this->form_fields['user_password']['default'] = '93167DE7';
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171744F3D6D155865';
+        $this->form_fields['send_payment_info'] = array(
+            'title' => __('Payment information mail', 'woocommerce-heidelpay'),
+            'type' => 'checkbox',
+            'description' => __(
+                'Add payment information to e-mail',
+                'woocommerce-heidelpay'
+            ),
+            'default' => 'yes',
+            'desc_tip' => true,
+        );
     }
 
     public function payment_fields()
