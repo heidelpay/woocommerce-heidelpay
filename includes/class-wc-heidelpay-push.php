@@ -60,21 +60,24 @@ class WC_Heidelpay_Push
     {
         $orderID = $response->getIdentification()->getTransactionId();
         $order = wc_get_order($orderID);
+        $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
-        if ($response->isSuccess()) {
-            if ($order->get_total() === $response->getPresentation()->getAmount()) {
-                $order->update_status(
-                    'processing',
-                    $this->getNote($response)
-                );
-            } else {
-                $order->add_order_note(
-                    $this->getNote($response),
-                    false
-                );
+        if ($payCode[1] === 'CP' || $payCode[1] === 'RC' || $payCode[1] === 'CD' || $payCode[1] === 'DB') {
+            if ($response->isSuccess()) {
+                if ($order->get_total() === $response->getPresentation()->getAmount()) {
+                    $order->update_status(
+                        'processing',
+                        $this->getNote($response)
+                    );
+                } else {
+                    $order->add_order_note(
+                        $this->getNote($response),
+                        false
+                    );
+                }
+            } elseif ($response->isError()) {
+                $order->update_status('failed');
             }
-        } elseif ($response->isError()) {
-            $order->update_status('failed');
         }
     }
 
