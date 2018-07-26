@@ -62,13 +62,41 @@ class WC_Heidelpay_Push
         $order = wc_get_order($orderID);
         $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
-        if ($payCode[1] === 'CP' || $payCode[1] === 'RC' || $payCode[1] === 'CD' || $payCode[1] === 'DB') {
+        wc_get_logger()->log(WC_Log_Levels::DEBUG, $order->get_status());
+
+        if ($payCode[0] === 'IV') {
+            if ($response->isSuccess()) {
+                switch ($payCode[1]) {
+                    case 'FI':
+                        $order->update_status(
+                            'on-hold',
+                            'Order has been finalized'
+                        );
+                        break;
+                    case 'PA':
+                        $order->update_status(
+                            'processing',
+                            'Reservation done'
+                        );
+                        break;
+                }
+            }
+        }
+
+        if ($payCode[1] === 'CP' || $payCode[1] === 'RC' || $payCode[1] === 'DB') {
             if ($response->isSuccess()) {
                 if ($order->get_total() === $response->getPresentation()->getAmount()) {
-                    $order->update_status(
-                        'processing',
-                        $this->getNote($response)
-                    );
+                    if ($payCode[0] === 'IV') {
+                        $order->update_status(
+                            'completed',
+                            $this->getNote($response)
+                        );
+                    } else {
+                        $order->update_status(
+                            'processing',
+                            $this->getNote($response)
+                        );
+                    }
                 } else {
                     $order->add_order_note(
                         $this->getNote($response),
@@ -76,7 +104,9 @@ class WC_Heidelpay_Push
                     );
                 }
             } elseif ($response->isError()) {
-                $order->update_status('failed');
+                if ($order->get_status() === 'pending') {
+                    $order->update_status('failed');
+                }
             }
         }
     }
