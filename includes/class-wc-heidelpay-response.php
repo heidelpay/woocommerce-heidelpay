@@ -72,7 +72,7 @@ class WC_Heidelpay_Response
         $uid = self::$response->getIdentification()->getUniqueId();
 
         if (self::$response->isSuccess()) {
-            $payCode = explode('.', $post_data ['PAYMENT_CODE']);
+            $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
             $note = '';
 
             $this->setPaymentInfo($order);
@@ -87,11 +87,12 @@ class WC_Heidelpay_Response
                     );
                     $order->add_order_note($note, false);
                 }
-
-                $order->update_status(
-                    'on-hold',
-                    __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
-                );
+                if ($payCode[0] !== 'IV') {
+                    $order->update_status(
+                        'on-hold',
+                        __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
+                    );
+                }
             } else {
                 $order->payment_complete();
             }
@@ -114,7 +115,7 @@ class WC_Heidelpay_Response
             //empty cart
             wc()->cart->empty_cart();
 
-            //show thank you page
+//show thank you page
             echo $order->get_checkout_order_received_url();
         }
     }
@@ -125,7 +126,8 @@ class WC_Heidelpay_Response
      * @param WC_Order $order
      * @return null
      */
-    public function setPaymentInfo(WC_Order $order)
+    public
+    function setPaymentInfo(WC_Order $order)
     {
         // Load template text for Payment information
         $payInfoTemplate = $this->getInfoTemplate();
@@ -158,7 +160,8 @@ class WC_Heidelpay_Response
      * Provide the template text for payment information.
      * @return null|string
      */
-    public function getInfoTemplate()
+    public
+    function getInfoTemplate()
     {
         $payCode = explode('.', self::$response->getPayment()->getCode());
         switch (strtoupper($payCode[0])) {
