@@ -126,8 +126,7 @@ class WC_Heidelpay_Response
      * @param WC_Order $order
      * @return null
      */
-    public
-    function setPaymentInfo(WC_Order $order)
+    public function setPaymentInfo(WC_Order $order)
     {
         // Load template text for Payment information
         $payInfoTemplate = $this->getInfoTemplate();
@@ -160,8 +159,7 @@ class WC_Heidelpay_Response
      * Provide the template text for payment information.
      * @return null|string
      */
-    public
-    function getInfoTemplate()
+    public function getInfoTemplate()
     {
         $payCode = explode('.', self::$response->getPayment()->getCode());
         switch (strtoupper($payCode[0])) {
