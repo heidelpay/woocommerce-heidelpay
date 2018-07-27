@@ -78,21 +78,19 @@ class WC_Heidelpay_Response
             $this->setPaymentInfo($order);
 
             // If no money has been payed yet.
-            if (strtoupper($payCode[1]) === 'PA' || strtoupper($payCode[1]) === 'RG') {
-                // In not Prepayment and Invoice payment can be captured manually
-                if (strtoupper($payCode [0]) !== 'PP' && strtoupper($payCode [0]) !== 'IV') {
+            if ($payCode[0] !== 'IV' && ($payCode[1] === 'PA' || $payCode[1] === 'RG')) {
+                // If not Prepayment and Invoice payment can be captured manually
+                if ($payCode [0] !== 'PP') {
                     $note = __(
                         'Payment reservation successful. Please use the hiP to check the payment.',
                         'woocommerce-heidelpay'
                     );
                     $order->add_order_note($note, false);
                 }
-                if ($payCode[0] !== 'IV') {
-                    $order->update_status(
-                        'on-hold',
-                        __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
-                    );
-                }
+                $order->update_status(
+                    'on-hold',
+                    __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
+                );
             } else {
                 $order->payment_complete();
             }
