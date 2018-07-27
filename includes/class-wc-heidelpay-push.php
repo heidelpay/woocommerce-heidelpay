@@ -60,21 +60,54 @@ class WC_Heidelpay_Push
     {
         $orderID = $response->getIdentification()->getTransactionId();
         $order = wc_get_order($orderID);
+        $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
-        if ($response->isSuccess()) {
-            if ($order->get_total() === $response->getPresentation()->getAmount()) {
-                $order->update_status(
-                    'processing',
-                    $this->getNote($response)
-                );
-            } else {
-                $order->add_order_note(
-                    $this->getNote($response),
-                    false
-                );
+        wc_get_logger()->log(WC_Log_Levels::DEBUG, $order->get_status());
+
+        if ($payCode[0] === 'IV') {
+            if ($response->isSuccess()) {
+                switch ($payCode[1]) {
+                    case 'FI':
+                        $order->update_status(
+                            'on-hold',
+                            'Order has been finalized'
+                        );
+                        break;
+                    case 'PA':
+                        $order->update_status(
+                            'processing',
+                            'Reservation done'
+                        );
+                        break;
+                }
             }
-        } elseif ($response->isError()) {
-            $order->update_status('failed');
+        }
+
+        if ($payCode[1] === 'CP' || $payCode[1] === 'RC' || $payCode[1] === 'DB') {
+            if ($response->isSuccess()) {
+                if ($order->get_total() === $response->getPresentation()->getAmount()) {
+                    if ($payCode[0] === 'IV') {
+                        $order->update_status(
+                            'completed',
+                            $this->getNote($response)
+                        );
+                    } else {
+                        $order->update_status(
+                            'processing',
+                            $this->getNote($response)
+                        );
+                    }
+                } else {
+                    $order->add_order_note(
+                        $this->getNote($response),
+                        false
+                    );
+                }
+            } elseif ($response->isError()) {
+                if ($order->get_status() === 'pending') {
+                    $order->update_status('failed');
+                }
+            }
         }
     }
 

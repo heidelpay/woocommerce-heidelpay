@@ -72,22 +72,21 @@ class WC_Heidelpay_Response
         $uid = self::$response->getIdentification()->getUniqueId();
 
         if (self::$response->isSuccess()) {
-            $payCode = explode('.', $post_data ['PAYMENT_CODE']);
+            $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
             $note = '';
 
             $this->setPaymentInfo($order);
 
             // If no money has been payed yet.
-            if (strtoupper($payCode[1]) === 'PA' || strtoupper($payCode[1]) === 'RG') {
-                // In not Prepayment and Invoice payment can be captured manually
-                if (strtoupper($payCode [0]) !== 'PP' && strtoupper($payCode [0]) !== 'IV') {
+            if ($payCode[0] !== 'IV' && ($payCode[1] === 'PA' || $payCode[1] === 'RG')) {
+                // If not Prepayment and Invoice payment can be captured manually
+                if ($payCode [0] !== 'PP') {
                     $note = __(
                         'Payment reservation successful. Please use the hiP to check the payment.',
                         'woocommerce-heidelpay'
                     );
                     $order->add_order_note($note, false);
                 }
-
                 $order->update_status(
                     'on-hold',
                     __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
@@ -114,7 +113,7 @@ class WC_Heidelpay_Response
             //empty cart
             wc()->cart->empty_cart();
 
-            //show thank you page
+//show thank you page
             echo $order->get_checkout_order_received_url();
         }
     }
