@@ -509,8 +509,16 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             echo wpautop(wptexturize($this->instructions)) . PHP_EOL;
         }
 
-        if($this->get_option('send_payment_info') === 'yes') {
-            if($order->get_status() === 'pending' || $order->get_status() === 'on-hold') {
+        $status = $order->get_status();
+        // defines the statuses when the mail should be send
+        $mailingArray = array(
+            'pending',
+            'on-hold',
+            'processing'
+        );
+
+        if ($this->get_option('send_payment_info') === 'yes') {
+            if (in_array($status, $mailingArray)) {
                 echo $order->get_meta('heidelpay-paymentInfo');
             }
         }
