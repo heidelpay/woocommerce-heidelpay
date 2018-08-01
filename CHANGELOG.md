@@ -2,19 +2,15 @@
 
 ## 1.2.0
 
-### Added
-
-#### Features:
-- Support for push notifications
-
-## 1.1.2
 ### Fixed:
-- missing payment information for secured invoice and direct debit on success page and notification mail.
-- invoice instruction was shown in other mails where other payment methods were used.
+- Missing payment information for secured invoice and direct debit on success page and notification mail.
+- Invoice instruction was shown in other mails where other payment methods were used.
 - Exception that can occur in combination with other plugins.
 
-### Added:
-- a checkbox to decide whether payment information should be added to the notification mail or not.
+### Added
+#### Features:
+- Support for push notifications
+- A checkbox to decide whether payment information should be added to the notification mail or not.
 
 ## 1.1.1
 
