@@ -1,5 +1,17 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## 1.2.0
+
+### Fixed:
+- Missing payment information for secured invoice and direct debit on success page and notification mail.
+- Invoice instruction was shown in other mails where other payment methods were used.
+- Exception that can occur in combination with other plugins.
+
+### Added
+#### Features:
+- Support for push notifications
+- A checkbox to decide whether payment information should be added to the notification mail or not.
+
 ## 1.1.1
 
 ### Fixed:
