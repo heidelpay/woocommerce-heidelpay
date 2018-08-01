@@ -78,10 +78,10 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
 
         $accountHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
 
-        if(!empty($brands)) {
+        if (!empty($brands)) {
             echo '<div>';
             echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
-            echo '<input type="text" id="accountholder" name="accountholder" class="form-row-wide validate-required" value="'. $accountHolder .'"> ';
+            echo '<input type="text" id="accountholder" name="accountholder" class="form-row-wide validate-required" value="' . $accountHolder . '"> ';
             echo '<br/>';
             echo '<label for="bankname">' . $accountHolderLabel . ':</label>';
             echo '<select name ="bankname" id="bankname" class="form-row-wide validate-required">';
@@ -134,7 +134,11 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
     {
         $available = true;
 
-        if (wc()->customer->get_billing_country() !== 'NL') {
+        if (wc()->customer !== null) {
+            if (wc()->customer->get_billing_country() !== 'NL') {
+                $available = false;
+            }
+        } else {
             $available = false;
         }
 
@@ -144,5 +148,4 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
 
         return $available_gateways;
     }
-
 }

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the heidelpay WooCommerce package.
 msgid ""
 msgstr ""
-"Project-Id-Version: heidelpay WooCommerce 1.1.1\n"
+"Project-Id-Version: heidelpay WooCommerce 1.1.2\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/woocommerce-"
 "heidelpay\n"
 "POT-Creation-Date: 2018-06-15 08:21:52+00:00\n"
@@ -12,6 +12,16 @@ msgstr ""
 "PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: includes/class-wc-heidelpay-response.php:134
+msgid "invoice_info"
+msgstr ""
+
+msgid "prepayment_info"
+msgstr ""
+
+msgid "direct_debit_info"
+msgstr ""
 
 #: includes/abstracts/abstract-wc-heidelpay-iframe-gateway.php:57
 msgid "Awaiting payment"
