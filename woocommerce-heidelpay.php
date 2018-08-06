@@ -224,10 +224,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              */
             public static function get_environment_warning()
             {
-                if (version_compare(phpversion(), WC_HEIDELPAY_MIN_PHP_VER, '<')) {
+                if (version_compare(PHP_VERSION, WC_HEIDELPAY_MIN_PHP_VER, '<')) {
                     $message = __('minimal PHP version error', 'woocommerce-heidelpay');
 
-                    return sprintf($message, WC_HEIDELPAY_MIN_PHP_VER, phpversion());
+                    return sprintf($message, WC_HEIDELPAY_MIN_PHP_VER, PHP_VERSION);
                 }
 
                 if (!defined('WC_VERSION')) {
@@ -281,7 +281,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              */
             public static function log($message)
             {
-                if (empty(self::$log)) {
+                if (null === self::$log) {
                     self::$log = new WC_Logger();
                 }
 
