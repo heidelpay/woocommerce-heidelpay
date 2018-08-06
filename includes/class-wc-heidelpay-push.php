@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-require_once(dirname(__DIR__) . '/vendor/autoload.php');
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Heidelpay\PhpPaymentApi\Push;
 
@@ -35,7 +35,7 @@ class WC_Heidelpay_Push
      */
     public function init($rawPayload, $secret)
     {
-        if (empty(self::$push)) {
+        if (null === self::$push) {
             self::$push = new Push($rawPayload);
         }
         /** @var Heidelpay\PhpPaymentApi\Response $response */
@@ -45,9 +45,9 @@ class WC_Heidelpay_Push
             $response->verifySecurityHash($secret, $response->getIdentification()->getTransactionId());
         } catch (\Exception $e) {
             $callers = debug_backtrace();
-            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r("Heidelpay - " .
-                $callers [0] ['function'] . ": Invalid push hash from " .
-                $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1));
+            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
+                $callers [0] ['function'] . ': Invalid push hash from ' .
+                $_SERVER ['REMOTE_ADDR'] . ', suspecting manipulation', 1));
             exit(); //error
         }
         $this->handlePush($response);

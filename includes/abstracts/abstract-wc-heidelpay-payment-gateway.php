@@ -173,7 +173,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * Validate the customer input coming from checkout.
-     * @return boolean
+     * @return void
      */
     public function checkoutValidation()
     {
@@ -186,12 +186,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function isGatewayActive()
     {
-        if (!empty($_POST['payment_method'])) {
-            if ($_POST['payment_method'] === $this->id)
-                return true;
-        }
-
-        return false;
+        return !empty($_POST['payment_method']) && $_POST['payment_method'] === $this->id;
     }
 
     /**
@@ -199,7 +194,8 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function enqueue_assets()
     {
-        wp_register_script('heidelpay-secured',
+        wp_register_script(
+            'heidelpay-secured',
             WC_HEIDELPAY_PLUGIN_URL . '/assets/js/securedInvoice.js',
             [],
             false,
@@ -214,6 +210,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      *
      * @param int $order_id
      * @return array|mixed
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      */
     public function process_payment($order_id)
     {
@@ -381,7 +378,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * process the Form input from customer comimg from checkout.
+     * process the Form input from customer coming from checkout.
      */
     protected function handleFormPost()
     {
@@ -518,11 +515,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * Hook - "woocommerce_email_before_order_table". Add heidelpay-paymentInfo text to "completed order" email.
      * @param WC_Order $order
-     * @param $sent_to_admin
-     * @param bool $plain_text
      * @return null
      */
-    public function emailInstructions(WC_Order $order, $sent_to_admin, $plain_text = false)
+    public function emailInstructions(WC_Order $order)
     {
         if ($order->get_payment_method() !== $this->id) {
             return null;
@@ -548,7 +543,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * @return array Containing the optionfield to select booking mode in the admin menue.
+     * @return array Containing the option field to select booking mode in the admin menu.
      */
     protected function getBookingSelection()
     {
