@@ -105,7 +105,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             'description' => ''
         );
 
-
         $this->form_fields['min'] = array(
             'title' => __('Minimum Amount', 'woocommerce-heidelpay'),
             'type' => 'text',
@@ -290,7 +289,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     {
         parent::handleFormPost();
 
-        if (!empty($_POST['salutation']) AND !empty($_POST['birthdate'])) {
+        if (!empty($_POST['salutation']) && !empty($_POST['birthdate'])) {
             $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
         }
     }

@@ -14,12 +14,13 @@
  * @package  woocommerce-heidelpay
  * @category WooCommerce
  */
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
-    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php';
 
 /**
  * Class WC_Heidelpay_IFrame_Gateway
@@ -82,7 +83,8 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
      */
     public function enqueue_assets()
     {
-        wp_register_script('heidelpay-iFrame',
+        wp_register_script(
+            'heidelpay-iFrame',
             WC_HEIDELPAY_PLUGIN_URL . '/assets/js/creditCardFrame.js',
             [],
             false,
@@ -160,7 +162,8 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
             htmlspecialchars(
                 print_r(
                     $this->plugin_id . ' - ' . $this->id . __(
-                        ' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay'
+                        ' Error: Paymentmethod was not found: ',
+                        'woocommerce-heidelpay'
                     ) . $bookingAction,
                     1
                 )
