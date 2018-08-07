@@ -19,8 +19,8 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
-    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php');
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod;
 

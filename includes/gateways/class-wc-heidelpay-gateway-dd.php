@@ -19,9 +19,8 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
-    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
-
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\DirectDebitPaymentMethod;
 
@@ -33,7 +32,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     public function checkoutValidation()
     {
         // If gateway is not active no validation is necessary.
-        if($this->isGatewayActive() === false) {
+        if ($this->isGatewayActive() === false) {
             return true;
         }
 
@@ -83,12 +82,12 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
         $accountIbanLabel = __('IBAN', 'woocommerce-heidelpay');
 
-        $accountHolder = wc()->customer->get_billing_first_name(). ' ' . wc()->customer->get_last_name();
+        $accountHolder = wc()->customer->get_billing_first_name() . ' ' . wc()->customer->get_last_name();
 
         echo '<div>';
 
         echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
-        echo '<input type="text" class="form-row-wiede validate-required" id="accountholder" name="accountholder" value="'. $accountHolder .'"> ';
+        echo '<input type="text" class="form-row-wiede validate-required" id="accountholder" name="accountholder" value="' . $accountHolder . '"> ';
         echo '<br/>';
 
         echo '<label for="accountiban">' . $accountIbanLabel . ':</label>';
@@ -98,6 +97,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     }
 
     //payment form
+
     /**
      * Set the id and PaymenMethod
      */

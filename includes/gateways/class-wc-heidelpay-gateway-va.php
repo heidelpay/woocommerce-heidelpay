@@ -26,7 +26,6 @@ use Heidelpay\PhpPaymentApi\PaymentMethods\PayPalPaymentMethod;
 
 class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
 {
-
     /** @var array Array of locales */
     public $locale;
     protected $bookingModes;
