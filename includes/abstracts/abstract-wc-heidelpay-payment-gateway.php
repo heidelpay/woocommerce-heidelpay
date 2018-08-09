@@ -27,8 +27,6 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
-
-    /** @var Heidelpay\PhpPaymentApi\PaymentMethods\BasicPaymentMethodTrait */
     public $payMethod;
     protected $name;
     protected $bookingAction;
