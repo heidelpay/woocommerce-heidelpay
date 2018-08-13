@@ -29,6 +29,27 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     /** @var array Array of locales */
     public $locale;
 
+    /**
+     * WC_Gateway_HP_DD constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->supports = array(
+            'subscriptions',
+            'subscription_cancellation',
+            'subscription_suspension',
+            'subscription_reactivation',
+            'subscription_amount_changes',
+            'subscription_date_changes',
+            'subscription_payment_method_change'
+        );
+    }
+
+    /**
+     * @return bool|void
+     */
     public function checkoutValidation()
     {
         // If gateway is not active no validation is necessary.
@@ -77,6 +98,9 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         );
     }
 
+    /**
+     * sets Payment Fields
+     */
     public function payment_fields()
     {
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
@@ -116,7 +140,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     {
         parent::handleFormPost();
 
-        if (!empty($_POST['accountholder']) AND !empty($_POST['accountiban'])) {
+        if (!empty($_POST['accountholder']) && !empty($_POST['accountiban'])) {
             $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['accountholder']));
             $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['accountiban']));
         }

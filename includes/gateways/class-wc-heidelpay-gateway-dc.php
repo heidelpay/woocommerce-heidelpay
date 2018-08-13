@@ -26,6 +26,27 @@ use Heidelpay\PhpPaymentApi\PaymentMethods\DebitCardPaymentMethod;
 
 class WC_Gateway_HP_DC extends WC_Heidelpay_IFrame_Gateway
 {
+    /**
+     * WC_Gateway_HP_DC constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->supports = array(
+            'subscriptions',
+            'subscription_cancellation',
+            'subscription_suspension',
+            'subscription_reactivation',
+            'subscription_amount_changes',
+            'subscription_date_changes',
+            'subscription_payment_method_change'
+        );
+    }
+
+    /**
+     * sets the Payment Method.
+     */
     public function setPayMethod()
     {
         $this->payMethod = new DebitCardPaymentMethod();

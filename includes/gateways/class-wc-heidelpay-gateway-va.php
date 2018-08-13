@@ -30,6 +30,27 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
     public $locale;
     protected $bookingModes;
 
+    /**
+     * WC_Gateway_HP_VA constructor.
+     */
+    public function __construct()
+    {
+        $this->supports = array(
+            'subscriptions',
+            'subscription_cancellation',
+            'subscription_suspension',
+            'subscription_reactivation',
+            'subscription_amount_changes',
+            'subscription_date_changes',
+            'subscription_payment_method_change'
+        );
+
+        parent::__construct();
+    }
+
+    /**
+     * sets the Payment Method.
+     */
     public function setPayMethod()
     {
         $this->payMethod = new PayPalPaymentMethod();
