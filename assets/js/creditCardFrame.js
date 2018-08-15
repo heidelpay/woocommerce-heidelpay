@@ -10,27 +10,27 @@
  * @category WOOCOMMERCE
  */
 
+jQuery(document).ready(function(){
+        /**
+         * Add an event listener to form submit, which will execute the sendMessage function
+         */
+        if (paymentFrameForm.addEventListener) {// W3C DOM
+            paymentFrameForm.addEventListener('submit', sendMessage);
+        } else if (paymentFrameForm.attachEvent) { // IE DOM
+            paymentFrameForm.attachEvent('onsubmit', sendMessage);
+        }
 
-jQuery(function () {
-    /**
-     * Get the form element
-     */
-        paymentFrameForm = document.getElementById('paymentFrameForm');
-        if(paymentFrameForm != null) {
-            var paymentFrameIframe = document.getElementById('paymentFrameIframe');
-
-            /**
-             * Add an event listener to from submit, which will execute the sendMessage function
-             */
-            if (paymentFrameForm.addEventListener) {// W3C DOM
-                paymentFrameForm.addEventListener('submit', sendMessage);
-            }
-            else if (paymentFrameForm.attachEvent) { // IE DOM
-                paymentFrameForm.attachEvent('onsubmit', sendMessage);
-            }
-		}
+        /**
+         * Add an event listener to your webpage, which will receive the response message from payment server.
+         */
+        if (window.addEventListener) { // W3C DOM
+            window.addEventListener('message', receiveMessage);
+        } else if (window.attachEvent) { // IE DOM
+            window.attachEvent('onmessage', receiveMessage);
+        }
     }
 )
+
 
 /**
  * Define send Message function
@@ -40,60 +40,54 @@ jQuery(function () {
  */
 
 function sendMessage(e) {
-	
-	if(e.preventDefault) { e.preventDefault(); } 
-	else { e.returnValue = false; }
 
-	var data = {}; 
-	
-	/**
-	 * Collection form input fields
-	 */
-	
+    if(e.preventDefault) { e.preventDefault(); }
+    else { e.returnValue = false; }
 
-	/**
-	 * Send html postmessage to payment frame
-	 */
-	targetOrigin = getDomainFromUrl(jQuery('#paymentFrameIframe').attr('src'));
-	paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
+    var data = {};
+    /**
+     * Get the iFrame element
+     */
+    var paymentFrameIframe = document.getElementById('paymentFrameIframe');
+    /**
+     * Get hostname and protocol from paymentIframe
+     */
+    var targetOrigin = getDomainFromUrl(paymentFrameIframe.src);
+
+    /**
+     * Send html postmessage to payment frame
+     */
+    paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
 }
 
 
 /**
- * Function to get the domain from a given url 
+ * Function to get the domain from a given url
  */
-function getDomainFromUrl(url) { 
-	var arr = url.split("/"); 
-	return arr[0] + "//" + arr[2]; 
-	}
-
-
-/**
- * Add an listener to your webpage, which will recieve the response message
- * from payment server.
- */
-if (window.addEventListener) { // W3C DOM
-	window.addEventListener('message', receiveMessage);
-		
-	} 
-else if (window.attachEvent) { // IE DOM 
-	window.attachEvent('onmessage', receiveMessage); 
-	}
+function getDomainFromUrl(url) {
+    var arr = url.split("/");
+    return arr[0] + "//" + arr[2];
+}
 
 /**
  * Define receiveMessage function
  *
- * This function will recieve the response message form the payment server.
+ * This function will receive the response message form the payment server.
  */
-function receiveMessage(e) { 
-	
-	if (e.origin !== targetOrigin) {
-		return; 
-	}
-	
-	var antwort = JSON.parse(e.data);
-	console.log(antwort);
+function receiveMessage(e) {
+    /**
+     * Get the iFrame element
+     */
+    var paymentFrameIframe = document.getElementById('paymentFrameIframe');
+    /**
+     * Get hostname and protocol from paymentIframe
+     */
+
+    var targetOrigin = getDomainFromUrl(paymentFrameIframe.src);
+    if (e.origin !== targetOrigin) {
+        return;
+    }
+
+    var antwort = JSON.parse(e.data);
+    //console.log(antwort);
 }
-
-
-
