@@ -87,6 +87,9 @@ class WC_Heidelpay_Response
                     );
                     $order->add_order_note($note, false);
                 }
+                if ($payCode[1] === 'RG') {
+                    $order->add_meta_data('heidelpay-Registration', $uid);
+                }
                 $order->update_status(
                     'on-hold',
                     __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note

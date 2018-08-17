@@ -43,7 +43,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
             'subscription_reactivation',
             'subscription_amount_changes',
             'subscription_date_changes',
-            'subscription_payment_method_change'
         );
     }
 

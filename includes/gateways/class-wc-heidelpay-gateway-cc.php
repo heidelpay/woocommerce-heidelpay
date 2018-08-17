@@ -21,11 +21,15 @@ if (!defined('ABSPATH')) {
 
 require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
     DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php';
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'traits' .
+    DIRECTORY_SEPARATOR . 'trait-wc-heidelpay-subscription-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod;
 
 class WC_Gateway_HP_CC extends WC_Heidelpay_IFrame_Gateway
 {
+    use WC_Heidelpay_Subscription_Gateway;
+
     /**
      * WC_Gateway_HP_CC constructor.
      */
@@ -42,6 +46,15 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_IFrame_Gateway
             'subscription_date_changes',
             'subscription_payment_method_change'
         );
+
+        if (class_exists('WC_Subscriptions_Order')) {
+            add_action(
+                'woocommerce_scheduled_subscription_payment_' . $this->id,
+                array($this, 'scheduledSubscriptionPayment'),
+                10,
+                2
+            );
+        }
     }
 
     /**
@@ -49,24 +62,9 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_IFrame_Gateway
      */
     public function setPayMethod()
     {
+        /** @var \Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod payMethod */
         $this->payMethod = new CreditCardPaymentMethod();
         $this->id = 'hp_cc';
         $this->name = __('Credit Card', 'woocommerce-heidelpay');
     }
-
-    public function process_payment($order_id)
-    {
-        $order = wc_get_order($order_id);
-        $this->prepareRequest($order);
-
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, WC_Subscriptions_Order::get_total_initial_payment($order));
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, WC_Subscriptions_Order::get_recurring_total($order));
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, WC_Subscriptions_Order::get_subscription_period($order));
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, WC_Subscriptions_Order::get_subscription_length($order));
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, WC_Subscriptions_Order::order_contains_subscription($order));
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, WC_Subscriptions_Order::get_subscription_interval($order));
-
-        //return $this->performRequest($order_id);
-    }
-
 }

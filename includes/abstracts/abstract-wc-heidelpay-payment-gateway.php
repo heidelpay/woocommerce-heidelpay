@@ -455,6 +455,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function callback_handler()
     {
+        wc_get_logger()->log(
+            WC_Log_Levels::DEBUG,
+            'CallbackHandler ACTIVATED!!!!!!!!!'
+        );
         if (!empty($_POST)) {
             $response = new WC_Heidelpay_Response();
             $response->init($_POST, $this->get_option('secret'));

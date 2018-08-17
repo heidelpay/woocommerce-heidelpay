@@ -41,6 +41,10 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         );
     }
 
+    /**
+     * @param int $order_id
+     * @return array|mixed
+     */
     public function process_payment($order_id)
     {
         return $this->toCheckoutPayment($order_id);
@@ -133,6 +137,9 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $bookingAction = $this->getBookingAction();
 
         if (method_exists($this->payMethod, $bookingAction)) {
+            if (wcs_order_contains_subscription($order)) {
+                $bookingAction = 'registration';
+            }
             $this->payMethod->$bookingAction(
                 $host,
                 'FALSE',
