@@ -36,25 +36,7 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_IFrame_Gateway
     public function __construct()
     {
         parent::__construct();
-
-        $this->supports = array(
-            'subscriptions',
-            'subscription_cancellation',
-            'subscription_suspension',
-            'subscription_reactivation',
-            'subscription_amount_changes',
-            'subscription_date_changes',
-            'subscription_payment_method_change'
-        );
-
-        if (class_exists('WC_Subscriptions_Order')) {
-            add_action(
-                'woocommerce_scheduled_subscription_payment_' . $this->id,
-                array($this, 'scheduledSubscriptionPayment'),
-                10,
-                2
-            );
-        }
+        $this->constructerAddon();
     }
 
     /**

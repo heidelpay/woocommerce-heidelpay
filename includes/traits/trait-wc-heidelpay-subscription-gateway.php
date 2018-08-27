@@ -17,6 +17,28 @@
 
 trait WC_Heidelpay_Subscription_Gateway
 {
+    public function constructerAddon()
+    {
+        if (class_exists('WC_Subscriptions_Order')) {
+            $this->supports = array(
+                'subscriptions',
+                'subscription_cancellation',
+                'subscription_suspension',
+                'subscription_reactivation',
+                'subscription_amount_changes',
+                'subscription_date_changes',
+                'subscription_payment_method_change'
+            );
+
+            add_action(
+                'woocommerce_scheduled_subscription_payment_' . $this->id,
+                array($this, 'scheduledSubscriptionPayment'),
+                10,
+                2
+            );
+        }
+    }
+
     /**
      * @param $amount float
      * @param $renewalOrder WC_Order
@@ -29,11 +51,7 @@ trait WC_Heidelpay_Subscription_Gateway
         $order = WC_Subscriptions_Renewal_Order::get_parent_order($renewalOrder->get_id());
         //TODO: Debit on Registration
         parent::prepareRequest($renewalOrder);
-
-        wc_get_logger()->log(
-            WC_Log_Levels::DEBUG,
-            'REQUEST::::::::::::: ' . print_r($this->payMethod->getRequest(), 1)
-        );
+        $this->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
 
         try {
             $this->payMethod->debitOnRegistration($order->get_meta('heidelpay-Registration'));
@@ -42,36 +60,15 @@ trait WC_Heidelpay_Subscription_Gateway
             return null;
         }
 
+        /** @var \Heidelpay\PhpPaymentApi\Response $response */
+        $response = $this->payMethod->getResponse();
+
         if ($this->payMethod->getResponse()->isSuccess()) {
-            wc_get_logger()->log(
-                WC_Log_Levels::DEBUG,
-                'RESPONSE:::::::' . print_r($this->payMethod->getResponse(), 1)
-            );
-            //####################################
-            // Ab hier komme ich nicht weiter Der Initial Request wird durchgeführt, allerdings findet keine Weiterleitung statt, dementsprechend auch keine Transaktion
-            // folgendes habe ich schon ausprobiert:
-            //
-            // return $this->payMethod->getResponse()->getPaymentFormUrl();
-            //
-            // echo $this->payMethod->getResponse()->getPaymentFormUrl();
-            //
-            // header('Location: ' . $this->payMethod->getResponse()->getPaymentFormUrl());
-            //
-            // return [
-            //      'result' => 'success',
-            //      'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
-            //   ];
+            $renewalOrder->payment_complete($response->getIdentification()->getShortId());
         }
         if ($this->payMethod->getResponse()->isError()) {
             wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse()->getError(), 1));
         }
-    }
-
-    public function prepareRequest(WC_Order $order)
-    {
-        $this->setAuthentification();
-        $this->setCustomer($order);
-        $this->setBasket($order->get_id());
-        $this->setCriterions();
+        return null;
     }
 }

@@ -21,11 +21,15 @@ if (!defined('ABSPATH')) {
 
 require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
     DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php';
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'traits' .
+    DIRECTORY_SEPARATOR . 'trait-wc-heidelpay-subscription-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\PayPalPaymentMethod;
 
 class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
 {
+    use WC_Heidelpay_Subscription_Gateway;
+
     /** @var array Array of locales */
     public $locale;
     protected $bookingModes;
@@ -35,16 +39,8 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
      */
     public function __construct()
     {
-        $this->supports = array(
-            'subscriptions',
-            'subscription_cancellation',
-            'subscription_suspension',
-            'subscription_reactivation',
-            'subscription_amount_changes',
-            'subscription_date_changes',
-        );
-
         parent::__construct();
+        $this->constructerAddon();
     }
 
     /**
