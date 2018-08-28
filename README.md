@@ -15,6 +15,7 @@ To use this extension please paste the contents of the folder "woocommerce"" int
 * credit card
 * debit card
 * direct debit
+* GiroPay
 * iDEAL
 * Paypal
 * Sofort
