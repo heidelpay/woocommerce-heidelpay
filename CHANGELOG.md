@@ -1,5 +1,14 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## 1.3.0
+
+### Fixed:
+- Credit Card iFrame not working in Safari Browsers
+
+### Added:
+#### Features:
+- Add GiroPay Payment Method
+
 ## 1.2.0
 
 ### Fixed:

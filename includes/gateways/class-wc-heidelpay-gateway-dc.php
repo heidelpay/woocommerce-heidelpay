@@ -15,17 +15,17 @@
  * @category WooCommerce
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
-    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php');
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\DebitCardPaymentMethod;
 
-class WC_Gateway_HP_DC extends WC_Heidelpay_IFrame_Gateway {
-
+class WC_Gateway_HP_DC extends WC_Heidelpay_IFrame_Gateway
+{
     public function setPayMethod()
     {
         $this->payMethod = new DebitCardPaymentMethod();

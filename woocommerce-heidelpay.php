@@ -10,7 +10,7 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Plugin Name: heidelpay WooCommerce
  * Plugin URI: https://dev.heidelpay.com
  * Description: heidelpay payment integration for WooCommerce
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: heidelpay
  * Author URI: htts://www.heidelpay.com
  * Developer: heidelpay
@@ -29,7 +29,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     /**
      * Required minimums and constants
      */
-    define('WC_HEIDELPAY_VERSION', '1.2.0');
+    define('WC_HEIDELPAY_VERSION', '1.3.0');
     define('WC_HEIDELPAY_MIN_PHP_VER', '5.6.0');
     define('WC_HEIDELPAY_MIN_WC_VER', '3.0.0');
     define('WC_HEIDELPAY_MAIN_FILE', __FILE__);
@@ -132,6 +132,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php';
                 require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-idl.php';
                 require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php';
+                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-gp.php';
                 require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php';
                 require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php';
                 require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php';
@@ -152,6 +153,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 $methods[] = 'WC_Gateway_HP_DC';
                 $methods[] = 'WC_Gateway_HP_IDL';
                 $methods[] = 'WC_Gateway_HP_DD';
+                $methods[] = 'WC_Gateway_HP_GP';
                 $methods[] = 'WC_Gateway_HP_IVPG';
                 $methods[] = 'WC_Gateway_HP_SO';
                 $methods[] = 'WC_Gateway_HP_VA';
@@ -224,10 +226,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              */
             public static function get_environment_warning()
             {
-                if (version_compare(phpversion(), WC_HEIDELPAY_MIN_PHP_VER, '<')) {
+                if (version_compare(PHP_VERSION, WC_HEIDELPAY_MIN_PHP_VER, '<')) {
                     $message = __('minimal PHP version error', 'woocommerce-heidelpay');
 
-                    return sprintf($message, WC_HEIDELPAY_MIN_PHP_VER, phpversion());
+                    return sprintf($message, WC_HEIDELPAY_MIN_PHP_VER, PHP_VERSION);
                 }
 
                 if (!defined('WC_VERSION')) {
@@ -281,7 +283,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
              */
             public static function log($message)
             {
-                if (empty(self::$log)) {
+                if (null === self::$log) {
                     self::$log = new WC_Logger();
                 }
 

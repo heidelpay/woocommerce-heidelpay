@@ -27,7 +27,6 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
-
     public $payMethod;
     protected $name;
     protected $bookingAction;
@@ -70,16 +69,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     abstract protected function setPayMethod();
 
-
-    public function pushHandler()
-    {
-        if (array_key_exists('<?xml_version', $_POST)) {
-            $push = new WC_Heidelpay_Push();
-            $push->init(file_get_contents('php://input'), $this->get_option('secret'));
-        }
-        exit;
-    }
-
+    /**
+     * Initiates the form fields
+     */
     public function init_form_fields()
     {
         $this->form_fields = array(
@@ -164,8 +156,22 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
+     * Handles an incoming Push Notification
+     *
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\XmlResponseParserException
+     */
+    public function pushHandler()
+    {
+        if (array_key_exists('<?xml_version', $_POST)) {
+            $push = new WC_Heidelpay_Push();
+            $push->init(file_get_contents('php://input'), $this->get_option('secret'));
+        }
+        exit;
+    }
+
+    /**
      * Validate the customer input coming from checkout.
-     * @return boolean
+     * @return void
      */
     public function checkoutValidation()
     {
@@ -178,12 +184,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function isGatewayActive()
     {
-        if (!empty($_POST['payment_method'])) {
-            if ($_POST['payment_method'] === $this->id)
-                return true;
-        }
-
-        return false;
+        return !empty($_POST['payment_method']) && $_POST['payment_method'] === $this->id;
     }
 
     /**
@@ -191,7 +192,8 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function enqueue_assets()
     {
-        wp_register_script('heidelpay-secured',
+        wp_register_script(
+            'heidelpay-secured',
             WC_HEIDELPAY_PLUGIN_URL . '/assets/js/securedInvoice.js',
             [],
             false,
@@ -201,6 +203,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         wp_enqueue_script('heidelpay-secured');
     }
 
+    /**
+     * Process the payment
+     *
+     * @param int $order_id
+     * @return array|mixed
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     */
     public function process_payment($order_id)
     {
         $order = wc_get_order($order_id);
@@ -250,6 +259,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    /**
+     * Get the Language set in WordPress Settings
+     *
+     * @return string
+     */
     public function getLanguage()
     {
         if (strpos(get_locale(), 'de_') !== false) {
@@ -258,6 +272,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         return 'en';
     }
 
+    /**
+     * @param WC_Order $order
+     */
     protected function setCustomer(WC_Order $order)
     {
         $this->payMethod->getRequest()->customerAddress(
@@ -274,6 +291,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         );
     }
 
+    /**
+     * @param $order_id
+     */
     protected function setBasket($order_id)
     {
         $order = wc_get_order($order_id);
@@ -304,7 +324,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * Send payment request.
      * Validation happens before this in the checkoutValidation() function.
+     *
      * @return mixed
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      */
     protected function performRequest($order_id)
     {
@@ -312,8 +334,8 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $this->handleFormPost($_POST);
         }
 
-        if (!empty($this->bookingAction) AND method_exists($this->payMethod, $this->bookingAction)) {
-            $action = $this->getbookingAction();
+        if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
+            $action = $this->getBookingAction();
             try {
                 $this->payMethod->$action();
             } catch (Exception $e) {
@@ -354,7 +376,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * process the Form input from customer comimg from checkout.
+     * process the Form input from customer coming from checkout.
      */
     protected function handleFormPost()
     {
@@ -371,7 +393,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param String $message
      */
-    public function addPaymentError(String $message)
+    public function addPaymentError($message)
     {
         wc_add_notice(
             __('Payment error: ', 'woocommerce-heidelpay') . htmlspecialchars($message),
@@ -402,6 +424,21 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         return $this->messageMapper->getDefaultMessage();
     }
 
+    /**
+     * Funktion to log Events as a notice. It has a prefix to identify that the log entry is from heidelpay and which
+     * function has created it.
+     * @param  string|array $logData
+     */
+    protected function paymentLog($logData)
+    {
+        $callers = debug_backtrace();
+        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
+            $callers [1] ['function'] . ': ' . print_r($logData, 1), 1));
+    }
+
+    /**
+     * echoes the admin options
+     */
     public function admin_options()
     {
         echo '<h2>';
@@ -437,50 +474,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * @return array Containing the optionfield to select booking mode in the admin menue.
-     */
-    protected function getBookingSelection()
-    {
-        return array(
-            'title' => __('Bookingmode', 'woocommerce-heidelpay'),
-            'type' => 'select',
-            'options' => array(
-                'DB' => __('Debit', 'woocommerce-heidelpay'),
-                'PA' => __('Authorization', 'woocommerce-heidelpay')
-            ),
-            'id' => $this->id . '_bookingmode',
-            'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
-            'default' => 'DB'
-        );
-    }
-
-    /**
-     * Funktion to log Events as a notice. It has a prefix to identify that the log entry is from heidelpay and which
-     * function has created it.
-     * @param  string|array $logData
-     */
-    protected function paymentLog($logData)
-    {
-        $callers = debug_backtrace();
-        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
-            $callers [1] ['function'] .': '. print_r($logData, 1), 1));
-    }
-
-    /**
-     * Get the order using the Get parameter 'key'
-     * @return bool|WC_Order|WC_Refund
-     */
-    public function getOrderFromKey()
-    {
-        if(isset($_GET['key'])) {
-            $order_id = wc_get_order_id_by_order_key($_GET['key']);
-            return wc_get_order($order_id);
-        }
-
-        return null;
-    }
-
-    /**
      * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the successpage after
      * payment.
      * @param $orderReceivedText
@@ -496,7 +489,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
         $paymentInfo = $order->get_meta('heidelpay-paymentInfo');
 
-        if(!empty($paymentInfo)) {
+        if (!empty($paymentInfo)) {
             $orderReceivedText .= '<p>' . $paymentInfo . '</p>';
         }
 
@@ -504,13 +497,25 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
+     * Get the order using the Get parameter 'key'
+     * @return bool|WC_Order|WC_Refund
+     */
+    public function getOrderFromKey()
+    {
+        if (isset($_GET['key'])) {
+            $order_id = wc_get_order_id_by_order_key($_GET['key']);
+            return wc_get_order($order_id);
+        }
+
+        return null;
+    }
+
+    /**
      * Hook - "woocommerce_email_before_order_table". Add heidelpay-paymentInfo text to "completed order" email.
      * @param WC_Order $order
-     * @param $sent_to_admin
-     * @param bool $plain_text
      * @return null
      */
-    public function emailInstructions(WC_Order $order, $sent_to_admin, $plain_text = false)
+    public function emailInstructions(WC_Order $order)
     {
         if ($order->get_payment_method() !== $this->id) {
             return null;
@@ -533,5 +538,23 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 echo $order->get_meta('heidelpay-paymentInfo');
             }
         }
+    }
+
+    /**
+     * @return array Containing the option field to select booking mode in the admin menu.
+     */
+    protected function getBookingSelection()
+    {
+        return array(
+            'title' => __('Bookingmode', 'woocommerce-heidelpay'),
+            'type' => 'select',
+            'options' => array(
+                'DB' => __('Debit', 'woocommerce-heidelpay'),
+                'PA' => __('Authorization', 'woocommerce-heidelpay')
+            ),
+            'id' => $this->id . '_bookingmode',
+            'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
+            'default' => 'DB'
+        );
     }
 }
