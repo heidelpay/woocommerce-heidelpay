@@ -14,12 +14,13 @@
  * @package  woocommerce-heidelpay
  * @category WooCommerce
  */
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once(WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
-    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php');
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
+    DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php';
 
 /**
  * Class WC_Heidelpay_IFrame_Gateway
@@ -61,12 +62,6 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         ];
     }
 
-    protected function performRequest($order_id)
-    {
-        $order = wc_get_order($order_id);
-        echo $this->getIFrame($order);
-    }
-
     /**
      * Initialise Gateway Settings Form Fields.
      */
@@ -88,7 +83,8 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
      */
     public function enqueue_assets()
     {
-        wp_register_script('heidelpay-iFrame',
+        wp_register_script(
+            'heidelpay-iFrame',
             WC_HEIDELPAY_PLUGIN_URL . '/assets/js/creditCardFrame.js',
             [],
             false,
@@ -109,6 +105,12 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         }
     }
 
+    protected function performRequest($order_id)
+    {
+        $order = wc_get_order($order_id);
+        echo $this->getIFrame($order);
+    }
+
     /**
      * Build the Iframe and return the String
      * @param $order
@@ -116,7 +118,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
      * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
      * @return String
      */
-    protected function getIFrame( WC_Order $order)
+    protected function getIFrame(WC_Order $order)
     {
         // Load script for payment cards
         wp_enqueue_script('heidelpay-iFrame');
@@ -139,7 +141,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 
             $iFrame = '<form method="post" class="formular" id="paymentFrameForm">';
             if ($this->payMethod->getResponse()->isSuccess()) {
-                $iFrame .=  '<iframe id="paymentFrameIframe" src="'
+                $iFrame .= '<iframe id="paymentFrameIframe" src="'
                     . $this->payMethod->getResponse()->getPaymentFormUrl()
                     . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
             } else {
@@ -147,7 +149,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
                 $this->paymentLog($this->payMethod->getResponse()->getError());
             }
             $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
-            $iFrame .=  '</form>';
+            $iFrame .= '</form>';
 
             return $iFrame;
         }
@@ -160,7 +162,8 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
             htmlspecialchars(
                 print_r(
                     $this->plugin_id . ' - ' . $this->id . __(
-                        ' Error: Paymentmethod was not found: ', 'woocommerce-heidelpay'
+                        ' Error: Paymentmethod was not found: ',
+                        'woocommerce-heidelpay'
                     ) . $bookingAction,
                     1
                 )
@@ -171,7 +174,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
 
     public function getBookingAction()
     {
-        if(!empty($this->bookingModes[$this->get_option('bookingmode')])) {
+        if (!empty($this->bookingModes[$this->get_option('bookingmode')])) {
             return $this->bookingModes[$this->get_option('bookingmode')];
         }
         return $this->bookingAction;
