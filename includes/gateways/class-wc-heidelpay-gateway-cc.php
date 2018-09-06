@@ -39,6 +39,12 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_IFrame_Gateway
         $this->constructerAddon();
     }
 
+    public function init_form_fields()
+    {
+        parent::init_form_fields();
+        $this->initFormFieldsAddon();
+    }
+
     /**
      * sets the Payment Method.
      */

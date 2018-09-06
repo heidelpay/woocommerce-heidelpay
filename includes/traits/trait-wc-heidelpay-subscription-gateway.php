@@ -25,9 +25,6 @@ trait WC_Heidelpay_Subscription_Gateway
                 'subscription_cancellation',
                 'subscription_suspension',
                 'subscription_reactivation',
-                'subscription_amount_changes',
-                'subscription_date_changes',
-                'subscription_payment_method_change'
             );
 
             add_action(
@@ -36,6 +33,18 @@ trait WC_Heidelpay_Subscription_Gateway
                 10,
                 2
             );
+        }
+    }
+
+    public function initFormFieldsAddon()
+    {
+        if (class_exists('WC_Subscriptions_Order')) {
+            $this->form_fields['transaction_channel_subscription'] = array(
+                'title' => __('Transaction Channel for Subscriptions', 'woocommerce-heidelpay'),
+                'type' => 'text',
+                'id' => $this->id . '_transaction_channel_subscriptions',
+                'description' => 'Transaction Channel for Subscriptions',
+                'default' => '');
         }
     }
 

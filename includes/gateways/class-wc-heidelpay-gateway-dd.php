@@ -74,6 +74,8 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     {
         parent::init_form_fields();
 
+        $this->initFormFieldsAddon();
+
         $this->form_fields['title']['default'] = sprintf(__('%s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['description']['default'] = sprintf(__('Insert payment data for %s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['enabled']['label'] = sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name);

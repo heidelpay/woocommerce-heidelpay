@@ -223,7 +223,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function prepareRequest(WC_Order $order)
     {
-        $this->setAuthentification();
+        $this->setAuthentification($order);
         $this->setAsync();
         $this->setCustomer($order);
         $this->setBasket($order->get_id());
@@ -232,18 +232,23 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * Set up your authentification data for Heidepay api
+     * @param WC_order $order
      */
-    protected function setAuthentification()
+    protected function setAuthentification(WC_order $order)
     {
         $isSandbox = false;
+        $channel = $this->get_option('transaction_channel');
         if ($this->get_option('sandbox') === 'yes') {
             $isSandbox = true;
+        }
+        if (wcs_order_contains_renewal($order)) {
+            $channel = $this->get_option('transaction_channel_subscription');
         }
         $this->payMethod->getRequest()->authentification(
             $this->get_option('security_sender'),
             $this->get_option('user_login'),
             $this->get_option('user_password'),
-            $this->get_option('transaction_channel'),
+            $channel,
             $isSandbox
         );
     }
@@ -335,7 +340,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         }
 
         if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
-            $action = $this->getBookingAction();
+            if (wcs_order_contains_subscription(wc_get_order($order_id))) {
+                $action = 'registration';
+            } else {
+                $action = $this->getBookingAction();
+            }
             try {
                 $this->payMethod->$action();
             } catch (Exception $e) {
