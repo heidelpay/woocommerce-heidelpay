@@ -105,13 +105,12 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $order = $this->getOrderFromKey();
 
         if ($order !== null && $order->get_payment_method() === $this->id) {
-            $this->performRequest($order->get_id());
+            $this->performRequest($order);
         }
     }
 
-    protected function performRequest($order_id)
+    public function performRequest($order, $uid = null)
     {
-        $order = wc_get_order($order_id);
         echo $this->getIFrame($order);
     }
 
@@ -137,6 +136,9 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $bookingAction = $this->getBookingAction();
 
         if (method_exists($this->payMethod, $bookingAction)) {
+            if (class_exists('WC_Subscriptions_Order') && wcs_order_contains_subscription($order)) {
+                $bookingAction = 'registration';
+            }
             $this->payMethod->$bookingAction(
                 $host,
                 'FALSE',
@@ -174,6 +176,11 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
             )
         );
         return null;
+    }
+
+    public function performNoGuiRequest($order, $uid)
+    {
+        parent::performAfterRegistrationRequest($order, $uid);
     }
 
     public function getBookingAction()

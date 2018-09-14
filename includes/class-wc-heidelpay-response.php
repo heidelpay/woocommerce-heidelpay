@@ -77,8 +77,22 @@ class WC_Heidelpay_Response
 
             $this->setPaymentInfo($order);
 
+            //wc_get_logger()->log(WC_Log_Levels::DEBUG, $post_data['PAYMENT_CODE']);
+            //wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($post_data, 1));
+
+            // If registration, do a debit on registration afterwards
+            if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
+                $order->add_meta_data('heidelpay-Registration', $uid);
+                $paymethod = 'WC_Gateway_HP_' . $payCode[0];
+                $paymethod = new $paymethod;
+                $paymethod->prepareRequest($order);
+                $paymethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
+                $paymethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
+                $paymethod->performNoGuiRequest($order, $uid);
+            }
+
             // If no money has been payed yet.
-            if ($payCode[0] !== 'IV' && ($payCode[1] === 'PA' || $payCode[1] === 'RG')) {
+            if ($payCode[0] !== 'IV' && $payCode[1] === 'PA') {
                 // If not Prepayment and Invoice payment can be captured manually
                 if ($payCode [0] !== 'PP') {
                     $note = __(
@@ -87,9 +101,6 @@ class WC_Heidelpay_Response
                     );
                     $order->add_order_note($note, false);
                 }
-                if ($payCode[1] === 'RG') {
-                    $order->add_meta_data('heidelpay-Registration', $uid);
-                }
                 $order->update_status(
                     'on-hold',
                     __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
@@ -97,7 +108,7 @@ class WC_Heidelpay_Response
             } else {
                 $order->payment_complete();
             }
-
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Wie oft komme ich hier an?');
             echo $order->get_checkout_order_received_url();
 
             /* redirect customer to success page */

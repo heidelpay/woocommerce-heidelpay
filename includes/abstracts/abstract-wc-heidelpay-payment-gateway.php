@@ -28,8 +28,8 @@ use Heidelpay\PhpPaymentApi\Response;
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
     public $payMethod;
+    public $bookingAction;
     protected $name;
-    protected $bookingAction;
     protected $messageMapper;
 
     public function __construct()
@@ -215,7 +215,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $order = wc_get_order($order_id);
         $this->prepareRequest($order);
 
-        return $this->performRequest($order_id);
+        return $this->performRequest($order);
     }
 
     /**
@@ -241,7 +241,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         if ($this->get_option('sandbox') === 'yes') {
             $isSandbox = true;
         }
-        if (wcs_order_contains_renewal($order)) {
+        if (class_exists('WC_Subscriptions_Order') && wcs_order_contains_renewal($order)) {
             $channel = $this->get_option('transaction_channel_subscription');
         }
         $this->payMethod->getRequest()->authentification(
@@ -333,20 +333,27 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * @return mixed
      * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      */
-    protected function performRequest($order_id)
+    public function performRequest($order, $uid)
     {
         if (!empty($_POST)) {
             $this->handleFormPost($_POST);
         }
 
         if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
-            if (wcs_order_contains_subscription(wc_get_order($order_id))) {
+            if (class_exists('WC_Subscriptions_Order') &&
+                wcs_order_contains_subscription($order) &&
+                empty($order->get_meta('heidelpay-Registration'))) {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Order contains Subscription but no Registration');
                 $action = 'registration';
             } else {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Order contains no Subscription or has Registration');
                 $action = $this->getBookingAction();
             }
             try {
-                $this->payMethod->$action();
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Führe ' . $action . ' auf ' . $uid . ' aus.');
+                //wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(), 1));
+                //$this->payMethod->$action($this->payMethod->getRequest()->getIdentification()->getReferenceId());
+                $this->payMethod->$action($uid);
             } catch (Exception $e) {
                 wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
 
@@ -355,11 +362,17 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 return null;
             }
 
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse()->getFrontend()->getRedirectUrl(), 1));
+
             if ($this->payMethod->getResponse()->isSuccess()) {
-                return [
-                    'result' => 'success',
-                    'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
-                ];
+                if ($this->payMethod->getResponse()->getFrontend()->getRedirectUrl() !== '' ||
+                    !empty($this->payMethod->getResponse()->getFrontend()->getRedirectUrl())) {
+                    wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Redirect ist Vorhanden');
+                    return [
+                        'result' => 'success',
+                        'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
+                    ];
+                }
             }
 
             $this->paymentLog($this->payMethod->getResponse()->getError());
@@ -443,6 +456,41 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $callers = debug_backtrace();
         wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
             $callers [1] ['function'] . ': ' . print_r($logData, 1), 1));
+    }
+
+    public function performNoGuiRequest($order, $uid)
+    {
+        $this->performAfterRegistrationRequest($order, $uid);
+        //$this->performRequest($order, $uid);
+    }
+
+    public function performAfterRegistrationRequest($order, $uid)
+    {
+        //wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(), 1));
+        if (!empty($_POST)) {
+            $this->handleFormPost($_POST);
+        }
+        if ($order->get_meta('heidelpay-Registration') !== '') {
+            try {
+                $this->payMethod->debitOnRegistration($uid);
+            } catch (Exception $e) {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+
+                $this->addPaymentError($this->getErrorMessage());
+
+                return null;
+            }
+            if ($this->payMethod->getResponse()->isSuccess()) {
+                //Hier sollte eventuell noch etwas passieren
+            }
+        } else {
+            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Registration Meta nicht gesetzt');
+        }
+
+
+        $this->paymentLog($this->payMethod->getResponse()->getError());
+        $this->addPaymentError($this->getErrorMessage());
+        return null;
     }
 
     /**
