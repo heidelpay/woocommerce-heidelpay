@@ -241,8 +241,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         if ($this->get_option('sandbox') === 'yes') {
             $isSandbox = true;
         }
-        if (class_exists('WC_Subscriptions_Order') && wcs_order_contains_renewal($order)) {
-            $channel = $this->get_option('transaction_channel_subscription');
+        if (class_exists('WC_Subscriptions_Order')) {
+            if (wcs_order_contains_renewal($order)) {
+                $channel = $this->get_option('transaction_channel_subscription');
+            }
         }
         $this->payMethod->getRequest()->authentification(
             $this->get_option('security_sender'),
