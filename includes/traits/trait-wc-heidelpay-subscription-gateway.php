@@ -74,13 +74,6 @@ trait WC_Heidelpay_Subscription_Gateway
 
         if ($this->payMethod->getResponse()->isSuccess()) {
             $renewalOrder->payment_complete($response->getIdentification()->getShortId());
-            /* funktioniert fast. Response muss noch Subscription tauglich gemacht werden
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, $_POST);
-            if (!empty($_POST)) {
-                $response = new WC_Heidelpay_Response();
-                $response->init($_POST, $this->get_option('secret'));
-            }
-            */
         }
         if ($this->payMethod->getResponse()->isError()) {
             wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse()->getError(), 1));

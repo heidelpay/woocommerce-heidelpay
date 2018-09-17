@@ -77,9 +77,6 @@ class WC_Heidelpay_Response
 
             $this->setPaymentInfo($order);
 
-            //wc_get_logger()->log(WC_Log_Levels::DEBUG, $post_data['PAYMENT_CODE']);
-            //wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($post_data, 1));
-
             // If registration, do a debit on registration afterwards
             if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
                 $order->add_meta_data('heidelpay-Registration', $uid);

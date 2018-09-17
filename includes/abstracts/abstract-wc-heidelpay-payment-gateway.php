@@ -345,16 +345,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             if (class_exists('WC_Subscriptions_Order') &&
                 wcs_order_contains_subscription($order) &&
                 empty($order->get_meta('heidelpay-Registration'))) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Order contains Subscription but no Registration');
                 $action = 'registration';
             } else {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Order contains no Subscription or has Registration');
                 $action = $this->getBookingAction();
             }
             try {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Führe ' . $action . ' auf ' . $uid . ' aus.');
-                //wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getRequest(), 1));
-                //$this->payMethod->$action($this->payMethod->getRequest()->getIdentification()->getReferenceId());
                 $this->payMethod->$action($uid);
             } catch (Exception $e) {
                 wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
@@ -364,12 +359,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 return null;
             }
 
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse()->getFrontend()->getRedirectUrl(), 1));
-
             if ($this->payMethod->getResponse()->isSuccess()) {
                 if ($this->payMethod->getResponse()->getFrontend()->getRedirectUrl() !== '' ||
                     !empty($this->payMethod->getResponse()->getFrontend()->getRedirectUrl())) {
-                    wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Redirect ist Vorhanden');
                     return [
                         'result' => 'success',
                         'redirect' => $this->payMethod->getResponse()->getPaymentFormUrl(),
