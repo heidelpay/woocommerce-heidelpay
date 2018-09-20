@@ -109,6 +109,13 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         }
     }
 
+    /**
+     * @param $order
+     * @param null $uid
+     * @return mixed|void
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
+     */
     public function performRequest($order, $uid = null)
     {
         echo $this->getIFrame($order);
@@ -178,11 +185,18 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         return null;
     }
 
+    /**
+     * @param $order
+     * @param $uid
+     */
     public function performNoGuiRequest($order, $uid)
     {
         parent::performAfterRegistrationRequest($order, $uid);
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getBookingAction()
     {
         if (!empty($this->bookingModes[$this->get_option('bookingmode')])) {

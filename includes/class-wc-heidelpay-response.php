@@ -105,7 +105,6 @@ class WC_Heidelpay_Response
             } else {
                 $order->payment_complete();
             }
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Wie oft komme ich hier an?');
             echo $order->get_checkout_order_received_url();
 
             /* redirect customer to success page */
