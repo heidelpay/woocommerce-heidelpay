@@ -21,11 +21,33 @@ if (!defined('ABSPATH')) {
 
 require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
     DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-iframe-gateway.php';
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'traits' .
+    DIRECTORY_SEPARATOR . 'trait-wc-heidelpay-subscription-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\DebitCardPaymentMethod;
 
 class WC_Gateway_HP_DC extends WC_Heidelpay_IFrame_Gateway
 {
+    use WC_Heidelpay_Subscription_Gateway;
+
+    /**
+     * WC_Gateway_HP_DC constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->constructorAddon();
+    }
+
+    public function init_form_fields()
+    {
+        parent::init_form_fields();
+        $this->initFormFieldsAddon();
+    }
+
+    /**
+     * sets the Payment Method.
+     */
     public function setPayMethod()
     {
         $this->payMethod = new DebitCardPaymentMethod();

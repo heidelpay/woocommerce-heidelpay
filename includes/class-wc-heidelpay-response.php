@@ -77,8 +77,19 @@ class WC_Heidelpay_Response
 
             $this->setPaymentInfo($order);
 
+            // If registration, do a debit on registration afterwards
+            if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
+                $order->add_meta_data('heidelpay-Registration', $uid);
+                $paymethod = 'WC_Gateway_HP_' . $payCode[0];
+                $paymethod = new $paymethod;
+                $paymethod->prepareRequest($order);
+                $paymethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
+                $paymethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
+                $paymethod->performNoGuiRequest($order, $uid);
+            }
+
             // If no money has been payed yet.
-            if ($payCode[0] !== 'IV' && ($payCode[1] === 'PA' || $payCode[1] === 'RG')) {
+            if ($payCode[0] !== 'IV' && $payCode[1] === 'PA') {
                 // If not Prepayment and Invoice payment can be captured manually
                 if ($payCode [0] !== 'PP') {
                     $note = __(
@@ -94,7 +105,6 @@ class WC_Heidelpay_Response
             } else {
                 $order->payment_complete();
             }
-
             echo $order->get_checkout_order_received_url();
 
             /* redirect customer to success page */
