@@ -464,7 +464,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param WC_Order $order
      * @param $uid
-     * @return null
      */
     public function performAfterRegistrationRequest($order, $uid)
     {
@@ -482,14 +481,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             if ($this->payMethod->getResponse()->isError()) {
                 $order->set_status('on-hold');
             }
-        } else {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, 'Registration Meta nicht gesetzt');
         }
-
-
-        $this->paymentLog($this->payMethod->getResponse()->getError());
-        $this->addPaymentError($this->getErrorMessage());
-        return null;
     }
 
     /**
