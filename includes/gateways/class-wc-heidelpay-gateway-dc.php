@@ -36,7 +36,7 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_IFrame_Gateway
     public function __construct()
     {
         parent::__construct();
-        $this->constructerAddon();
+        $this->constructorAddon();
     }
 
     public function init_form_fields()

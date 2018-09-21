@@ -39,7 +39,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     public function __construct()
     {
         parent::__construct();
-        $this->constructerAddon();
+        $this->constructorAddon();
     }
 
     /**
