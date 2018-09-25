@@ -234,7 +234,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * Set up your authentification data for Heidepay api
      * @param WC_order $order
      */
-    protected function setAuthentification(WC_order $order)
+    protected function setAuthentification(WC_order $order = null)
     {
         $isSandbox = false;
         $channel = $this->get_option('transaction_channel');
@@ -242,7 +242,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $isSandbox = true;
         }
         if (class_exists('WC_Subscriptions_Order')) {
-            if (wcs_order_contains_renewal($order)) {
+            if ($order !== null && wcs_order_contains_renewal($order)) {
                 $channel = $this->get_option('transaction_channel_subscription');
             }
         }
