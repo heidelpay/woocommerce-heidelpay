@@ -242,7 +242,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $isSandbox = true;
         }
         if (class_exists('WC_Subscriptions_Order')) {
-            if ($order !== null && wcs_order_contains_renewal($order)) {
+            if ($order !== null && (wcs_order_contains_renewal($order) || wcs_order_contains_subscription($order))) {
                 $channel = $this->get_option('transaction_channel_subscription');
             }
         }
