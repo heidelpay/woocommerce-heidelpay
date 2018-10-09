@@ -4,7 +4,8 @@
 
 ### Added:
 #### Features:
-- supports WooCommerce Subscriptions
+- Supports WooCommerce Subscriptions
+- Add Prepayment Payment Method
 
 ## 1.3.0
 
