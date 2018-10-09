@@ -21,14 +21,30 @@ if (!defined('ABSPATH')) {
 
 require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'abstracts' .
     DIRECTORY_SEPARATOR . 'abstract-wc-heidelpay-payment-gateway.php';
+require_once WC_HEIDELPAY_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'traits' .
+    DIRECTORY_SEPARATOR . 'trait-wc-heidelpay-subscription-gateway.php';
 
 use Heidelpay\PhpPaymentApi\PaymentMethods\DirectDebitPaymentMethod;
 
 class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
 {
+    use WC_Heidelpay_Subscription_Gateway;
+
     /** @var array Array of locales */
     public $locale;
 
+    /**
+     * WC_Gateway_HP_DD constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->constructorAddon();
+    }
+
+    /**
+     * @return bool|void
+     */
     public function checkoutValidation()
     {
         // If gateway is not active no validation is necessary.
@@ -58,6 +74,8 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     {
         parent::init_form_fields();
 
+        $this->initFormFieldsAddon();
+
         $this->form_fields['title']['default'] = sprintf(__('%s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['description']['default'] = sprintf(__('Insert payment data for %s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['enabled']['label'] = sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name);
@@ -77,6 +95,9 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         );
     }
 
+    /**
+     * sets Payment Fields
+     */
     public function payment_fields()
     {
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
@@ -116,7 +137,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     {
         parent::handleFormPost();
 
-        if (!empty($_POST['accountholder']) AND !empty($_POST['accountiban'])) {
+        if (!empty($_POST['accountholder']) && !empty($_POST['accountiban'])) {
             $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['accountholder']));
             $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['accountiban']));
         }

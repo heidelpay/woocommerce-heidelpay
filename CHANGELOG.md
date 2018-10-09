@@ -1,5 +1,12 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## 1.4.0
+
+### Added:
+#### Features:
+- Supports WooCommerce Subscriptions
+- Add Prepayment Payment Method
+
 ## 1.3.0
 
 ### Fixed:

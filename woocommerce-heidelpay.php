@@ -10,7 +10,7 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Plugin Name: heidelpay WooCommerce
  * Plugin URI: https://dev.heidelpay.com
  * Description: heidelpay payment integration for WooCommerce
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author: heidelpay
  * Author URI: htts://www.heidelpay.com
  * Developer: heidelpay
@@ -29,7 +29,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     /**
      * Required minimums and constants
      */
-    define('WC_HEIDELPAY_VERSION', '1.3.0');
+    define('WC_HEIDELPAY_VERSION', '1.4.0');
     define('WC_HEIDELPAY_MIN_PHP_VER', '5.6.0');
     define('WC_HEIDELPAY_MIN_WC_VER', '3.0.0');
     define('WC_HEIDELPAY_MAIN_FILE', __FILE__);
@@ -124,20 +124,21 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 load_plugin_textdomain(
                     'woocommerce-heidelpay',
                     false,
-                    plugin_basename(dirname(__FILE__)) . '/languages'
+                    plugin_basename(__DIR__) . '/languages'
                 );
 
-                require_once dirname(__FILE__) . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-cc.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dc.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-idl.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-dd.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-gp.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-so.php';
-                require_once dirname(__FILE__) . '/includes/gateways/class-wc-heidelpay-gateway-va.php';
-                require_once dirname(__FILE__) . '/includes/class-wc-heidelpay-response.php';
-                require_once dirname(__FILE__) . '/includes/class-wc-heidelpay-push.php';
+                require_once __DIR__ . '/includes/abstracts/abstract-wc-heidelpay-payment-gateway.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-cc.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-pp.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-dc.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-idl.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-dd.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-gp.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-ivpg.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-so.php';
+                require_once __DIR__ . '/includes/gateways/class-wc-heidelpay-gateway-va.php';
+                require_once __DIR__ . '/includes/class-wc-heidelpay-response.php';
+                require_once __DIR__ . '/includes/class-wc-heidelpay-push.php';
 
                 add_filter('woocommerce_payment_gateways', array($this, 'add_gateways'));
             }
@@ -157,6 +158,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 $methods[] = 'WC_Gateway_HP_IVPG';
                 $methods[] = 'WC_Gateway_HP_SO';
                 $methods[] = 'WC_Gateway_HP_VA';
+                $methods[] = 'WC_Gateway_HP_PP';
 
                 return $methods;
             }
