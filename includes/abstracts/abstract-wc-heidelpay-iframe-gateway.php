@@ -41,6 +41,10 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         );
     }
 
+    /**
+     * @param int $order_id
+     * @return array|mixed
+     */
     public function process_payment($order_id)
     {
         return $this->toCheckoutPayment($order_id);
@@ -101,13 +105,19 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $order = $this->getOrderFromKey();
 
         if ($order !== null && $order->get_payment_method() === $this->id) {
-            $this->performRequest($order->get_id());
+            $this->performRequest($order);
         }
     }
 
-    protected function performRequest($order_id)
+    /**
+     * @param $order
+     * @param null $uid
+     * @return mixed|void
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws \Heidelpay\PhpPaymentApi\Exceptions\UndefinedTransactionModeException
+     */
+    public function performRequest($order, $uid = null)
     {
-        $order = wc_get_order($order_id);
         echo $this->getIFrame($order);
     }
 
@@ -133,6 +143,9 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $bookingAction = $this->getBookingAction();
 
         if (method_exists($this->payMethod, $bookingAction)) {
+            if (class_exists('WC_Subscriptions_Order') && wcs_order_contains_subscription($order)) {
+                $bookingAction = 'registration';
+            }
             $this->payMethod->$bookingAction(
                 $host,
                 'FALSE',
@@ -172,6 +185,18 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         return null;
     }
 
+    /**
+     * @param $order
+     * @param $uid
+     */
+    public function performNoGuiRequest($order, $uid)
+    {
+        parent::performAfterRegistrationRequest($order, $uid);
+    }
+
+    /**
+     * @return mixed|string
+     */
     public function getBookingAction()
     {
         if (!empty($this->bookingModes[$this->get_option('bookingmode')])) {
