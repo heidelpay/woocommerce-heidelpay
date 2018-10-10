@@ -1,6 +1,6 @@
 <?php
 /**
- * Secured Invoice
+ * Prepayment
  *
  * WooCommerce payment gateway for Secured Invoice
  *
