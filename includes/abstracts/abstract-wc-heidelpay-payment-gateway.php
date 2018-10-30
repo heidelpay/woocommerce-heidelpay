@@ -332,10 +332,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * Send payment request.
      * Validation happens before this in the checkoutValidation() function.
      *
+     * @param $order
+     * @param null $uid
      * @return mixed
-     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      */
-    public function performRequest($order, $uid)
+    public function performRequest($order, $uid = null)
     {
         if (!empty($_POST)) {
             $this->handleFormPost($_POST);
