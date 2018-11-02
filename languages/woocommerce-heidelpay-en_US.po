@@ -20,3 +20,12 @@ msgstr "The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from 
         		"and the creditor identifier: {CreditorId}</i><br />"
         		"<br />"
         		"Please ensure that there will be sufficient funds on the corresponding account."
+
+msgid "datePlaceholder"
+msgstr "yyyy-mm-dd"
+
+msgid "dateFormat"
+msgstr "yy-mm-dd"
+
+msgid "invalid date format"
+msgstr "Invalid date format."

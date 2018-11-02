@@ -36,6 +36,15 @@ msgstr "Der Betrag von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;c
         			"<br />"
         			"Bitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto."
 
+msgid "datePlaceholder"
+msgstr "tt.mm.jjjj"
+
+msgid "dateFormat"
+msgstr "dd.mm.yy"
+
+msgid "invalid date format"
+msgstr "Ungültiges Datumsformat."
+
 #: includes/abstracts/abstract-wc-heidelpay-iframe-gateway.php:57
 msgid "Awaiting payment"
 msgstr "Auf Zahlung warten"
