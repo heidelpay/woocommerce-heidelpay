@@ -339,7 +339,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     public function performRequest($order, $uid = null)
     {
         if (!empty($_POST)) {
-            $this->handleFormPost($_POST);
+            try{
+                $this->handleFormPost($_POST);
+            } catch (\Exception $e) {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                return null;
+            }
         }
 
         if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
