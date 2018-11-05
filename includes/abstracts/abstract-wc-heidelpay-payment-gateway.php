@@ -535,9 +535,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function addPayInfo($orderReceivedText)
     {
+        /**
+         * @var WC_Order $order
+         */
         $order = $this->getOrderFromKey();
 
-        if ($order === null || $order->get_payment_method() !== $this->id) {
+        if (!$order instanceof WC_Order || $order->get_payment_method() !== $this->id) {
             return $orderReceivedText;
         }
 
