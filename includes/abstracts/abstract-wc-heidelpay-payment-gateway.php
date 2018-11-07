@@ -114,14 +114,14 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'type' => 'text',
                 'id' => $this->id . '_security_sender',
                 'description' => 'Security Sender',
-                'default' => ''
+                'default' => '31HA07BC8142C5A171745D00AD63D182'
             ),
             'user_login' => array(
                 'title' => __('User Login', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => $this->id . '_user_login',
                 'description' => 'User Login',
-                'default' => ''
+                'default' => '31ha07bc8142c5a171744e5aef11ffd3'
             ),
             'user_password' => array(
                 'title' => __('User Password', 'woocommerce-heidelpay'),
