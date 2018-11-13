@@ -222,6 +222,17 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $salutationMText = __('Mr', 'woocommerce-heidelpay');
         $salutationWText = __('Mrs', 'woocommerce-heidelpay');
         $birthdateText = __('Birthdate', 'woocommerce-heidelpay');
+        $dateFormatPlaceholder = __('datePlaceholder', 'woocommerce-heidelpay');
+        $dateFormat = __('dateFormat', 'woocommerce-heidelpay');
+
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script('jquery-ui-datepicker');
+        wp_enqueue_style(
+            'jquery-ui-css',
+            WC_HEIDELPAY_PLUGIN_URL . '/assets/css/datepicker.css'
+        );
+
 
         echo '<div>';
 
@@ -234,33 +245,34 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
             '</select>' .
             '<br/>' .
             '<label for="hp_date">' . $birthdateText . ':</label>' .
-            '<input type="date" name="birthdate" id="hp_date" value="" class="form-row-wide validate-required"/>' .
+            '<input type="date" name="birthdate" id="hp_date" value="" class="form-row-wide validate-required" 
+            placeholder="' . $dateFormatPlaceholder . '"/>' .
             '<br/>';
-
         echo '</div>';
-        echo '<script>
-                var date_input = document.getElementById("hp_date");
-                
-                date_input.reportValidity = function() {
-                    var inputDate = this.valueAsDate;
-                    var currentDate = new Date();
-                    if(new Date(currentDate-inputDate).getFullYear() - new Date(0).getFullYear() < 18){
-                        return false;
+        echo '<script type="text/javascript">
+                    if ( jQuery(\'[type="date"]\').prop(\'type\') != \'date\' ) {
+                                    jQuery(document).ready(function(){
+                                        jQuery(\'#hp_date\').datepicker({
+                                            dateFormat: \'' . $dateFormat . '\',
+                                            changeYear: true,
+                                            changeMonth: true,
+                                            yearRange: \'-100:-18\',
+                                            defaultDate: "-17y -364d"
+                                        });
+                                    });
                     }
-                    return true;
-                };
-                
-                date_input.onchange = function () {
-                    if(!this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] == undefined){
-                        jQuery("form[name=checkout]").prepend(\'' . $this->ErrorHtml() . '\');
-                        jQuery("ul[class=woocommerce-error]")[0].scrollIntoView({behavior : "smooth"})
-                    }else{
-                        if(this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] !== undefined){
-                            jQuery("ul[class=woocommerce-error]").remove();
+                    
+                    date_input.onchange = function () {
+                        if(!this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] == undefined){
+                            jQuery("form[name=checkout]").prepend(\'' . $this->ErrorHtml() . '\');
+                            jQuery("ul[class=woocommerce-error]")[0].scrollIntoView({behavior : "smooth"})
+                        }else{
+                            if(this.reportValidity() && jQuery("ul[class=woocommerce-error]")[0] !== undefined){
+                                jQuery("ul[class=woocommerce-error]").remove();
                         }
                     }
                 };
-              </script>';
+</script>';
     }
 
     public function ErrorHtml()
@@ -286,12 +298,24 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->bookingAction = 'authorize';
     }
 
+
+    /**
+     * @throws Exception
+     */
     protected function handleFormPost()
     {
         parent::handleFormPost();
 
         if (!empty($_POST['salutation']) && !empty($_POST['birthdate'])) {
-            $this->payMethod->getRequest()->b2cSecured($_POST['salutation'], $_POST['birthdate']);
+            $input = $_POST;
+            try {
+                $date = new DateTime(htmlspecialchars($input['birthdate']));
+            } catch (\Exception $exception) {
+                wc_add_notice(__('Birthdate', 'woocommerce-heidelpay') . ': '
+                    . __('invalid date format', 'woocommerce-heidelpay'), 'error');
+                throw $exception;
+            }
+            $this->payMethod->getRequest()->b2cSecured(htmlspecialchars($input['salutation']), $date->format('Y-m-d'));
         }
     }
 }
