@@ -1,5 +1,12 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## 1.5.0
+
+### Added:
+- Payment method: Invoice
+### Fixed: 
+- Date input for secured invoice not working on Safari browser.
+
 ## 1.4.0
 
 ### Added:

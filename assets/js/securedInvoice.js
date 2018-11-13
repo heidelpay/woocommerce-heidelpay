@@ -20,5 +20,13 @@ jQuery(function () {
             jQuery('li.payment_method_hp_ivpg').show();
         }
         ;
+
+        var date_input = document.getElementById("hp_date");
+
+        date_input.reportValidity = function() {
+            var inputDate = this.valueAsDate;
+            var currentDate = new Date();
+            return new Date(currentDate-inputDate).getFullYear() - new Date(0).getFullYear() < 18
+        };
     });
 });

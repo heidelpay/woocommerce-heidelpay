@@ -114,14 +114,14 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 'type' => 'text',
                 'id' => $this->id . '_security_sender',
                 'description' => 'Security Sender',
-                'default' => ''
+                'default' => '31HA07BC8142C5A171745D00AD63D182'
             ),
             'user_login' => array(
                 'title' => __('User Login', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => $this->id . '_user_login',
                 'description' => 'User Login',
-                'default' => ''
+                'default' => '31ha07bc8142c5a171744e5aef11ffd3'
             ),
             'user_password' => array(
                 'title' => __('User Password', 'woocommerce-heidelpay'),
@@ -332,13 +332,19 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * Send payment request.
      * Validation happens before this in the checkoutValidation() function.
      *
+     * @param $order
+     * @param null $uid
      * @return mixed
-     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
      */
-    public function performRequest($order, $uid)
+    public function performRequest($order, $uid = null)
     {
         if (!empty($_POST)) {
-            $this->handleFormPost($_POST);
+            try{
+                $this->handleFormPost($_POST);
+            } catch (\Exception $e) {
+                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                return null;
+            }
         }
 
         if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
@@ -529,9 +535,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function addPayInfo($orderReceivedText)
     {
+        /**
+         * @var WC_Order $order
+         */
         $order = $this->getOrderFromKey();
 
-        if ($order === null || $order->get_payment_method() !== $this->id) {
+        if (!$order instanceof WC_Order || $order->get_payment_method() !== $this->id) {
             return $orderReceivedText;
         }
 

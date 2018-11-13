@@ -103,7 +103,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
         $accountIbanLabel = __('IBAN', 'woocommerce-heidelpay');
 
-        $accountHolder = wc()->customer->get_billing_first_name() . ' ' . wc()->customer->get_last_name();
+        $accountHolder = wc()->customer->get_billing_first_name() . ' ' . wc()->customer->get_billing_last_name();
 
         echo '<div>';
 
