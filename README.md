@@ -2,7 +2,7 @@
 [![PHP 7.0](https://img.shields.io/badge/php-7.0-blue.svg)](http://www.php.net)
 [![PHP 7.1](https://img.shields.io/badge/php-7.1-blue.svg)](http://www.php.net)
 
-![Logo](https://dev.heidelpay.de/devHeidelpay_400_180.jpg)
+![Logo](https://dev.heidelpay.com/devHeidelpay_400_180.jpg)
 
 # heidelpay WooCommerce plug-in
 Payment extension for WooCommerce
@@ -20,6 +20,7 @@ To use this extension please paste the contents of the folder "woocommerce"" int
 * iDEAL
 * Paypal
 * Sofort
+* invoice b2c
 * secured invoice b2c
 
 ### SYSTEM REQUIREMENTS
