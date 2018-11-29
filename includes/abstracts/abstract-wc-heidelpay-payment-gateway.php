@@ -315,7 +315,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @global string $wp_version
      */
-    protected function setCriterions()
+    protected function setCriterions($orderID = null)
     {
         global $wp_version;
 
