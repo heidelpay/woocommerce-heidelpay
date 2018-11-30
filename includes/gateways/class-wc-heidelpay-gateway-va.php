@@ -82,7 +82,7 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
         return (string)$this->bookingModes[$this->get_option('bookingmode')];
     }
 
-    public function setCriterions($orderID)
+    public function setCriterions($orderID = null)
     {
         parent::setCriterions();
 
