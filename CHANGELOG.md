@@ -1,5 +1,10 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## [1.6.0][1.6.0]
+
+### Added:
+- Unique ID and Short ID now show up in Order Meta
+
 ## [1.5.0][1.5.0]
 
 ### Added:
@@ -71,3 +76,4 @@
 [1.3.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.2.0..1.3.0
 [1.4.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.3.0..1.4.0
 [1.5.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.4.0..1.5.0
+[1.6.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.5.0..1.6.0
