@@ -307,7 +307,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $order = wc_get_order($order_id);
         $this->payMethod->getRequest()->basketData(
             $order_id, //order id
-            $order->get_total(),                         //cart amount
+            round($order->get_total(), 2),                         //cart amount
             'EUR',                         // Currency code of this request
             $this->get_option('secret')    // A secret passphrase from your application
         );
