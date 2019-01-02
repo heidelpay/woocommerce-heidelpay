@@ -31,3 +31,18 @@ latest stable PHP version whenever possible.
 ## LICENSE
 
 You can find a copy of the license in [LICENSE.txt](LICENSE.txt).
+
+## Support
+For any issues or questions please get in touch with our support.
+
+### Web page
+https://dev.heidelpay.com/
+ 
+### Email
+support@heidelpay.com
+ 
+### Phone
++49 (0)6221/6471-100
+
+### Twitter
+@devHeidelpay
