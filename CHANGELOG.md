@@ -1,20 +1,20 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
-## 1.5.0
+## [1.5.0][1.5.0]
 
 ### Added:
 - Payment method: Invoice
 ### Fixed: 
 - Date input for secured invoice not working on Safari browser.
 
-## 1.4.0
+## [1.4.0][1.4.0]
 
 ### Added:
 #### Features:
 - Supports WooCommerce Subscriptions
 - Add Prepayment Payment Method
 
-## 1.3.0
+## [1.3.0][1.3.0]
 
 ### Fixed:
 - Credit Card iFrame not working in Safari Browsers
@@ -23,7 +23,7 @@
 #### Features:
 - Add GiroPay Payment Method
 
-## 1.2.0
+## [1.2.0][1.2.0]
 
 ### Fixed:
 - Missing payment information for secured invoice and direct debit on success page and notification mail.
@@ -35,12 +35,12 @@
 - Support for push notifications
 - A checkbox to decide whether payment information should be added to the notification mail or not.
 
-## 1.1.1
+## [1.1.1][1.1.1]
 
 ### Fixed:
 - a bug that caused the payment requests to fail in some shops due to an invalid url.
 
-## 1.1.0
+## [1.1.0][1.1.0]
 
 ### Added
 
@@ -59,7 +59,15 @@
 ### Changed
 - payment methods will be deactivated by default.
 
-## 1.0.1
+## [1.0.1][1.0.1]
 
 ### Fixed
 - A bug which caused that the sandbox mode was activated regardless of the state of the switch.
+
+[1.0.1]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.0.0..1.0.1
+[1.1.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.0.1..1.1.0
+[1.1.1]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.1.0..1.1.1
+[1.2.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.1.1..1.2.0
+[1.3.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.2.0..1.3.0
+[1.4.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.3.0..1.4.0
+[1.5.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.4.0..1.5.0
