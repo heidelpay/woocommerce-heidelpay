@@ -5,6 +5,13 @@
 ### Added:
 - Unique ID and Short ID now show up in Order Meta
 
+### Change:
+- Use different way to get the host url to ensure better compatibility
+- Ensure that total price is only submitted with 2 decimal digits
+
+### Fixed:
+- Set the correct customer ip for payment request
+
 ## [1.5.0][1.5.0]
 
 ### Added:
