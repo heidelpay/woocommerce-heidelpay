@@ -134,10 +134,10 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         wp_enqueue_script('heidelpay-iFrame');
 
         $this->prepareRequest($order);
-
         // build host url and css path
-        $protocol = $_SERVER['HTTPS'] ? 'https' : 'http';
-        $host = $protocol . '://' . $_SERVER['SERVER_NAME'];
+        $urlArray = explode('/', get_home_url());
+        $host = $urlArray[0] . '//' . $urlArray[2];
+
         $cssPath = WC_HEIDELPAY_PLUGIN_URL . '/assets/css/creditCardFrame.css';
 
         $bookingAction = $this->getBookingAction();
