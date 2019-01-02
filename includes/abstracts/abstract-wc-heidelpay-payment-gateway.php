@@ -228,6 +228,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->setCustomer($order);
         $this->setBasket($order->get_id());
         $this->setCriterions();
+        $this->payMethod->getRequest()->getContact()->setIp(WC_Geolocation::get_ip_address());
     }
 
     /**
@@ -310,6 +311,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'EUR',                         // Currency code of this request
             $this->get_option('secret')    // A secret passphrase from your application
         );
+
     }
 
     /**
