@@ -208,7 +208,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      *
      * @param int $order_id
      * @return array|mixed
-     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws Exception
      */
     public function process_payment($order_id)
     {
@@ -220,6 +220,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order WC_Order
+     * @throws Exception
      */
     public function prepareRequest(WC_Order $order)
     {
@@ -300,6 +301,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order_id
+     * @throws Exception
      */
     protected function setBasket($order_id)
     {
@@ -315,7 +317,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @global string $wp_version
      */
-    protected function setCriterions()
+    protected function setCriterions($orderID = null)
     {
         global $wp_version;
 
@@ -339,7 +341,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     public function performRequest($order, $uid = null)
     {
         if (!empty($_POST)) {
-            try{
+            try {
                 $this->handleFormPost($_POST);
             } catch (\Exception $e) {
                 wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
@@ -461,6 +463,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param $order
      * @param $uid
+     * @throws WC_Data_Exception
      */
     public function performNoGuiRequest($order, $uid)
     {
@@ -470,6 +473,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param WC_Order $order
      * @param $uid
+     * @throws WC_Data_Exception
      */
     public function performAfterRegistrationRequest($order, $uid)
     {
@@ -532,6 +536,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * payment.
      * @param $orderReceivedText
      * @return string
+     * @throws Exception
      */
     public function addPayInfo($orderReceivedText)
     {
@@ -556,6 +561,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * Get the order using the Get parameter 'key'
      * @return bool|WC_Order|WC_Refund
+     * @throws Exception
      */
     public function getOrderFromKey()
     {
