@@ -27,9 +27,24 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
+    /**
+     * @var \Heidelpay\PhpPaymentApi\PaymentMethods\BasicPaymentMethodTrait $payMethod
+     */
     public $payMethod;
+
+    /**
+     * @var string $bookingAction
+     */
     public $bookingAction;
+
+    /**
+     * @var string $name
+     */
     protected $name;
+
+    /**
+     * @var MessageCodeMapper $messageMapper
+     */
     protected $messageMapper;
 
     public function __construct()
@@ -264,7 +279,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
-            get_home_url() . '/wc-api/' . strtolower(get_class($this))
+            $this->getResponeUrl()
         );
     }
 
@@ -310,10 +325,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->payMethod->getRequest()->basketData(
             $order_id, //order id
             round($order->get_total(), 2),                         //cart amount
-            'EUR',                         // Currency code of this request
+            $order->get_currency(),                         // Currency code of this request
             $this->get_option('secret')    // A secret passphrase from your application
         );
-
     }
 
     /**
@@ -518,6 +532,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         if (!empty($_POST)) {
             $response = new WC_Heidelpay_Response();
             $response->init($_POST, $this->get_option('secret'));
+        } else {
+            // Add Error Msg, debug log and redirect to cart.
+            $this->addPaymentError($this->getErrorMessage());
+            wc_get_logger()->log(WC_Log_Levels::DEBUG,
+                'Heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
+                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.');
+            wp_redirect(wc_get_cart_url());
         }
         exit();
     }
@@ -621,5 +642,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
             'default' => 'DB'
         );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getResponeUrl()
+    {
+        return get_home_url() . '/wc-api/' . strtolower(get_class($this));
     }
 }
