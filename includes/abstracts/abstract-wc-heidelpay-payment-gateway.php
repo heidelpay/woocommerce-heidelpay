@@ -536,8 +536,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             // Add Error Msg, debug log and redirect to cart.
             $this->addPaymentError($this->getErrorMessage());
             wc_get_logger()->log(WC_Log_Levels::DEBUG,
-                'Heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
-                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.');
+                'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
+                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
+                array('source' => 'heidelpay'));
             wp_redirect(wc_get_cart_url());
         }
         exit();
