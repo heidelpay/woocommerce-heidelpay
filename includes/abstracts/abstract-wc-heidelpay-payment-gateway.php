@@ -27,9 +27,24 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
+    /**
+     * @var \Heidelpay\PhpPaymentApi\PaymentMethods\BasicPaymentMethodTrait $payMethod
+     */
     public $payMethod;
+
+    /**
+     * @var string $bookingAction
+     */
     public $bookingAction;
+
+    /**
+     * @var string $name
+     */
     protected $name;
+
+    /**
+     * @var MessageCodeMapper $messageMapper
+     */
     protected $messageMapper;
 
     public function __construct()
@@ -208,7 +223,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      *
      * @param int $order_id
      * @return array|mixed
-     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws Exception
      */
     public function process_payment($order_id)
     {
@@ -220,6 +235,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order WC_Order
+     * @throws Exception
      */
     public function prepareRequest(WC_Order $order)
     {
@@ -228,6 +244,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         $this->setCustomer($order);
         $this->setBasket($order->get_id());
         $this->setCriterions();
+        $this->payMethod->getRequest()->getContact()->setIp(WC_Geolocation::get_ip_address());
     }
 
     /**
@@ -262,7 +279,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
-            get_home_url() . '/wc-api/' . strtolower(get_class($this))
+            $this->getResponeUrl()
         );
     }
 
@@ -300,14 +317,15 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order_id
+     * @throws Exception
      */
     protected function setBasket($order_id)
     {
         $order = wc_get_order($order_id);
         $this->payMethod->getRequest()->basketData(
             $order_id, //order id
-            $order->get_total(),                         //cart amount
-            'EUR',                         // Currency code of this request
+            round($order->get_total(), 2),                         //cart amount
+            $order->get_currency(),                         // Currency code of this request
             $this->get_option('secret')    // A secret passphrase from your application
         );
     }
@@ -315,7 +333,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @global string $wp_version
      */
-    protected function setCriterions()
+    protected function setCriterions($orderID = null)
     {
         global $wp_version;
 
@@ -339,7 +357,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     public function performRequest($order, $uid = null)
     {
         if (!empty($_POST)) {
-            try{
+            try {
                 $this->handleFormPost($_POST);
             } catch (\Exception $e) {
                 wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
@@ -461,6 +479,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param $order
      * @param $uid
+     * @throws WC_Data_Exception
      */
     public function performNoGuiRequest($order, $uid)
     {
@@ -470,6 +489,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param WC_Order $order
      * @param $uid
+     * @throws WC_Data_Exception
      */
     public function performAfterRegistrationRequest($order, $uid)
     {
@@ -512,6 +532,14 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         if (!empty($_POST)) {
             $response = new WC_Heidelpay_Response();
             $response->init($_POST, $this->get_option('secret'));
+        } else {
+            // Add Error Msg, debug log and redirect to cart.
+            $this->addPaymentError($this->getErrorMessage());
+            wc_get_logger()->log(WC_Log_Levels::DEBUG,
+                'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
+                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
+                array('source' => 'heidelpay'));
+            wp_redirect(wc_get_cart_url());
         }
         exit();
     }
@@ -532,6 +560,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * payment.
      * @param $orderReceivedText
      * @return string
+     * @throws Exception
      */
     public function addPayInfo($orderReceivedText)
     {
@@ -556,6 +585,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * Get the order using the Get parameter 'key'
      * @return bool|WC_Order|WC_Refund
+     * @throws Exception
      */
     public function getOrderFromKey()
     {
@@ -613,5 +643,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             'label' => __('Choose a bookingmode', 'woocommerce-heidelpay'),
             'default' => 'DB'
         );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getResponeUrl()
+    {
+        return get_home_url() . '/wc-api/' . strtolower(get_class($this));
     }
 }

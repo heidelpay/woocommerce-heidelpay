@@ -70,6 +70,7 @@ class WC_Heidelpay_Response
     public function handleResult($post_data, WC_Order $order)
     {
         $uid = self::$response->getIdentification()->getUniqueId();
+        $sid = self::$response->getIdentification()->getShortId();
 
         if (self::$response->isSuccess()) {
             $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
@@ -103,7 +104,9 @@ class WC_Heidelpay_Response
                     __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
                 );
             } else {
-                $order->payment_complete();
+                $order->add_meta_data('heidelpay-UniqueID', $uid);
+                $order->add_meta_data('heidelpay-ShortID', $sid);
+                $order->payment_complete($sid);
             }
             echo $order->get_checkout_order_received_url();
 
@@ -123,7 +126,7 @@ class WC_Heidelpay_Response
             //empty cart
             wc()->cart->empty_cart();
 
-//show thank you page
+            //show thank you page
             echo $order->get_checkout_order_received_url();
         }
     }

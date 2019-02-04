@@ -134,10 +134,10 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         wp_enqueue_script('heidelpay-iFrame');
 
         $this->prepareRequest($order);
-
         // build host url and css path
-        $protocol = $_SERVER['HTTPS'] ? 'https' : 'http';
-        $host = $protocol . '://' . $_SERVER['SERVER_NAME'];
+        $urlArray = explode('/', get_home_url());
+        $host = $urlArray[0] . '//' . $urlArray[2];
+
         $cssPath = WC_HEIDELPAY_PLUGIN_URL . '/assets/css/creditCardFrame.css';
 
         $bookingAction = $this->getBookingAction();
@@ -152,17 +152,21 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
                 $cssPath
             );
 
-            $iFrame = '<form method="post" class="formular" id="paymentFrameForm">';
-            if ($this->payMethod->getResponse()->isSuccess()) {
-                $iFrame .= '<iframe id="paymentFrameIframe" src="'
-                    . $this->payMethod->getResponse()->getPaymentFormUrl()
-                    . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />';
+            $iFrame = '';
+
+            $response = $this->payMethod->getResponse();
+            if ($response->isSuccess()) {
+                $iFrame = '<form method="post" class="formular" id="paymentFrameForm">'
+                . '<iframe id="paymentFrameIframe" src="'
+                . $response->getPaymentFormUrl()
+                . '" frameborder="0" scrolling="no" style="height:360px;"></iframe><br />'
+                . '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>'
+                . '</form>';
             } else {
-                $iFrame .= '<pre>' . print_r($this->getErrorMessage(), 1) . '</pre>';
-                $this->paymentLog($this->payMethod->getResponse()->getError());
+                $paymentError = $response->getError();
+                $this->paymentLog($paymentError);
+                wc_print_notice($this->getErrorMessage(), 'error');
             }
-            $iFrame .= '<button type="submit">' . __('Pay Now', 'woocommerce-heidelpay') . '</button>';
-            $iFrame .= '</form>';
 
             return $iFrame;
         }
