@@ -44,7 +44,7 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * sets the Payment Method.
+     * set the id and payment method
      */
     public function setPayMethod()
     {

@@ -287,7 +287,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * Set the id and PaymenMethod
+     * set the id and payment method
      */
     protected function setPayMethod()
     {

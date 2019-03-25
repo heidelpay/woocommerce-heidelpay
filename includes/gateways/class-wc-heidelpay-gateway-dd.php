@@ -119,9 +119,9 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
 
     //payment form
 
-    /**
-     * Set the id and PaymenMethod
-     */
+	/**
+	 * set the id and payment method
+	 */
     protected function setPayMethod()
     {
         $this->payMethod = new DirectDebitPaymentMethod();
@@ -130,10 +130,10 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $this->name = __('Direct Debit', 'woocommerce-heidelpay');
     }
 
-    /**
-     * @return false Returns false if the handling failed
-     */
-    protected function handleFormPost()
+	/**
+	 * no return value
+	 */
+	protected function handleFormPost()
     {
         parent::handleFormPost();
 

@@ -45,9 +45,9 @@ class WC_Gateway_HP_DC extends WC_Heidelpay_IFrame_Gateway
         $this->initFormFieldsAddon();
     }
 
-    /**
-     * sets the Payment Method.
-     */
+	/**
+	 * set the id and payment method
+	 */
     public function setPayMethod()
     {
         $this->payMethod = new DebitCardPaymentMethod();
