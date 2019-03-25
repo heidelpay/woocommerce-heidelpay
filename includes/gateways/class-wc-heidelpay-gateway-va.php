@@ -43,9 +43,9 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
         $this->constructorAddon();
     }
 
-    /**
-     * sets the Payment Method.
-     */
+	/**
+	 * set the id and payment method
+	 */
     public function setPayMethod()
     {
         $this->payMethod = new PayPalPaymentMethod();

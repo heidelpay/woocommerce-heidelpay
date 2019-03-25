@@ -54,7 +54,7 @@ class WC_Gateway_HP_IV extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * Set the id and PaymentMethod
+     * set the id and payment method
      */
     protected function setPayMethod()
     {

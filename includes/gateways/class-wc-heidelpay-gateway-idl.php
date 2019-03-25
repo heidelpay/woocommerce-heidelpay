@@ -29,6 +29,9 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
     /** @var array Array of locales */
     public $locale;
 
+	/**
+	 * set the id and payment method
+	 */
     public function setPayMethod()
     {
         $this->payMethod = new IDealPaymentMethod();
@@ -60,7 +63,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         $accountHolderLabel = __('Account Holder', 'woocommerce-heidelpay');
         $bankNameLabel = __('Bank', 'woocommerce-heidelpay');
 
-        // Performe Authorize request to get paymethod config
+        // perform authorize request to get payment method config
         $this->setAuthentification();
         $this->setAsync();
         $this->setCriterions();
@@ -130,7 +133,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * @return false Returns false if the handling failed
+     * no return
      */
     protected function handleFormPost()
     {

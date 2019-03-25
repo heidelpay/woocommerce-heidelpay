@@ -2,7 +2,7 @@
 /**
  * Prepayment
  *
- * WooCommerce payment gateway for Secured Invoice
+ * WooCommerce payment gateway for Prepayment
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2018-present heidelpay GmbH. All rights reserved.
@@ -73,7 +73,7 @@ class WC_Gateway_HP_PP extends WC_Heidelpay_Payment_Gateway
 
 
      /**
-     * Set the id and PaymenMethod
+     * set the id and payment method
      */
     protected function setPayMethod()
     {

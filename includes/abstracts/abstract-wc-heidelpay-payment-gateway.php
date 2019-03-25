@@ -194,7 +194,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Check whether this paymethod was selected based on
+     * Check whether this payment method was selected based on
      * @return bool
      */
     public function isGatewayActive()
@@ -234,7 +234,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * @param $order WC_Order
+     * @param WC_Order $order
      * @throws Exception
      */
     public function prepareRequest(WC_Order $order)
@@ -279,7 +279,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
-            $this->getResponeUrl()
+            $this->getResponseUrl()
         );
     }
 
@@ -537,7 +537,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $this->addPaymentError($this->getErrorMessage());
             wc_get_logger()->log(WC_Log_Levels::DEBUG,
                 'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
-                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
+                . 'Please make sure the ResponseURL (' . $this->getResponseUrl() .')is accessible from the internet.',
                 array('source' => 'heidelpay'));
             wp_redirect(wc_get_cart_url());
         }
@@ -648,7 +648,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @return string
      */
-    protected function getResponeUrl()
+    protected function getResponseUrl()
     {
         return get_home_url() . '/wc-api/' . strtolower(get_class($this));
     }

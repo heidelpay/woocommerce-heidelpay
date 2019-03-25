@@ -29,6 +29,9 @@ class WC_Gateway_HP_GP extends WC_Heidelpay_Payment_Gateway
     /** @var array Array of locales */
     public $locale;
 
+	/**
+	 * set the id and payment method
+	 */
     public function setPayMethod()
     {
         $this->payMethod = new GiropayPaymentMethod();
