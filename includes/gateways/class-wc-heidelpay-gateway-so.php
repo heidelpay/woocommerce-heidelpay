@@ -29,9 +29,9 @@ class WC_Gateway_HP_SO extends WC_Heidelpay_Payment_Gateway
     /** @var array Array of locales */
     public $locale;
 
-	/**
-	 * set the id and payment method
-	 */
+    /**
+     * set the id and payment method
+     */
     public function setPayMethod()
     {
         $this->payMethod = new SofortPaymentMethod();
