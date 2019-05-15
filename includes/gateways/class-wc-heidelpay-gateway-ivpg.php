@@ -235,6 +235,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
 
         echo '<div>';
+        parent::payment_fields();
 
         echo
             '<label for="hp_salutation">' . $salutationText . ':</label>' .

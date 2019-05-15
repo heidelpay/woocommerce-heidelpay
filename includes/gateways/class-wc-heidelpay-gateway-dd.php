@@ -106,6 +106,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $accountHolder = wc()->customer->get_billing_first_name() . ' ' . wc()->customer->get_billing_last_name();
 
         echo '<div>';
+        parent::payment_fields();
 
         echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
         echo '<input type="text" class="form-row-wiede validate-required" id="accountholder" name="accountholder" value="' . $accountHolder . '"> ';
