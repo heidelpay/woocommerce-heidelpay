@@ -45,9 +45,12 @@ class WC_Heidelpay_Push
             $response->verifySecurityHash($secret, $response->getIdentification()->getTransactionId());
         } catch (\Exception $e) {
             $callers = debug_backtrace();
-            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
+            wc_get_logger()->notice(
+                print_r('Heidelpay - ' .
                 $callers [0] ['function'] . ': Invalid push hash from ' .
-                $_SERVER ['REMOTE_ADDR'] . ', suspecting manipulation', 1));
+                $_SERVER ['REMOTE_ADDR'] . ', suspecting manipulation', 1),
+                array('source' => 'heidelpay')
+            );
             exit(); //error
         }
         $this->handlePush($response);
@@ -62,7 +65,7 @@ class WC_Heidelpay_Push
         $order = wc_get_order($orderID);
         $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, $order->get_status());
+        wc_get_logger()->debug($order->get_status(), array('source' => 'heidelpay'));
 
         if ($payCode[0] === 'IV') {
             if ($response->isSuccess()) {

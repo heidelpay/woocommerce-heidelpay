@@ -36,10 +36,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * @var string $bookingAction
      */
     public $bookingAction;
-
-    /**
-     * @var string $name
-     */
+    public $wcLogger;
     protected $name;
 
     /**
@@ -49,6 +46,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function __construct()
     {
+        $this->wcLogger = wc_get_logger();
         $this->has_fields = false;
         $this->bookingAction = 'debit';
         $this->messageMapper = new MessageCodeMapper(get_locale());
@@ -360,7 +358,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             try {
                 $this->handleFormPost($_POST);
             } catch (\Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                $this->wcLogger->debug(
+                    htmlspecialchars(print_r($e->getMessage(), 1)),
+                    array('source' => 'heidelpay')
+                );
                 return null;
             }
         }
@@ -376,7 +377,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             try {
                 $this->payMethod->$action($uid);
             } catch (Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                $this->wcLogger->debug(
+                    htmlspecialchars(print_r($e->getMessage(), 1)),
+                    array('source' => 'heidelpay')
+                );
 
                 $this->addPaymentError($this->getErrorMessage());
 
@@ -398,8 +402,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         } else {
             $this->addPaymentError($this->getErrorMessage());
 
-            wc_get_logger()->log(
-                WC_Log_Levels::ERROR,
+            $this->wcLogger->error(
                 htmlspecialchars(
                     print_r(
                         $this->plugin_id . ' - ' . $this->id . __(
@@ -408,7 +411,8 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                         ) . $this->bookingAction,
                         1
                     )
-                )
+                ),
+                array('source' => 'heidelpay')
             );
 
             return null;
@@ -472,8 +476,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     protected function paymentLog($logData)
     {
         $callers = debug_backtrace();
-        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
-            $callers [1] ['function'] . ': ' . print_r($logData, 1), 1));
+        $this->wcLogger->notice(
+            print_r($callers[1]['function'] . ': ' . print_r($logData, 1), 1),
+            array('source' => 'heidelpay')
+        );
     }
 
     /**
@@ -500,7 +506,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             try {
                 $this->payMethod->debitOnRegistration($uid);
             } catch (Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                $this->wcLogger->debug(
+                    htmlspecialchars(print_r($e->getMessage(), 1)),
+                    array('source' => 'heidelpay')
+                );
 
                 $this->addPaymentError($this->getErrorMessage());
             }

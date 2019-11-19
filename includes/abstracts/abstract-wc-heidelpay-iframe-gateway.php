@@ -174,8 +174,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $this->addPaymentError($this->getErrorMessage());
         wc_print_notices();
 
-        wc_get_logger()->log(
-            WC_Log_Levels::ERROR,
+        wc_get_logger()->error(
             htmlspecialchars(
                 print_r(
                     $this->plugin_id . ' - ' . $this->id . __(
@@ -184,7 +183,8 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
                     ) . $bookingAction,
                     1
                 )
-            )
+            ),
+            array('source' => 'heidelpay')
         );
         return null;
     }

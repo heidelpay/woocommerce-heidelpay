@@ -48,9 +48,12 @@ class WC_Heidelpay_Response
             self::$response->verifySecurityHash($secret, $identificationTransactionId);
         } catch (\Exception $exception) {
             $callers = debug_backtrace();
-            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r("Heidelpay - " .
+            wc_get_logger()->notice(
+                print_r("Heidelpay - " .
                 $callers [0] ['function'] . ": Invalid response hash from " .
-                $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1));
+                $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1),
+                array('source' => 'heidelpay')
+            );
             exit(); //error
         }
 

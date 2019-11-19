@@ -71,7 +71,7 @@ trait WC_Heidelpay_Subscription_Gateway
         try {
             $this->payMethod->debitOnRegistration($order->get_meta('heidelpay-Registration'));
         } catch (Exception $e) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, $e);
+            wc_get_logger()->error($e, array('source' => 'heidelpay'));
             return null;
         }
 
