@@ -17,6 +17,9 @@
 
 trait WC_Heidelpay_Subscription_Gateway
 {
+    /**
+     * constructor for subscription support
+     */
     public function constructorAddon()
     {
         if (class_exists('WC_Subscriptions_Order')) {
@@ -36,6 +39,9 @@ trait WC_Heidelpay_Subscription_Gateway
         }
     }
 
+    /**
+     * additional formfields for admin backend
+     */
     public function initFormFieldsAddon()
     {
         if (class_exists('WC_Subscriptions_Order')) {
@@ -52,7 +58,7 @@ trait WC_Heidelpay_Subscription_Gateway
      * @param $amount float
      * @param $renewalOrder WC_Order
      * @return array|null
-     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws Exception
      */
     public function scheduledSubscriptionPayment($amount, $renewalOrder)
     {
@@ -69,14 +75,17 @@ trait WC_Heidelpay_Subscription_Gateway
             return null;
         }
 
-        /** @var \Heidelpay\PhpPaymentApi\Response $response */
+        /** @var Response $response */
         $response = $this->payMethod->getResponse();
 
         if ($this->payMethod->getResponse()->isSuccess()) {
             $renewalOrder->payment_complete($response->getIdentification()->getShortId());
         }
         if ($this->payMethod->getResponse()->isError()) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse()->getError(), 1));
+            wc_get_logger()->error(
+                print_r($this->payMethod->getResponse()->getError(), 1),
+                array('source' => 'heidelpay')
+            );
         }
         return null;
     }

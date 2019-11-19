@@ -465,7 +465,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Funktion to log Events as a notice. It has a prefix to identify that the log entry is from heidelpay and which
+     * Function to log Events as a notice. It adds a context to identify that the log entry is from heidelpay and which
      * function has created it.
      * @param  string|array $logData
      */
