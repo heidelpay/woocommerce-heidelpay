@@ -85,18 +85,62 @@ class Request extends AbstractMethod
     }
 
     /**
+     * Set all necessary parameter for company.
+     *
+     * The executive array can be created beforehand or kept empty and be added later
+     *
+     * @param string $companyName
+     * @param string $poBox
+     * @param string $street
+     * @param string $zip
+     * @param string $city
+     * @param string $country
+     * @param string $CommercialSector
+     * @param string $registrationType
+     * @param string $commercialRegisterNumber
+     * @param string $vatId
+     * @param array  $executives
+     */
+    public function company(
+        $companyName = null,
+        $poBox = null,
+        $street = null,
+        $zip = null,
+        $city = null,
+        $country = null,
+        $CommercialSector = null,
+        $registrationType = null,
+        $commercialRegisterNumber = null,
+        $vatId = null,
+        $executives = null
+    ) {
+        $this->getCompany()->setCompanyname($companyName)
+            ->setRegistrationtype($registrationType)
+            ->setCommercialregisternumber($commercialRegisterNumber)
+            ->setVatid($vatId)
+            ->setCommercialSector($CommercialSector)
+            ->setExecutive($executives)
+            ->getLocation()
+                ->setPobox($poBox)
+                ->setStreet($street)
+                ->setZip($zip)
+                ->setCity($city)
+                ->setCountry($country);
+    }
+
+    /**
      * Set all necessary customer parameter for a request
      *
      * @param string $nameGiven      customer given name, e.g. John
      * @param string $nameFamily     customer family name, e.g. Doe
-     * @param string $nameCompany    company name, e.g. Heidelpay
+     * @param string $nameCompany    company name, e.g. heidelpay
      * @param string $shopperId      customer id in your application, e.g. 1249
      * @param string $addressStreet  address street of the customer, e.g. Vagerowstr.
      * @param string $addressState   address state ot the customer, e.g. Bayern
      * @param string $addressZip     address zip code, e.g. 69115
      * @param string $addressCity    address city, e.g. Heidelberg
      * @param string $addressCountry address country code 2 letters, e.g. DE
-     * @param string $contactMail    email adress of the customer, e.g. ab@mail.de
+     * @param string $contactMail    email address of the customer, e.g. ab@mail.de
      *
      * @return \Heidelpay\PhpPaymentApi\Request
      */
@@ -124,6 +168,19 @@ class Request extends AbstractMethod
         $this->getContact()->setEmail($contactMail);
 
         return $this;
+    }
+
+    /**
+     * @param string $shopperId
+     * @param string $invoiceId
+     * @param string $reversaltype string $reversaltype "CANCLE, RETURN or CREDIT"
+     */
+    public function factoring($invoiceId, $shopperId = null)
+    {
+        $this->getIdentification()->setInvoiceid($invoiceId);
+        if ($shopperId !== null) {
+            $this->getIdentification()->setShopperid($shopperId);
+        }
     }
 
     /**

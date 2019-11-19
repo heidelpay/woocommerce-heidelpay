@@ -1,17 +1,17 @@
 [
     {
         "name": "heidelpay/php-message-code-mapper",
-        "version": "v1.0.1",
-        "version_normalized": "1.0.1.0",
+        "version": "v1.0.2",
+        "version_normalized": "1.0.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/heidelpay/php-message-code-mapper.git",
-            "reference": "d19a61e5f079d1e66169aefcbbaae227bff64130"
+            "reference": "4d9390b8a271b2eda98e411cbf1624e4f5cf7947"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/heidelpay/php-message-code-mapper/zipball/d19a61e5f079d1e66169aefcbbaae227bff64130",
-            "reference": "d19a61e5f079d1e66169aefcbbaae227bff64130",
+            "url": "https://api.github.com/repos/heidelpay/php-message-code-mapper/zipball/4d9390b8a271b2eda98e411cbf1624e4f5cf7947",
+            "reference": "4d9390b8a271b2eda98e411cbf1624e4f5cf7947",
             "shasum": ""
         },
         "require": {
@@ -23,7 +23,7 @@
             "heidelpay/phpdocumentor": "^2.9.1",
             "phpunit/phpunit": "~5.7"
         },
-        "time": "2018-03-01T07:22:04+00:00",
+        "time": "2019-02-04T15:13:31+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -54,20 +54,21 @@
     },
     {
         "name": "heidelpay/php-payment-api",
-        "version": "v1.5.0",
-        "version_normalized": "1.5.0.0",
+        "version": "v1.7.1",
+        "version_normalized": "1.7.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/heidelpay/php-payment-api.git",
-            "reference": "f3bea9bb5af0f0fc498f9d20c58e1c04efac13a9"
+            "reference": "30b5be4a784de8c6ee67931a251fffa77a30ab4b"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/heidelpay/php-payment-api/zipball/f3bea9bb5af0f0fc498f9d20c58e1c04efac13a9",
-            "reference": "f3bea9bb5af0f0fc498f9d20c58e1c04efac13a9",
+            "url": "https://api.github.com/repos/heidelpay/php-payment-api/zipball/30b5be4a784de8c6ee67931a251fffa77a30ab4b",
+            "reference": "30b5be4a784de8c6ee67931a251fffa77a30ab4b",
             "shasum": ""
         },
         "require": {
+            "ext-json": "*",
             "ext-simplexml": "*",
             "lib-curl": "*",
             "lib-openssl": "*",
@@ -81,16 +82,17 @@
         },
         "require-dev": {
             "codacy/coverage": "^1.4",
-            "codeception/aspect-mock": "~2.1.1",
+            "codeception/aspect-mock": "~3.0.0",
             "codeception/codeception": "~2.3.9",
             "friendsofphp/php-cs-fixer": "^2.0",
+            "heidelpay/php-basket-api": "^1.0",
             "heidelpay/phpdocumentor": "2.9.1"
         },
         "suggest": {
             "heidelpay/php-basket-api": "Use this package to transmit basket information.",
             "heidelpay/php-message-code-mapper": "You can use this package to provide user-friendly messages instead of error codes."
         },
-        "time": "2018-04-13T07:21:22+00:00",
+        "time": "2019-02-25T15:29:11+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -101,23 +103,6 @@
         "notification-url": "https://packagist.org/downloads/",
         "license": [
             "proprietary"
-        ],
-        "authors": [
-            {
-                "name": "Jens Richter"
-            },
-            {
-                "name": "Ronja Wann"
-            },
-            {
-                "name": "Stephano Vogel"
-            },
-            {
-                "name": "Daniel Kraut"
-            },
-            {
-                "name": "Simon Gabriel"
-            }
         ],
         "description": "New client library for heidelpay payments replacing heidelpay/php-api.",
         "homepage": "http://dev.heidelpay.com",

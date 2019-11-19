@@ -3,7 +3,7 @@ Lizenzvereinbarung Plug-in
 
 I. Präambel
 
-Diese Lizenzvereinbarung Plug-in (nachfolgend – „Vereinbarung“) bildet einen Vertrag zwischen dem Nutzer des Plug-ins und der Heidelberger Payment GmbH (nachfolgend „heidelpay“).
+Diese Lizenzvereinbarung Plug-in (nachfolgend – „Vereinbarung“) bildet einen Vertrag zwischen dem Nutzer des Plug-ins und der heidelpay GmbH (nachfolgend „heidelpay“).
 
 Das Plug-in von heidelpay ist ein Software-Programm, welches die Schnittstelle zum Payment-System von heidelpay mit einer Anwendung (zum Beispiel: Shopsystem, Warenwirtschaft, Debitorenmanagement etc.) verbindet. Das Plug-in dient dem Datenaustausch zwischen dem Payment-System von heidelpay und der Anwendung. Das Plug-in erweitert den Funktionsumfang der Anwendung hinsichtlich der mit heidelpay gesondert vertraglich vereinbarten Leistungen. 
 

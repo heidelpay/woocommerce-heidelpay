@@ -2,12 +2,14 @@
 
 namespace Heidelpay\Tests\PhpPaymentApi\Unit;
 
+use AspectMock\Test as aspectMockTest;
 use Codeception\TestCase\Test;
+use Heidelpay\PhpPaymentApi\Constants\ApiConfig;
+use Heidelpay\PhpPaymentApi\Constants\FrontendMode;
 use Heidelpay\PhpPaymentApi\Constants\TransactionMode;
 use Heidelpay\PhpPaymentApi\Exceptions\JsonParserException;
-use Heidelpay\PhpPaymentApi\Request;
 use Heidelpay\PhpPaymentApi\ParameterGroups\CriterionParameterGroup;
-use AspectMock\Test as aspectMockTest;
+use Heidelpay\PhpPaymentApi\Request;
 
 /**
  *
@@ -164,7 +166,7 @@ class RequestTest extends Test
         $referenceVars = array(
             'CRITERION.SECRET' => '209022666cd4706e5f451067592b6be1aff4a913d5bb7f8249f7418ee25c91b318ebac66f41a6692539c8923adfdad6aae26138b1b3a7e37a197ab952be57876',
             'FRONTEND.ENABLED' => 'TRUE',
-            'FRONTEND.MODE' => 'WHITELABEL',
+            'FRONTEND.MODE' => FrontendMode::FRONTEND_MODE_WHITELABEL,
             'IDENTIFICATION.TRANSACTIONID' => '2843294932',
             'PRESENTATION.AMOUNT' => 23.12,
             'PRESENTATION.CURRENCY' => 'EUR',
@@ -175,6 +177,50 @@ class RequestTest extends Test
         );
 
         $this->assertEquals($referenceVars, $request->toArray());
+    }
+
+    /**
+     * @dataProvider FactoringParameterShouldBeSetAsExpectedDataProvider
+     * @test
+     *
+     * @param mixed $invoiceId
+     * @param mixed $shopperId
+     * @param mixed $expectedInvoiceId
+     * @param mixed $expectedShopperId
+     */
+    public function FactoringParameterShouldBeSetAsExpected($invoiceId, $shopperId, $expectedInvoiceId, $expectedShopperId)
+    {
+        $request = new Request();
+
+        $request->getIdentification()->setShopperid('OriginalShopperId');
+        $request->getIdentification()->setInvoiceid('OriginalInvoiceId');
+
+        if ($shopperId) {
+            $request->factoring($invoiceId, $shopperId);
+        } else {
+            $request->factoring($invoiceId);
+        }
+
+        $expectedRequestVars = [
+            'CRITERION.SDK_NAME' => 'Heidelpay\PhpPaymentApi',
+            'CRITERION.SDK_VERSION' => ApiConfig::SDK_VERSION,
+            'FRONTEND.ENABLED' => 'TRUE',
+            'FRONTEND.MODE' => 'WHITELABEL',
+            'IDENTIFICATION.INVOICEID' => $expectedInvoiceId,
+            'IDENTIFICATION.SHOPPERID' => $expectedShopperId,
+            'REQUEST.VERSION' => '1.0',
+            'TRANSACTION.MODE' => 'CONNECTOR_TEST',
+        ];
+
+        $this->assertEquals($expectedRequestVars, $request->toArray());
+    }
+
+    public function FactoringParameterShouldBeSetAsExpectedDataProvider()
+    {
+        return [
+            'shopperid null' => ['invoice01', null, 'invoice01', 'OriginalShopperId'],
+            'shopperid set separately' => ['invoice01', 'shopper01', 'invoice01', 'shopper01'],
+        ];
     }
 
     /**

@@ -10,11 +10,11 @@ use PHPUnit\Framework\TestCase;
  * This class provides unit tests for the CustomerMessage implementation.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
  *
- * @link https://dev.heidelpay.de/php-messages-code-mapper
+ * @link http://dev.heidelpay.com/php-messages-code-mapper
  *
- * @author Stephano Vogel
+ * @author Stephano Vogel <development@heidelpay.com>
  *
  * @package heidelpay
  * @subpackage php-messages-code-mapper
