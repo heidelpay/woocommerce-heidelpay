@@ -28,6 +28,8 @@ trait WC_Heidelpay_Subscription_Gateway
                 'subscription_cancellation',
                 'subscription_suspension',
                 'subscription_reactivation',
+                'subscription_amount_changes',
+                'subscription_date_changes'
             );
 
             add_action(
