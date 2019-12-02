@@ -3,8 +3,10 @@
 ## [1.7.0][1.7.0]
 
 ### Added:
-- Logging uses context to generate a heidelpay logfile
-- Subscription now supports configuration to change amount and date
+- Use context to generate a dedicated heidelpay logfile
+- Support for WooCommerce Subsciptions configuration
+  - Change amount of subscription
+  - Change date of subscription
 
 ## [1.6.0][1.6.0]
 
