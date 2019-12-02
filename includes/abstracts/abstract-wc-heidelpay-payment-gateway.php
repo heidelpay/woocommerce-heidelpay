@@ -36,7 +36,11 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      * @var string $bookingAction
      */
     public $bookingAction;
+
+    /** @var WC_Logger $wcLogger */
     public $wcLogger;
+
+    /** @var string $name */
     protected $name;
 
     /**
