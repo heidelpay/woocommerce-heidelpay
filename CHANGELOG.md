@@ -1,5 +1,13 @@
 # Release Notes - heidelpay Payment Gateway for WooCommerce
 
+## [1.7.0][1.7.0]
+
+### Added:
+- Use context to generate a dedicated heidelpay logfile
+- Support for WooCommerce Subsciptions configuration
+  - Change amount of subscription
+  - Change date of subscription
+
 ## [1.6.0][1.6.0]
 
 ### Added:
@@ -84,3 +92,4 @@
 [1.4.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.3.0..1.4.0
 [1.5.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.4.0..1.5.0
 [1.6.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.5.0..1.6.0
+[1.7.0]: https://github.com/heidelpay/woocommerce-heidelpay/compare/1.6.0..1.7.0

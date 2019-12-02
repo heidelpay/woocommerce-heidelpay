@@ -7,9 +7,9 @@
 [![PHP 7.1](https://img.shields.io/badge/php-7.1-blue.svg)](http://www.php.net)
 [![PHP 7.2](https://img.shields.io/badge/php-7.2-blue.svg)](http://www.php.net)
 
-![Logo](https://dev.heidelpay.de/devHeidelpay_400_180.jpg)
+![Logo](http://dev.heidelpay.com/devHeidelpay_400_180.jpg)
 
-**heidelpay message code mapper**
+## heidelpay message code mapper
 
 This library provides user-friendly output of (error)-messages coming from
 the heidelpay API.
@@ -72,3 +72,18 @@ Now you can return or print out the message by calling the `getMessage()` method
 ```echo $instance->getMessage($errorcode);```
 
 Error codes are accepted in either the 'XXX.XXX.XXX' or 'HP-Error-XXX.XXX.XXX' format.
+
+## Support
+For any issues or questions please get in touch with our support.
+
+#### Web page
+https://dev.heidelpay.com/
+ 
+#### Email
+support@heidelpay.com
+ 
+#### Phone
++49 (0)6221/6471-100
+
+#### Twitter
+@devHeidelpay

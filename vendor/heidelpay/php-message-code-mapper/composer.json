@@ -7,13 +7,13 @@
     "authors": [
         {
             "name": "Stephano Vogel",
-            "email": "development@heidelpay.de"
+            "email": "development@heidelpay.com"
         }
     ],
     "support" : {
         "email" : "development@heidelpay.de"
     },
-    "homepage" : "https://dev.heidelpay.de",
+    "homepage" : "http://dev.heidelpay.com",
     "autoload" : {
         "psr-4": {
             "Heidelpay\\MessageCodeMapper\\": "lib"

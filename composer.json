@@ -10,14 +10,18 @@
   "authors": [
     {
       "name": "Daniel Kraut",
-      "email": "github@bnoob.eu"
+      "role": "Developer"
     },
     {
       "name": "Florian Evertz",
-      "email": "florian.evertz@googlemail.com"
+      "role": "Developer"
     },
     {
-      "name": "David Owusu"
+      "name": "David Owusu",
+      "role": "Developer"
     }
-  ]
+  ],
+  "support": {
+    "email": "development@heidelpay.com"
+  }
 }
