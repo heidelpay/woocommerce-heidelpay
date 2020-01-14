@@ -4,9 +4,13 @@
 
 ### Added:
 - Use context to generate a dedicated heidelpay logfile
-- Support for WooCommerce Subsciptions configuration
-  - Change amount of subscription
-  - Change date of subscription
+- WooCommerce Subscriptions
+    - Support for  configuration
+        - Change amount of subscription
+        - Change date of subscription
+    - Direct debit: 
+        - Add creditorId payment information
+        - Payment info text for subscription renewal orders.
 
 ## [1.6.0][1.6.0]
 
