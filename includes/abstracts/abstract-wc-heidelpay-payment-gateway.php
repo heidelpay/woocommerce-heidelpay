@@ -27,6 +27,7 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
+    protected $templateTextKey = '';
     /**
      * @var \Heidelpay\PhpPaymentApi\PaymentMethods\BasicPaymentMethodTrait $payMethod
      */
@@ -639,6 +640,41 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 echo $order->get_meta('heidelpay-paymentInfo');
             }
         }
+    }
+
+    /**
+     * Add payment information to the order if available.
+     * Information usually are set for invoice, direct debit and prepayment.
+     * @param WC_Order $order
+     * @param Response $response
+     * @return null
+     */
+    public function setPaymentInfo(WC_Order $order, Response $response)
+    {
+        // Load template text for Payment information
+        if ($this->templateTextKey === '') {
+            return null;
+        }
+
+        $payInfoTemplate = __($this->templateTextKey, 'woocommerce-heidelpay');
+        $payInfo = $response->getConnector();
+        $presentation = $response->getPresentation();
+
+        $paymentData = [
+            '{AMOUNT}' => $presentation->getAmount(),
+            '{CURRENCY}' => $presentation->getCurrency(),
+            '{CONNECTOR_ACCOUNT_HOLDER}' => $payInfo->getAccountHolder(),
+            '{CONNECTOR_ACCOUNT_IBAN}' => $payInfo->getAccountIBan(),
+            '{CONNECTOR_ACCOUNT_BIC}' => $payInfo->getAccountBic(),
+            '{IDENTIFICATION_SHORTID}' => $response->getIdentification()->getShortId(),
+            '{Iban}' => $response->getAccount()->getIban(),
+            '{Ident}' => $response->getAccount()->getIdentification(),
+            '{CreditorId}' => $response->getIdentification()->getCreditorId(),
+        ];
+
+        $paymentText = strtr($payInfoTemplate, $paymentData);
+
+        $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
     }
 
     /**
