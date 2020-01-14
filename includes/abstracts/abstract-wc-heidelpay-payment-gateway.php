@@ -493,7 +493,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function performNoGuiRequest($order, $uid)
     {
-        $this->performAfterRegistrationRequest($order, $uid);
+        return $this->performAfterRegistrationRequest($order, $uid);
     }
 
     /**
@@ -520,6 +520,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             if ($this->payMethod->getResponse()->isError()) {
                 $order->set_status('on-hold');
             }
+            return $this->payMethod->getResponse();
         }
     }
 

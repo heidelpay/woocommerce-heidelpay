@@ -15,6 +15,10 @@
  * @category WooCommerce
  */
 
+/**
+ * Trait WC_Heidelpay_Subscription_Gateway
+ * @property \Heidelpay\PhpPaymentApi\TransactionTypes\DebitOnRegistrationTransactionType payMethod
+ */
 trait WC_Heidelpay_Subscription_Gateway
 {
     /**
