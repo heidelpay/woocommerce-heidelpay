@@ -490,7 +490,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param $order
      * @param $uid
-     * @throws WC_Data_Exception
+     * @return Response
      */
     public function performNoGuiRequest($order, $uid)
     {
@@ -500,12 +500,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param WC_Order $order
      * @param $uid
-     * @throws WC_Data_Exception
+     * @return Response
      */
     public function performAfterRegistrationRequest($order, $uid)
     {
         if (!empty($_POST)) {
-            $this->handleFormPost($_POST);
+            $this->handleFormPost();
         }
         if ($order->get_meta('heidelpay-Registration') !== '') {
             try {
@@ -523,6 +523,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             }
             return $this->payMethod->getResponse();
         }
+        return null;
     }
 
     /**
@@ -550,10 +551,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         } else {
             // Add Error Msg, debug log and redirect to cart.
             $this->addPaymentError($this->getErrorMessage());
-            wc_get_logger()->log(WC_Log_Levels::DEBUG,
+            wc_get_logger()->log(
+                WC_Log_Levels::DEBUG,
                 'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
                 . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
-                array('source' => 'heidelpay'));
+                array('source' => 'heidelpay')
+            );
             wp_redirect(wc_get_cart_url());
         }
         exit();
