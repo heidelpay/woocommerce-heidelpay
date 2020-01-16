@@ -79,8 +79,14 @@ class WC_Heidelpay_Response
             $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
             $note = '';
 
-            $paymethod = 'WC_Gateway_'.strtoupper($order->get_payment_method());
-            $paymethod = new $paymethod;
+            $availableGateways = WC_Payment_Gateways::instance()->get_available_payment_gateways();
+
+            $paymentMethodId = $order->get_payment_method();
+            if (empty($availableGateways[$paymentMethodId])) {
+                return;
+            }
+            /** @var WC_Payment_Gateways $paymethod */
+            $paymethod = $availableGateways[$paymentMethodId];
 
             // If registration, do a debit on registration afterwards
             if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
