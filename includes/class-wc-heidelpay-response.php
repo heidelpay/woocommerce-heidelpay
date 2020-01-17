@@ -79,18 +79,30 @@ class WC_Heidelpay_Response
             $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
             $note = '';
 
-            $this->setPaymentInfo($order);
+            $availableGateways = WC_Payment_Gateways::instance()->get_available_payment_gateways();
+
+            $paymentMethodId = $order->get_payment_method();
+            if (empty($availableGateways[$paymentMethodId])) {
+                return;
+            }
+            /** @var WC_Payment_Gateways $paymethod */
+            $paymethod = $availableGateways[$paymentMethodId];
 
             // If registration, do a debit on registration afterwards
             if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
                 $order->add_meta_data('heidelpay-Registration', $uid);
-                $paymethod = 'WC_Gateway_HP_' . $payCode[0];
-                $paymethod = new $paymethod;
+                /** @var WC_Heidelpay_Payment_Gateway $paymethod */
                 $paymethod->prepareRequest($order);
                 $paymethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
                 $paymethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
-                $paymethod->performNoGuiRequest($order, $uid);
+                // Use the Response of the debitOnRegiststration in order to set the correct paymentInfo
+                $noGuiResponse = $paymethod->performNoGuiRequest($order, $uid);
+                if ($noGuiResponse !== null) {
+                    self::$response = $noGuiResponse;
+                }
             }
+
+            $paymethod->setPaymentInfo($order, self::$response);
 
             // If no money has been payed yet.
             if ($payCode[0] !== 'IV' && $payCode[1] === 'PA') {
@@ -131,63 +143,6 @@ class WC_Heidelpay_Response
 
             //show thank you page
             echo $order->get_checkout_order_received_url();
-        }
-    }
-
-    /**
-     * Add payment information to the order if available.
-     * Information usually are set for invoice, direct debit and prepayment.
-     * @param WC_Order $order
-     * @return null
-     */
-    public function setPaymentInfo(WC_Order $order)
-    {
-        // Load template text for Payment information
-        $payInfoTemplate = $this->getInfoTemplate();
-        if ($payInfoTemplate === null) {
-            return null;
-        }
-
-        $response = self::$response;
-        $payInfo = $response->getConnector();
-        $presentation = $response->getPresentation();
-
-        $paymentData = array(
-            '{AMOUNT}' => $presentation->getAmount(),
-            '{CURRENCY}' => $presentation->getCurrency(),
-            '{CONNECTOR_ACCOUNT_HOLDER}' => $payInfo->getAccountHolder(),
-            '{CONNECTOR_ACCOUNT_IBAN}' => $payInfo->getAccountIBan(),
-            '{CONNECTOR_ACCOUNT_BIC}' => $payInfo->getAccountBic(),
-            '{IDENTIFICATION_SHORTID}' => self::$response->getIdentification()->getShortId(),
-            '{Iban}' => $response->getAccount()->getIban(),
-            '{Ident}' => $response->getAccount()->getIdentification(),
-            '{CreditorId}' => $response->getIdentification()->getCreditorId(),
-        );
-
-        $paymentText = strtr($payInfoTemplate, $paymentData);
-
-        $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
-    }
-
-    /**
-     * Provide the template text for payment information.
-     * @return null|string
-     */
-    public function getInfoTemplate()
-    {
-        $payCode = explode('.', self::$response->getPayment()->getCode());
-        switch (strtoupper($payCode[0])) {
-            case 'IV':
-                return __('invoice_info', 'woocommerce-heidelpay');
-                break;
-            case 'PP':
-                return __('prepayment_info', 'woocommerce-heidelpay');
-                break;
-            case 'DD':
-                return __('direct_debit_info', 'woocommerce-heidelpay');
-                break;
-            default:
-                return null;
         }
     }
 }

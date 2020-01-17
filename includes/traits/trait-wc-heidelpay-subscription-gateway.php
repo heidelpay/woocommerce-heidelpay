@@ -15,6 +15,12 @@
  * @category WooCommerce
  */
 
+use Heidelpay\PhpPaymentApi\Response;
+
+/**
+ * Trait WC_Heidelpay_Subscription_Gateway
+ * @property \Heidelpay\PhpPaymentApi\TransactionTypes\DebitOnRegistrationTransactionType payMethod
+ */
 trait WC_Heidelpay_Subscription_Gateway
 {
     /**
@@ -81,6 +87,7 @@ trait WC_Heidelpay_Subscription_Gateway
         $response = $this->payMethod->getResponse();
 
         if ($this->payMethod->getResponse()->isSuccess()) {
+            parent::setPaymentInfo($renewalOrder, $response);
             $renewalOrder->payment_complete($response->getIdentification()->getShortId());
         }
         if ($this->payMethod->getResponse()->isError()) {

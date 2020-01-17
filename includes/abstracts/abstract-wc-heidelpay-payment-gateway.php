@@ -27,6 +27,7 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
+    protected $templateTextKey = '';
     /**
      * @var \Heidelpay\PhpPaymentApi\PaymentMethods\BasicPaymentMethodTrait $payMethod
      */
@@ -489,22 +490,22 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @param $order
      * @param $uid
-     * @throws WC_Data_Exception
+     * @return Response
      */
     public function performNoGuiRequest($order, $uid)
     {
-        $this->performAfterRegistrationRequest($order, $uid);
+        return $this->performAfterRegistrationRequest($order, $uid);
     }
 
     /**
      * @param WC_Order $order
      * @param $uid
-     * @throws WC_Data_Exception
+     * @return Response
      */
     public function performAfterRegistrationRequest($order, $uid)
     {
         if (!empty($_POST)) {
-            $this->handleFormPost($_POST);
+            $this->handleFormPost();
         }
         if ($order->get_meta('heidelpay-Registration') !== '') {
             try {
@@ -520,7 +521,9 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             if ($this->payMethod->getResponse()->isError()) {
                 $order->set_status('on-hold');
             }
+            return $this->payMethod->getResponse();
         }
+        return null;
     }
 
     /**
@@ -548,10 +551,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         } else {
             // Add Error Msg, debug log and redirect to cart.
             $this->addPaymentError($this->getErrorMessage());
-            wc_get_logger()->log(WC_Log_Levels::DEBUG,
+            wc_get_logger()->log(
+                WC_Log_Levels::DEBUG,
                 'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
                 . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
-                array('source' => 'heidelpay'));
+                array('source' => 'heidelpay')
+            );
             wp_redirect(wc_get_cart_url());
         }
         exit();
@@ -638,6 +643,41 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 echo $order->get_meta('heidelpay-paymentInfo');
             }
         }
+    }
+
+    /**
+     * Add payment information to the order if available.
+     * Information usually are set for invoice, direct debit and prepayment.
+     * @param WC_Order $order
+     * @param Response $response
+     * @return null
+     */
+    public function setPaymentInfo(WC_Order $order, Response $response)
+    {
+        // Load template text for Payment information
+        if ($this->templateTextKey === '') {
+            return null;
+        }
+
+        $payInfoTemplate = __($this->templateTextKey, 'woocommerce-heidelpay');
+        $payInfo = $response->getConnector();
+        $presentation = $response->getPresentation();
+
+        $paymentData = [
+            '{AMOUNT}' => $presentation->getAmount(),
+            '{CURRENCY}' => $presentation->getCurrency(),
+            '{CONNECTOR_ACCOUNT_HOLDER}' => $payInfo->getAccountHolder(),
+            '{CONNECTOR_ACCOUNT_IBAN}' => $payInfo->getAccountIBan(),
+            '{CONNECTOR_ACCOUNT_BIC}' => $payInfo->getAccountBic(),
+            '{IDENTIFICATION_SHORTID}' => $response->getIdentification()->getShortId(),
+            '{Iban}' => $response->getAccount()->getIban(),
+            '{Ident}' => $response->getAccount()->getIdentification(),
+            '{CreditorId}' => $response->getIdentification()->getCreditorId(),
+        ];
+
+        $paymentText = strtr($payInfoTemplate, $paymentData);
+
+        $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
     }
 
     /**

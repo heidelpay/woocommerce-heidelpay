@@ -297,6 +297,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->name = __('Secured Invoice', 'woocommerce-heidelpay');
         $this->has_fields = true;
         $this->bookingAction = 'authorize';
+        $this->templateTextKey = 'invoice_info';
     }
 
 

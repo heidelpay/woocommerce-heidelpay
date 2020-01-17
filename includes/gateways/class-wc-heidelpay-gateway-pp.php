@@ -82,5 +82,6 @@ class WC_Gateway_HP_PP extends WC_Heidelpay_Payment_Gateway
         $this->name = __('Prepayment', 'woocommerce-heidelpay');
         $this->has_fields = false;
         $this->bookingAction = 'authorize';
+        $this->templateTextKey = 'prepayment_info';
     }
 }

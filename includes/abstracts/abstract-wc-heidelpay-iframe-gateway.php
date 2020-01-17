@@ -190,15 +190,6 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
     }
 
     /**
-     * @param $order
-     * @param $uid
-     */
-    public function performNoGuiRequest($order, $uid)
-    {
-        parent::performAfterRegistrationRequest($order, $uid);
-    }
-
-    /**
      * @return mixed|string
      */
     public function getBookingAction()
