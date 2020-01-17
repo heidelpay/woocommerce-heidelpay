@@ -96,7 +96,10 @@ class WC_Heidelpay_Response
                 $paymethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
                 $paymethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
                 // Use the Response of the debitOnRegiststration in order to set the correct paymentInfo
-                self::$response = $paymethod->performNoGuiRequest($order, $uid)??self::$response;
+                $noGuiResponse = $paymethod->performNoGuiRequest($order, $uid);
+                if ($noGuiResponse !== null) {
+                    self::$response = $noGuiResponse;
+                }
             }
 
             $paymethod->setPaymentInfo($order, self::$response);
