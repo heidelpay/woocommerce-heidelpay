@@ -254,13 +254,18 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     protected function setAuthentification(WC_order $order = null)
     {
         $isSandbox = false;
-        $channel = $this->get_option('transaction_channel');
-        if ($this->get_option('sandbox') === 'yes') {
+        if ( $this->get_option('sandbox') === 'yes' ) {
             $isSandbox = true;
         }
+
+        // Set filter on channel to allow 3rd parties to change channel depending on ordered products.
+        $channel = apply_filters( 'heidelpay_payment_gateway_transaction_channel', $this->get_option( 'transaction_channel' ), $order, $isSandbox );
+
         if (class_exists('WC_Subscriptions_Order')) {
             if ($order !== null && (wcs_order_contains_renewal($order) || wcs_order_contains_subscription($order))) {
-                $channel = $this->get_option('transaction_channel_subscription');
+
+                // Set filter on channel to allow 3rd parties to change channel depending on ordered subscription.
+                $channel = apply_filters( 'heidelpay_payment_gateway_transaction_channel_subscription', $this->get_option( 'transaction_channel_subscription' ), $order, $isSandbox );
             }
         }
         $this->payMethod->getRequest()->authentification(
