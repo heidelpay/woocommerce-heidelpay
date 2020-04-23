@@ -12,6 +12,9 @@
         - Add creditorId payment information
         - Payment info text for subscription renewal orders.
 
+###Fixed:
+- Push notifications were not processed
+
 ## [1.6.0][1.6.0]
 
 ### Added:
