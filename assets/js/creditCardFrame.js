@@ -52,7 +52,11 @@ function sendMessage(e) {
     /**
      * Get hostname and protocol from paymentIframe
      */
-    var targetOrigin = getDomainFromUrl(paymentFrameIframe.src);
+    var source = paymentFrameIframe.getAttribute("src");
+    if (source === null) {
+        source = paymentFrameIframe.getAttribute("data-src");
+    }
+    var targetOrigin = getDomainFromUrl(source);
 
     /**
      * Send html postmessage to payment frame
@@ -82,12 +86,14 @@ function receiveMessage(e) {
     /**
      * Get hostname and protocol from paymentIframe
      */
-
-    var targetOrigin = getDomainFromUrl(paymentFrameIframe.src);
+    var source = paymentFrameIframe.getAttribute("src");
+    if (source === null) {
+        source = paymentFrameIframe.getAttribute("data-src");
+    }
+    var targetOrigin = getDomainFromUrl(source);
     if (e.origin !== targetOrigin) {
         return;
     }
 
     var antwort = JSON.parse(e.data);
-    //console.log(antwort);
 }
