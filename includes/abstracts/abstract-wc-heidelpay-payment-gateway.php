@@ -186,7 +186,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             $push = new WC_Heidelpay_Push();
             $push->init($rawPayload, $this->get_option('secret'));
         } else {
-            $this->wcLogger->error('Push was empty or did not process', ['source' => 'heidelpay']);
+            $this->wcLogger->warning('Push was empty or did not process', ['source' => 'heidelpay']);
         }
         exit;
     }
