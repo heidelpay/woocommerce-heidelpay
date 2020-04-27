@@ -46,8 +46,7 @@ class WC_Heidelpay_Push
         } catch (\Exception $e) {
             $callers = debug_backtrace();
             wc_get_logger()->notice(
-                print_r('Heidelpay - ' .
-                $callers [0] ['function'] . ': Invalid push hash from ' .
+                print_r($callers [0] ['function'] . ': Invalid push hash from ' .
                 $_SERVER ['REMOTE_ADDR'] . ', suspecting manipulation', 1),
                 array('source' => 'heidelpay')
             );

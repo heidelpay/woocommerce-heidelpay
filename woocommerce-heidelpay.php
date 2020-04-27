@@ -18,6 +18,9 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Text Domain: woocommerce-heidelpay
  * Domain Path: /languages
  *
+ * WC requires at least: 3.0
+ * WC tested up to: 3.8
+ *
  * Copyright: © 2018-present heidelpay GmbH
  * License: see LICENSE.txt
  */
