@@ -49,7 +49,7 @@ function sendMessage(e) {
      * Get the iFrame element
      */
     var paymentFrameIframe = document.getElementById('paymentFrameIframe');
-    var targetOrigin = getDomainFromUrl(paymentFrameIframe);
+    var targetOrigin = getUrlFromIframe(paymentFrameIframe);
 
     /**
      * Send html postmessage to payment frame
@@ -60,7 +60,7 @@ function sendMessage(e) {
 /**
  * Function to get the domain from a given url
  */
-function getDomainFromUrl(paymentIframe) {
+function getUrlFromIframe(paymentIframe) {
     /**
      * Get hostname and protocol from paymentIframe
      */
@@ -82,7 +82,7 @@ function receiveMessage(e) {
      * Get the iFrame element
      */
     var paymentFrameIframe = document.getElementById('paymentFrameIframe');
-    var targetOrigin = getDomainFromUrl(paymentFrameIframe);
+    var targetOrigin = getUrlFromIframe(paymentFrameIframe);
     if (e.origin !== targetOrigin) {
         return;
     }
