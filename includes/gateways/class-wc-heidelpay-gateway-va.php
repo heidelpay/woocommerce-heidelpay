@@ -64,7 +64,6 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
     public function init_form_fields()
     {
         parent::init_form_fields();
-        $this->initFormFieldsAddon();
 
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
         $this->form_fields['user_login']['default'] = '31ha07bc8142c5a171744e5aef11ffd3';
@@ -72,6 +71,8 @@ class WC_Gateway_HP_VA extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8124365CA41D4BDA79CCCD22';
 
         $this->form_fields['bookingmode'] = $this->getBookingSelection();
+
+        $this->initFormFieldsAddon();
     }
 
     /**
