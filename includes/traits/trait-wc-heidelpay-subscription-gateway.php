@@ -28,7 +28,7 @@ trait WC_Heidelpay_Subscription_Gateway
      */
     public function constructorAddon()
     {
-        if (class_exists('WC_Subscriptions_Order')) {
+        if (class_exists('WC_Subscriptions')) {
             $this->supports = array(
                 'subscriptions',
                 'subscription_cancellation',
