@@ -118,8 +118,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         echo '</div>';
     }
 
-    //payment form
-
     /**
      * Set the id and PaymenMethod
      */
