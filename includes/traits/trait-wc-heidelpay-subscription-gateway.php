@@ -68,7 +68,7 @@ trait WC_Heidelpay_Subscription_Gateway
     public function isSubscriptionEnabled()
     {
         $enabled = false;
-        if ($this->get_option('activate_for_subscriptions')) {
+        if ($this->get_option('activate_for_subscriptions') === 'yes') {
             $enabled = true;
         }
         return $enabled;
