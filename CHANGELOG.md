@@ -5,6 +5,7 @@
 ### Added:
 - Use context to generate a dedicated heidelpay logfile
 - WooCommerce Subscriptions
+    - Enable / Disable payment for subscription orders
     - Support for  configuration
         - Change amount of subscription
         - Change date of subscription
