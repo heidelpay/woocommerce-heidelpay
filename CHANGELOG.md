@@ -15,6 +15,7 @@
 
 ###Fixed:
 - Push notifications were not processed
+- IFrame not working if lazyloading is active
 
 ## [1.6.0][1.6.0]
 
