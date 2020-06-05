@@ -707,6 +707,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function getResponeUrl()
     {
-        return get_home_url() . '/wc-api/' . strtolower(get_class($this));
+        return get_home_url(null, '/wc-api/' . strtolower(get_class($this)));
     }
 }
