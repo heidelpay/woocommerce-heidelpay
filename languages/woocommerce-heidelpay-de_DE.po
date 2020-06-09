@@ -366,8 +366,8 @@ msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}
 
 msgid "direct_debit_info"
 msgstr "Der Betrag von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:<br /><br />"
-        			"IBAN: {Iban}<br /><br/>"
-        			"<i>Die Abbuchung enth&auml;lt die Mandatsreferenz-ID: {Ident}<br />"
-        			"und die Gl&auml;ubiger ID: {CreditorId}</i><br />"
-        			"<br />"
-        			"Bitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto."
+"IBAN: {Iban}<br /><br/>"
+"<i>Die Abbuchung enth&auml;lt die Mandatsreferenz-ID: {Ident}<br />"
+"und die Gl&auml;ubiger ID: {CreditorId}</i><br />"
+"<br />"
+"Bitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto."
