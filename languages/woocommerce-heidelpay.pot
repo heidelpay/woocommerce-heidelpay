@@ -261,7 +261,10 @@ msgid "Available Countries for secured invoice"
 msgstr ""
 
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:131
-msgid "Here you can enable secured Invoice for specific countries. Be aware that this will not enable the country in your WooCommerce settings and you have to enable them seperately."
+msgid ""
+"Here you can enable secured Invoice for specific countries. Be aware that "
+"this will not enable the country in your WooCommerce settings and you have "
+"to enable them seperately."
 msgstr ""
 
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:139

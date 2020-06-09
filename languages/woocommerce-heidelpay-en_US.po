@@ -1,18 +1,17 @@
-msgid "invoice_info"
-msgstr "Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> after receiving your order to the following account<br /><br />"
-"Holder: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
-"IBAN: {CONNECTOR_ACCOUNT_IBAN}<br/><br/>"
-"BIC: {CONNECTOR_ACCOUNT_BIC}<br/><br/>"
-"<i>Please use only this identification number as the descriptor :</i><br/>"
-"<strong>{IDENTIFICATION_SHORTID}</strong>"
 
-msgid "prepayment_info"
-msgstr "Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account<br /><br />"
-"Holder: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
-"IBAN: {CONNECTOR_ACCOUNT_IBAN}<br/><br/>"
-"<i>Please use only this identification number as the descriptor :</i><br/>"
-"<strong>{IDENTIFICATION_SHORTID}</strong>"
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:230
+msgid "datePlaceholder"
+msgstr "yyyy-mm-dd"
 
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:231
+msgid "dateFormat"
+msgstr "yy-mm-dd"
+
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:321
+msgid "invalid date format"
+msgstr "Invalid date format."
+
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:147
 msgid "direct_debit_info"
 msgstr "The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from this account within the next days:<br /><br />"
 "IBAN: {Iban}<br /><br/>"
@@ -21,11 +20,20 @@ msgstr "The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from 
 "<br />"
 "Please ensure that there will be sufficient funds on the corresponding account."
 
-msgid "datePlaceholder"
-msgstr "yyyy-mm-dd"
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:58
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:62
+msgid "invoice_info"
+msgstr "Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> after receiving your order to the following account<br /><br />"
+"Holder: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
+"IBAN: {CONNECTOR_ACCOUNT_IBAN}<br/><br/>"
+"BIC: {CONNECTOR_ACCOUNT_BIC}<br/><br/>"
+"<i>Please use only this identification number as the descriptor :</i><br/>"
+"<strong>{IDENTIFICATION_SHORTID}</strong>"
 
-msgid "dateFormat"
-msgstr "yy-mm-dd"
-
-msgid "invalid date format"
-msgstr "Invalid date format."
+#: includes/gateways/class-wc-heidelpay-gateway-pp.php:89
+msgid "prepayment_info"
+msgstr "Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account<br /><br />"
+"Holder: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
+"IBAN: {CONNECTOR_ACCOUNT_IBAN}<br/><br/>"
+"<i>Please use only this identification number as the descriptor :</i><br/>"
+"<strong>{IDENTIFICATION_SHORTID}</strong>"

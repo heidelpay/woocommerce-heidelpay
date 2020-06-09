@@ -46,14 +46,14 @@ msgstr "Auf Zahlung warten"
 msgid "Pay Now"
 msgstr "Jetzt bezahlen"
 
-#: includes/abstracts/abstract-wc-heidelpay-iframe-gateway.php:180 
+#: includes/abstracts/abstract-wc-heidelpay-iframe-gateway.php:180
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:417
 msgid " Error: Paymentmethod was not found: "
 msgstr "Fehler: Zahlart nicht gefunden: "
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:60 
-#: includes/gateways/class-wc-heidelpay-gateway-dd.php:77 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:77 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:60
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:77
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:82
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:47
 msgid "%s"
 msgstr "%s"
@@ -66,9 +66,9 @@ msgstr "heidelpay %s"
 msgid "Enable/Disable"
 msgstr "Aktivieren"
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:99 
-#: includes/gateways/class-wc-heidelpay-gateway-dd.php:79 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:86 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:99
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:79
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:91
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:56
 msgid "Enable %s"
 msgstr "%s aktivieren"
@@ -89,10 +89,10 @@ msgstr "Beschreibung"
 msgid "Payment method description that the customer will see on your checkout."
 msgstr "Beschreibung der Zahlart im Checkout"
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:117 
-#: includes/gateways/class-wc-heidelpay-gateway-dd.php:78 
-#: includes/gateways/class-wc-heidelpay-gateway-iv.php:35 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:79 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:117
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:78
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:35
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:84
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:49
 msgid "Insert payment data for %s"
 msgstr "Zahlungsdaten für %s einfügen"
@@ -133,24 +133,24 @@ msgstr "Sandbox"
 msgid "Enable sandbox mode"
 msgstr "Sandbox-Modus aktivieren"
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:452 
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:452
 #: includes/gateways/class-wc-heidelpay-gateway-idl.php:104
 msgid "Payment error: "
 msgstr "Zahlungsfehler: "
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:693
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:692
 msgid "Bookingmode"
 msgstr "Buchungsmodus"
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:696
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:695
 msgid "Debit"
 msgstr "Direktbuchung"
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:697
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:696
 msgid "Authorization"
 msgstr "Authorisierung"
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:700
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:699
 msgid "Choose a bookingmode"
 msgstr "Buchungsmodus wählen"
 
@@ -184,21 +184,21 @@ msgstr "Bitte den Kontoinhaber eingeben"
 msgid "You have to enter the IBAN"
 msgstr "Bitte die IBAN eingeben"
 
-#: includes/gateways/class-wc-heidelpay-gateway-dd.php:85 
-#: includes/gateways/class-wc-heidelpay-gateway-iv.php:45 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:93 
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:85
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:45
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:98
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:63
 msgid "Payment information mail"
 msgstr "Zahlungsdaten per mail"
 
-#: includes/gateways/class-wc-heidelpay-gateway-dd.php:87 
-#: includes/gateways/class-wc-heidelpay-gateway-iv.php:47 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:95 
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:87
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:47
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:100
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:65
 msgid "Add payment information to e-mail"
 msgstr "Fügt Zahlungsdaten der Bestätigungsmail hinzu"
 
-#: includes/gateways/class-wc-heidelpay-gateway-dd.php:103 
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:103
 #: includes/gateways/class-wc-heidelpay-gateway-idl.php:60
 msgid "Account Holder"
 msgstr "Kontoinhaber"
@@ -227,18 +227,18 @@ msgstr "Bank"
 msgid "Chose a bank please."
 msgstr "Bitte eine Bank wählen"
 
-#: includes/gateways/class-wc-heidelpay-gateway-iv.php:38 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:82 
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:38
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:87
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:52
 msgid "please send the money to IBAN BIC "
 msgstr "Bitte überweisen Sie an IBAN BIC "
 
-#: includes/gateways/class-wc-heidelpay-gateway-iv.php:64
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:68
 msgid "Invoice"
 msgstr "Rechnungskauf"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:41 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:281
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:41
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:286
 msgid "You have to be at least 18 years old in order to use secured invoice"
 msgstr "Der versicherte Rechnungskauf ist erst ab 18 Jahren möglich"
 
@@ -250,23 +250,23 @@ msgstr "Bitte Anrede wählen"
 msgid "You are not allowed to use secured invoice with a company name"
 msgstr "Der versicherte Rechnungskauf ist nicht für Firmenkunden möglich"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:104
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:109
 msgid "Advanced options"
 msgstr "Erweiterte Optionen"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:110
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:115
 msgid "Minimum Amount"
 msgstr "Mindestbetrag"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:117
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:122
 msgid "Maxmimum Amount"
 msgstr "Maximalbetrag"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:124
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:129
 msgid "Available Countries for secured invoice"
 msgstr "Erlaubte Länder für den versicherten Rechnungskauf"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:126
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:131
 msgid ""
 "Here you can enable secured Invoice for specific countries. Be aware that "
 "this will not enable the country in your WooCommerce settings and you have "
@@ -276,44 +276,44 @@ msgstr ""
 "beschränken.Bitte beachten Sie, dass sie entsprechende Länder weiterhin in "
 "den WooCommerce Einstellungen aktivieren müssen"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:134
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:139
 msgid "Enable Germany"
 msgstr "Deutschland aktivieren"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:140
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:145
 msgid "Enable Austria"
 msgstr "Österreich aktivieren"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:221
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:226
 msgid "Salutation"
 msgstr "Anrede"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:222
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:227
 msgid "Mr"
 msgstr "Herr"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:223
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:228
 msgid "Mrs"
 msgstr "Frau"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:224 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:316
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:229
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:320
 msgid "Birthdate"
 msgstr "Geburtsdatum"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:225
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:230
 msgid "datePlaceholder"
 msgstr "tt.mm.jjjj"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:226
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:231
 msgid "dateFormat"
 msgstr "dd.mm.yy"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:297
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:302
 msgid "Secured Invoice"
 msgstr "Versicherter Rechnungskauf"
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:317
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:321
 msgid "invalid date format"
 msgstr "Ungültiges Datumsformat."
 
@@ -349,6 +349,17 @@ msgstr "WooCommerce-Version zu niedrig"
 msgid "cURL is not installed."
 msgstr "cURL ist nicht installiert"
 
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:147
+msgid "direct_debit_info"
+msgstr "Der Betrag von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:<br /><br />"
+"IBAN: {Iban}<br /><br/>"
+"<i>Die Abbuchung enth&auml;lt die Mandatsreferenz-ID: {Ident}<br />"
+"und die Gl&auml;ubiger ID: {CreditorId}</i><br />"
+"<br />"
+"Bitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto."
+
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:58
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:62
 msgid "invoice_info"
 msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> nach Erhalt der Ware auf folgendes Konto:<br/><br/>"
 "Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
@@ -357,6 +368,7 @@ msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}
 "<i>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an:</i><br/>"
 "<strong>{IDENTIFICATION_SHORTID}</strong>"
 
+#: includes/gateways/class-wc-heidelpay-gateway-pp.php:89
 msgid "prepayment_info"
 msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto:<br/><br/>"
 "Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
@@ -364,10 +376,3 @@ msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}
 "<i>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an:</i><br/>"
 "<strong>{IDENTIFICATION_SHORTID}</strong>"
 
-msgid "direct_debit_info"
-msgstr "Der Betrag von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:<br /><br />"
-"IBAN: {Iban}<br /><br/>"
-"<i>Die Abbuchung enth&auml;lt die Mandatsreferenz-ID: {Ident}<br />"
-"und die Gl&auml;ubiger ID: {CreditorId}</i><br />"
-"<br />"
-"Bitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto."
