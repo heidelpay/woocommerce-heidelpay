@@ -53,12 +53,16 @@ class WC_Gateway_HP_IV extends WC_Heidelpay_Payment_Gateway
         );
     }
 
+    public function getPaymentInfoTemplate()
+    {
+        return __('invoice_info', 'woocommerce-heidelpay');
+    }
+
     /**
      * Set the id and PaymentMethod
      */
     protected function setPayMethod()
     {
-        $this->templateTextKey = 'invoice_info';
         $this->payMethod = new InvoicePaymentMethod();
         $this->id = 'hp_iv';
         $this->name = __('Invoice', 'woocommerce-heidelpay');

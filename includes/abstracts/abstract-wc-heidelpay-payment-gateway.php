@@ -659,28 +659,27 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     public function setPaymentInfo(WC_Order $order, Response $response)
     {
         // Load template text for Payment information
-        if ($this->templateTextKey === '') {
-            return null;
+        $paymentInfoTemplate = $this->getPaymentInfoTemplate();
+        if (empty($paymentInfoTemplate)) {
+            return;
         }
 
-        $payInfoTemplate = __($this->templateTextKey, 'woocommerce-heidelpay');
-        $payInfo = $response->getConnector();
+        $connector = $response->getConnector();
         $presentation = $response->getPresentation();
 
         $paymentData = [
             '{AMOUNT}' => $presentation->getAmount(),
             '{CURRENCY}' => $presentation->getCurrency(),
-            '{CONNECTOR_ACCOUNT_HOLDER}' => $payInfo->getAccountHolder(),
-            '{CONNECTOR_ACCOUNT_IBAN}' => $payInfo->getAccountIBan(),
-            '{CONNECTOR_ACCOUNT_BIC}' => $payInfo->getAccountBic(),
+            '{CONNECTOR_ACCOUNT_HOLDER}' => $connector->getAccountHolder(),
+            '{CONNECTOR_ACCOUNT_IBAN}' => $connector->getAccountIBan(),
+            '{CONNECTOR_ACCOUNT_BIC}' => $connector->getAccountBic(),
             '{IDENTIFICATION_SHORTID}' => $response->getIdentification()->getShortId(),
             '{Iban}' => $response->getAccount()->getIban(),
             '{Ident}' => $response->getAccount()->getIdentification(),
             '{CreditorId}' => $response->getIdentification()->getCreditorId(),
         ];
 
-        $paymentText = strtr($payInfoTemplate, $paymentData);
-
+        $paymentText = strtr($paymentInfoTemplate, $paymentData);
         $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
     }
 
@@ -708,5 +707,15 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     protected function getResponeUrl()
     {
         return get_home_url(null, '/wc-api/' . strtolower(get_class($this)));
+    }
+
+    /** Default Payment info template is empty.
+     * Override this method in order to assign an individual Template text translation.
+     *
+     * @return string|void
+     */
+    public function getPaymentInfoTemplate()
+    {
+        return __('', 'woocommerce-heidelpay');
     }
 }
