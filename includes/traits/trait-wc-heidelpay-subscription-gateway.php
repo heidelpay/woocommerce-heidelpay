@@ -28,7 +28,7 @@ trait WC_Heidelpay_Subscription_Gateway
      */
     public function constructorAddon()
     {
-        if (class_exists('WC_Subscriptions_Order')) {
+        if (class_exists('WC_Subscriptions')) {
             $this->supports = array(
                 'subscriptions',
                 'subscription_cancellation',
@@ -48,17 +48,51 @@ trait WC_Heidelpay_Subscription_Gateway
     }
 
     /**
+     * @inheritDoc
+     */
+    public function setAvailability($available_gateways)
+    {
+        if (class_exists('WC_Subscriptions') &&
+            WC_Subscriptions_Cart::cart_contains_subscription() &&
+            !$this->isSubscriptionEnabled()) {
+            unset($available_gateways[$this->id]);
+        }
+        return $available_gateways;
+    }
+
+    /**
+     * Checks if Payment is enabled for Subsciptions
+     *
+     * @return bool
+     */
+    public function isSubscriptionEnabled()
+    {
+        $enabled = false;
+        if ($this->get_option('activate_for_subscriptions') === 'yes') {
+            $enabled = true;
+        }
+        return $enabled;
+    }
+
+    /**
      * additional formfields for admin backend
      */
     public function initFormFieldsAddon()
     {
-        if (class_exists('WC_Subscriptions_Order')) {
+        if (class_exists('WC_Subscriptions')) {
+            $this->form_fields['activate_for_subscriptions'] = array(
+                'title' => __('Enable/Disable Sub', 'woocommerce-heidelpay'),
+                'type' => 'checkbox',
+                'label' => __('Enable for Subscriptions', 'woocommerce-heidelpay'),
+                'default' => 'yes'
+            );
             $this->form_fields['transaction_channel_subscription'] = array(
                 'title' => __('Transaction Channel for Subscriptions', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => $this->id . '_transaction_channel_subscriptions',
                 'description' => 'Transaction Channel for Subscriptions',
-                'default' => '');
+                'default' => ''
+            );
         }
     }
 

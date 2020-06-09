@@ -265,7 +265,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         if ($this->get_option('sandbox') === 'yes') {
             $isSandbox = true;
         }
-        if (class_exists('WC_Subscriptions_Order')) {
+        if (class_exists('WC_Subscriptions')) {
             if ($order !== null && (wcs_order_contains_renewal($order) || wcs_order_contains_subscription($order))) {
                 $channel = $this->get_option('transaction_channel_subscription');
             }
@@ -376,7 +376,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         }
 
         if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
-            if (class_exists('WC_Subscriptions_Order') &&
+            if (class_exists('WC_Subscriptions') &&
                 wcs_order_contains_subscription($order) &&
                 empty($order->get_meta('heidelpay-Registration'))) {
                 $action = 'registration';
@@ -707,6 +707,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     protected function getResponeUrl()
     {
-        return get_home_url() . '/wc-api/' . strtolower(get_class($this));
+        return get_home_url(null, '/wc-api/' . strtolower(get_class($this)));
     }
 }

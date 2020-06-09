@@ -5,6 +5,7 @@
 ### Added:
 - Use context to generate a dedicated heidelpay logfile
 - WooCommerce Subscriptions
+    - Enable / Disable payment for subscription orders
     - Support for  configuration
         - Change amount of subscription
         - Change date of subscription
@@ -14,6 +15,7 @@
 
 ###Fixed:
 - Push notifications were not processed
+- IFrame not working if lazyloading is active
 
 ## [1.6.0][1.6.0]
 

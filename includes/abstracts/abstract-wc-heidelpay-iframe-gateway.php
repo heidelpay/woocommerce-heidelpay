@@ -143,7 +143,7 @@ abstract class WC_Heidelpay_IFrame_Gateway extends WC_Heidelpay_Payment_Gateway
         $bookingAction = $this->getBookingAction();
 
         if (method_exists($this->payMethod, $bookingAction)) {
-            if (class_exists('WC_Subscriptions_Order') && wcs_order_contains_subscription($order)) {
+            if (class_exists('WC_Subscriptions') && wcs_order_contains_subscription($order)) {
                 $bookingAction = 'registration';
             }
             $this->payMethod->$bookingAction(
