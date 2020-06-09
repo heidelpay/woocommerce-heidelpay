@@ -359,10 +359,10 @@ msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}
 
 msgid "prepayment_info"
 msgstr "Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto:<br/><br/>"
-        		"Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
-        		"IBAN: {CONNECTOR_ACCOUNT_IBAN}<br/><br/>"
-        		"<i>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an:</i><br/>"
-        		"<strong>{IDENTIFICATION_SHORTID}</strong>"
+"Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER}<br/>"
+"IBAN: {CONNECTOR_ACCOUNT_IBAN}<br/><br/>"
+"<i>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an:</i><br/>"
+"<strong>{IDENTIFICATION_SHORTID}</strong>"
 
 msgid "direct_debit_info"
 msgstr "Der Betrag von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:<br /><br />"
