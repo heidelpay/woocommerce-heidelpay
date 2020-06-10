@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-06-05T07:45:49+00:00\n"
+"POT-Creation-Date: 2020-06-09T11:33:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: woocommerce-heidelpay\n"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:60
 #: includes/gateways/class-wc-heidelpay-gateway-dd.php:77
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:77
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:82
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:47
 msgid "%s"
 msgstr ""
@@ -64,7 +64,7 @@ msgstr ""
 
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:99
 #: includes/gateways/class-wc-heidelpay-gateway-dd.php:79
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:86
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:91
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:56
 msgid "Enable %s"
 msgstr ""
@@ -88,7 +88,7 @@ msgstr ""
 #: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:117
 #: includes/gateways/class-wc-heidelpay-gateway-dd.php:78
 #: includes/gateways/class-wc-heidelpay-gateway-iv.php:35
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:79
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:84
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:49
 msgid "Insert payment data for %s"
 msgstr ""
@@ -134,19 +134,19 @@ msgstr ""
 msgid "Payment error: "
 msgstr ""
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:693
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:692
 msgid "Bookingmode"
 msgstr ""
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:696
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:695
 msgid "Debit"
 msgstr ""
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:697
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:696
 msgid "Authorization"
 msgstr ""
 
-#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:700
+#: includes/abstracts/abstract-wc-heidelpay-payment-gateway.php:699
 msgid "Choose a bookingmode"
 msgstr ""
 
@@ -180,14 +180,14 @@ msgstr ""
 
 #: includes/gateways/class-wc-heidelpay-gateway-dd.php:85
 #: includes/gateways/class-wc-heidelpay-gateway-iv.php:45
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:93
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:98
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:63
 msgid "Payment information mail"
 msgstr ""
 
 #: includes/gateways/class-wc-heidelpay-gateway-dd.php:87
 #: includes/gateways/class-wc-heidelpay-gateway-iv.php:47
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:95
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:100
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:65
 msgid "Add payment information to e-mail"
 msgstr ""
@@ -222,17 +222,17 @@ msgid "Chose a bank please."
 msgstr ""
 
 #: includes/gateways/class-wc-heidelpay-gateway-iv.php:38
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:82
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:87
 #: includes/gateways/class-wc-heidelpay-gateway-pp.php:52
 msgid "please send the money to IBAN BIC "
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-iv.php:64
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:68
 msgid "Invoice"
 msgstr ""
 
 #: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:41
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:281
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:286
 msgid "You have to be at least 18 years old in order to use secured invoice"
 msgstr ""
 
@@ -244,64 +244,67 @@ msgstr ""
 msgid "You are not allowed to use secured invoice with a company name"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:104
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:109
 msgid "Advanced options"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:110
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:115
 msgid "Minimum Amount"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:117
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:122
 msgid "Maxmimum Amount"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:124
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:129
 msgid "Available Countries for secured invoice"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:126
-msgid "Here you can enable secured Invoice for specific countries. Be aware that this will not enable the country in your WooCommerce settings and you have to enable them seperately."
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:131
+msgid ""
+"Here you can enable secured Invoice for specific countries. Be aware that "
+"this will not enable the country in your WooCommerce settings and you have "
+"to enable them seperately."
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:134
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:139
 msgid "Enable Germany"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:140
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:145
 msgid "Enable Austria"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:221
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:226
 msgid "Salutation"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:222
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:227
 msgid "Mr"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:223
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:228
 msgid "Mrs"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:224
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:316
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:229
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:320
 msgid "Birthdate"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:225
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:230
 msgid "datePlaceholder"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:226
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:231
 msgid "dateFormat"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:297
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:302
 msgid "Secured Invoice"
 msgstr ""
 
-#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:317
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:321
 msgid "invalid date format"
 msgstr ""
 
@@ -336,3 +339,18 @@ msgstr ""
 #: woocommerce-heidelpay.php:252
 msgid "cURL is not installed."
 msgstr ""
+
+#: includes/gateways/class-wc-heidelpay-gateway-dd.php:147
+msgid "direct_debit_info"
+msgstr ""
+
+#: includes/gateways/class-wc-heidelpay-gateway-iv.php:58
+#: includes/gateways/class-wc-heidelpay-gateway-ivpg.php:62
+msgid "invoice_info"
+msgstr ""
+
+
+#: includes/gateways/class-wc-heidelpay-gateway-pp.php:89
+msgid "prepayment_info"
+msgstr ""
+

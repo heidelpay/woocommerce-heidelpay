@@ -127,7 +127,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $this->id = 'hp_dd';
         $this->has_fields = true;
         $this->name = __('Direct Debit', 'woocommerce-heidelpay');
-        $this->templateTextKey = 'direct_debit_info';
     }
 
     /**
@@ -141,5 +140,10 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
             $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['accountholder']));
             $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['accountiban']));
         }
+    }
+
+    public function getPaymentInfoTemplate()
+    {
+        return __('direct_debit_info', 'woocommerce-heidelpay');
     }
 }
