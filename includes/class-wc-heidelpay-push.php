@@ -66,29 +66,36 @@ class WC_Heidelpay_Push
 
         wc_get_logger()->debug($order->get_status(), array('source' => 'heidelpay'));
 
-        if ($payCode[0] === 'IV') {
-            if ($response->isSuccess()) {
-                switch ($payCode[1]) {
-                    case 'FI':
-                        $order->update_status(
-                            'on-hold',
-                            'Order has been finalized'
-                        );
-                        break;
-                    case 'PA':
-                        $order->update_status(
-                            'processing',
-                            'Reservation done'
-                        );
-                        break;
-                }
+        // Do not process pending transactions.
+        if ($response->isPending()) {
+            return;
+        }
+
+        list($transactionMethod, $transactionType) = $payCode;
+        if ($transactionMethod === 'IV' && $response->isSuccess()) {
+            switch ($transactionType) {
+                case 'FI':
+                    $order->update_status(
+                        'on-hold',
+                        'Order has been finalized'
+                    );
+                    break;
+                case 'PA':
+                    $order->update_status(
+                        'processing',
+                        'Reservation done'
+                    );
+                    break;
             }
         }
 
-        if ($payCode[1] === 'CP' || $payCode[1] === 'RC' || $payCode[1] === 'DB') {
-            if ($response->isSuccess()) {
+        $paidTransactionTypes = ['CP', 'RC', 'DB'];
+
+        if (in_array($transactionType, $paidTransactionTypes, true)) {
+            if ($response->isSuccess() && !$order->is_paid()) {
                 if ($order->get_total() === $response->getPresentation()->getAmount()) {
-                    if ($payCode[0] === 'IV') {
+                    $order->payment_complete($response->getIdentification()->getShortId());
+                    if ($transactionMethod === 'IV') {
                         $order->update_status(
                             'completed',
                             $this->getNote($response)
