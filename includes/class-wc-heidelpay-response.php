@@ -75,7 +75,7 @@ class WC_Heidelpay_Response
         $uid = self::$response->getIdentification()->getUniqueId();
         $sid = self::$response->getIdentification()->getShortId();
 
-        if (self::$response->isSuccess()) {
+        if (self::$response->isSuccess() && !self::$response->isPending()) {
             $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
             $note = '';
 
