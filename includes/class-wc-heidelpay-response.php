@@ -85,24 +85,24 @@ class WC_Heidelpay_Response
             if (empty($availableGateways[$paymentMethodId])) {
                 return;
             }
-            /** @var WC_Payment_Gateways $paymethod */
-            $paymethod = $availableGateways[$paymentMethodId];
+            /** @var WC_Heidelpay_Payment_Gateway | WC_Heidelpay_IFrame_Gateway $paymentMethod */
+            $paymentMethod = $availableGateways[$paymentMethodId];
 
             // If registration, do a debit on registration afterwards
             if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
                 $order->add_meta_data('heidelpay-Registration', $uid);
                 /** @var WC_Heidelpay_Payment_Gateway $paymethod */
-                $paymethod->prepareRequest($order);
-                $paymethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
-                $paymethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
-                // Use the Response of the debitOnRegiststration in order to set the correct paymentInfo
-                $noGuiResponse = $paymethod->performNoGuiRequest($order, $uid);
+                $paymentMethod->prepareRequest($order);
+                $paymentMethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
+                $paymentMethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
+                // Use the Response of the debitOnRegistration in order to set the correct paymentInfo
+                $noGuiResponse = $paymentMethod->performNoGuiRequest($order, $uid);
                 if ($noGuiResponse !== null) {
                     self::$response = $noGuiResponse;
                 }
             }
 
-            $paymethod->setPaymentInfo($order, self::$response);
+            $paymentMethod->setPaymentInfo($order, self::$response);
 
             // If no money has been payed yet.
             if ($payCode[0] !== 'IV' && $payCode[1] === 'PA') {
