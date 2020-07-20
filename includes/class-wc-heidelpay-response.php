@@ -79,14 +79,17 @@ class WC_Heidelpay_Response
             $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
             $note = '';
 
-            $availableGateways = WC_Payment_Gateways::instance()->get_available_payment_gateways();
-
+            $paymentGatewayList = WC_Payment_Gateways::instance()->payment_gateways();
             $paymentMethodId = $order->get_payment_method();
-            if (empty($availableGateways[$paymentMethodId])) {
+            /** @var WC_Heidelpay_Payment_Gateway $paymentMethod */
+            $paymentMethod = !empty($paymentGatewayList[$paymentMethodId])?$paymentGatewayList[$paymentMethodId]:null;
+            if (!$paymentMethod || !($paymentMethod instanceof WC_Heidelpay_Payment_Gateway)) {
+                wc_get_logger()->notice(
+                    sprintf("Payment method is not valid or was not found: %s", htmlspecialchars($paymentMethodId)),
+                    ['source' => 'heidelpay']
+                );
                 return;
             }
-            /** @var WC_Heidelpay_Payment_Gateway | WC_Heidelpay_IFrame_Gateway $paymentMethod */
-            $paymentMethod = $availableGateways[$paymentMethodId];
 
             // If registration, do a debit on registration afterwards
             if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {

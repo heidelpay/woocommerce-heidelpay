@@ -242,11 +242,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order WC_Order
-     * @throws Exception
      */
     public function prepareRequest(WC_Order $order)
     {
-        $this->setAuthentification($order);
+        $this->setAuthentication($order);
         $this->setAsync();
         $this->setCustomer($order);
         $this->setBasket($order->get_id());
@@ -255,10 +254,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Set up your authentification data for Heidepay api
+     * Set up your authentication data for heidelpay api
      * @param WC_order $order
      */
-    protected function setAuthentification(WC_order $order = null)
+    protected function setAuthentication(WC_order $order = null)
     {
         $isSandbox = false;
         $channel = $this->get_option('transaction_channel');
@@ -286,7 +285,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
-            $this->getResponeUrl()
+            $this->getResponseUrl()
         );
     }
 
@@ -324,7 +323,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order_id
-     * @throws Exception
      */
     protected function setBasket($order_id)
     {
@@ -338,7 +336,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * @global string $wp_version
+     * @param null|string $orderID
      */
     protected function setCriterions($orderID = null)
     {
@@ -415,7 +413,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
                 htmlspecialchars(
                     print_r(
                         $this->plugin_id . ' - ' . $this->id . __(
-                            ' Error: Paymentmethod was not found: ',
+                            ' Error: Payment method was not found: ',
                             'woocommerce-heidelpay'
                         ) . $this->bookingAction,
                         1
@@ -455,7 +453,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Get the mapped Errormessage from Respone wich is html escaped.
+     * Get the mapped Errormessage from response which is html escaped.
      * If a response is given as a parameter that will determine the message. Otherwise the Response from the payMethod
      * is used. If none of them is given return the default message
      * @param Response|null $response
@@ -558,7 +556,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             wc_get_logger()->log(
                 WC_Log_Levels::DEBUG,
                 'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
-                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
+                . 'Please make sure the ResponseURL (' . $this->getResponseUrl() .')is accessible from the internet.',
                 array('source' => 'heidelpay')
             );
             wp_redirect(wc_get_cart_url());
@@ -568,7 +566,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * Filter function for the hook: woocommerce_available_payment_gateways
-     * Can be used to set conditions vor availability of a paymethod.
+     * Can be used to set conditions vor availability of a payment method.
      * @param $available_gateways
      * @return mixed
      */
@@ -578,7 +576,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the successpage after
+     * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the success page after
      * payment.
      * @param $orderReceivedText
      * @return string
@@ -704,7 +702,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @return string
      */
-    protected function getResponeUrl()
+    protected function getResponseUrl()
     {
         return get_home_url(null, '/wc-api/' . strtolower(get_class($this)));
     }
