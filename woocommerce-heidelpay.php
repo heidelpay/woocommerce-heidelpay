@@ -12,14 +12,14 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Description: heidelpay payment integration for WooCommerce
  * Version: 1.7.0
  * Author: heidelpay
- * Author URI: htts://www.heidelpay.com
+ * Author URI: https://www.heidelpay.com
  * Developer: heidelpay
  * Developer URI: https://dev.heidelpay.com
  * Text Domain: woocommerce-heidelpay
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.8
+ * WC tested up to: 4.3
  *
  * Copyright: © 2018-present heidelpay GmbH
  * License: see LICENSE.txt
@@ -300,5 +300,4 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         WC_Heidelpay::get_instance();
 
     endif;
-
 }
