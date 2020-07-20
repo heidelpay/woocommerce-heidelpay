@@ -61,7 +61,7 @@ class WC_Gateway_HP_IDL extends WC_Heidelpay_Payment_Gateway
         $bankNameLabel = __('Bank', 'woocommerce-heidelpay');
 
         // Performe Authorize request to get paymethod config
-        $this->setAuthentification();
+        $this->setAuthentication();
         $this->setAsync();
         $this->setCriterions();
 
