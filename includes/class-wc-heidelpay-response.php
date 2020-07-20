@@ -90,7 +90,6 @@ class WC_Heidelpay_Response
                 );
                 return;
             }
-            /** @var WC_Heidelpay_Payment_Gateway | WC_Heidelpay_IFrame_Gateway $paymentMethod */
 
             // If registration, do a debit on registration afterwards
             if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
