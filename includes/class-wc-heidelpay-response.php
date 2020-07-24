@@ -106,6 +106,8 @@ class WC_Heidelpay_Response
             }
 
             $paymentMethod->setPaymentInfo($order, self::$response);
+            $order->add_meta_data('heidelpay-UniqueID', $uid);
+            $order->add_meta_data('heidelpay-ShortID', $sid);
 
             // If no money has been payed yet.
             if ($payCode[0] !== 'IV' && $payCode[1] === 'PA') {
@@ -122,8 +124,6 @@ class WC_Heidelpay_Response
                     __('Awaiting payment.', 'woocommerce-heidelpay') . ' ' . $note
                 );
             } else {
-                $order->add_meta_data('heidelpay-UniqueID', $uid);
-                $order->add_meta_data('heidelpay-ShortID', $sid);
                 $order->payment_complete($sid);
             }
             echo $order->get_checkout_order_received_url();
