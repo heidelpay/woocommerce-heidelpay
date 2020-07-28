@@ -107,7 +107,7 @@ trait WC_Heidelpay_Subscription_Gateway
         /** @var WC_Order $order */
         //$order = wcs_get_order
         $order = WC_Subscriptions_Renewal_Order::get_parent_order($renewalOrder->get_id());
-        parent::prepareRequest($renewalOrder);
+        $this->prepareSubscriptionPayment($renewalOrder);
         $this->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
 
         try {
@@ -131,5 +131,26 @@ trait WC_Heidelpay_Subscription_Gateway
             );
         }
         return null;
+    }
+
+    public function prepareSubscriptionPayment($order)
+    {
+        $isSandbox = false;
+        $channel = $this->get_option('transaction_channel_subscription');
+        if ($this->get_option('sandbox') === 'yes') {
+            $isSandbox = true;
+        }
+        $this->payMethod->getRequest()->authentification(
+            $this->get_option('security_sender'),
+            $this->get_option('user_login'),
+            $this->get_option('user_password'),
+            $channel,
+            $isSandbox
+        );
+        $this->setAsync();
+        $this->setCustomer($order);
+        $this->setBasket($order->get_id());
+        $this->setCriterions();
+        $this->payMethod->getRequest()->getContact()->setIp(WC_Geolocation::get_ip_address());
     }
 }
