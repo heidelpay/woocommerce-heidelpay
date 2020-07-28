@@ -120,11 +120,11 @@ trait WC_Heidelpay_Subscription_Gateway
         /** @var Response $response */
         $response = $this->payMethod->getResponse();
 
-        if ($this->payMethod->getResponse()->isSuccess()) {
+        if ($response->isSuccess()) {
             parent::setPaymentInfo($renewalOrder, $response);
             $renewalOrder->payment_complete($response->getIdentification()->getShortId());
         }
-        if ($this->payMethod->getResponse()->isError()) {
+        if ($response->isError()) {
             wc_get_logger()->error(
                 print_r($this->payMethod->getResponse()->getError(), 1),
                 array('source' => 'heidelpay')
