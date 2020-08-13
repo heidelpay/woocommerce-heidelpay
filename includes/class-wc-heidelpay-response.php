@@ -50,9 +50,9 @@ class WC_Heidelpay_Response
             $callers = debug_backtrace();
             wc_get_logger()->notice(
                 print_r("Heidelpay - " .
-                $callers [0] ['function'] . ": Invalid response hash from " .
-                $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1),
-                array('source' => 'heidelpay')
+                    $callers [0] ['function'] . ": Invalid response hash from " .
+                    $_SERVER ['REMOTE_ADDR'] . ", suspecting manipulation", 1),
+                ['source' => 'heidelpay']
             );
             exit(); //error
         }
@@ -61,29 +61,26 @@ class WC_Heidelpay_Response
         $order = wc_get_order($orderId);
 
 
-        $this->handleResult($post_data, $order);
+        $this->handleResult(self::$response, $order);
     }
 
     /**
      * handle result post
      *
-     * @param $post_data
+     * @param Response $response
      * @param WC_Order $order
      */
-    public function handleResult($post_data, WC_Order $order)
+    public function handleResult($response, WC_Order $order)
     {
-        $response = self::$response;
         $uid = $response->getIdentification()->getUniqueId();
         $sid = $response->getIdentification()->getShortId();
-
         $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
         // Get Payment Method.
         $paymentGatewayList = WC_Payment_Gateways::instance()->payment_gateways();
         $paymentMethodId = $order->get_payment_method();
-        wc_get_logger()->debug('subscription order id? ' . (wcs_is_subscription($order)?'YES':'NOH'));
         /** @var WC_Heidelpay_Payment_Gateway $paymentMethod */
-        $paymentMethod = !empty($paymentGatewayList[$paymentMethodId])?$paymentGatewayList[$paymentMethodId]:null;
+        $paymentMethod = !empty($paymentGatewayList[$paymentMethodId]) ? $paymentGatewayList[$paymentMethodId] : null;
         if (!$paymentMethod || !($paymentMethod instanceof WC_Heidelpay_Payment_Gateway)) {
             wc_get_logger()->notice(
                 sprintf("Payment method is not valid or was not found: %s", htmlspecialchars($paymentMethodId)),
@@ -95,7 +92,7 @@ class WC_Heidelpay_Response
         // If registration, do a debit on registration afterwards
         if (($payCode[1] === 'RG' || $payCode[1] === 'CF') && $response->isSuccess()) {
             $order->add_meta_data('heidelpay-Registration', $uid);
-            $order->save();
+            $order->save_meta_data();
             /** @var WC_Heidelpay_Payment_Gateway $paymethod */
             $paymentMethod->prepareRequest($order);
             //$paymentMethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
@@ -104,7 +101,7 @@ class WC_Heidelpay_Response
             $debitOnRegistrationResponse = $paymentMethod->performNoGuiRequest($order, $uid);
             if ($debitOnRegistrationResponse !== null) {
                 $redirectUrl = $debitOnRegistrationResponse->getFrontend()->getRedirectUrl();
-                if(!empty($redirectUrl)) {
+                if (!empty($redirectUrl)) {
                     echo $redirectUrl;
                     return;
                 }
@@ -143,13 +140,13 @@ class WC_Heidelpay_Response
             $error = $response->getError();
             $order->update_status('failed');
 
-            echo apply_filters('woocommerce_get_cancel_order_url_raw', add_query_arg(array(
+            echo apply_filters('woocommerce_get_cancel_order_url_raw', add_query_arg([
                 'cancel_order' => 'true',
                 'order' => $order->get_order_key(),
                 'order_id' => $order->get_id(),
                 '_wpnonce' => wp_create_nonce('woocommerce-cancel_order'),
                 'errorCode' => $error['code'],
-            ), $order->get_cancel_endpoint()));
+            ], $order->get_cancel_endpoint()));
         } elseif ($response->isPending()) {
             //empty cart
             wc()->cart->empty_cart();
