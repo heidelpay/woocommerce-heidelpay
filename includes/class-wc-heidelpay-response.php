@@ -72,40 +72,50 @@ class WC_Heidelpay_Response
      */
     public function handleResult($post_data, WC_Order $order)
     {
-        $uid = self::$response->getIdentification()->getUniqueId();
-        $sid = self::$response->getIdentification()->getShortId();
+        $response = self::$response;
+        $uid = $response->getIdentification()->getUniqueId();
+        $sid = $response->getIdentification()->getShortId();
 
-        if (self::$response->isSuccess() && !self::$response->isPending()) {
-            $payCode = explode('.', strtoupper($post_data['PAYMENT_CODE']));
+        $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
+
+        // Get Payment Method.
+        $paymentGatewayList = WC_Payment_Gateways::instance()->payment_gateways();
+        $paymentMethodId = $order->get_payment_method();
+        wc_get_logger()->debug('subscription order id? ' . (wcs_is_subscription($order)?'YES':'NOH'));
+        /** @var WC_Heidelpay_Payment_Gateway $paymentMethod */
+        $paymentMethod = !empty($paymentGatewayList[$paymentMethodId])?$paymentGatewayList[$paymentMethodId]:null;
+        if (!$paymentMethod || !($paymentMethod instanceof WC_Heidelpay_Payment_Gateway)) {
+            wc_get_logger()->notice(
+                sprintf("Payment method is not valid or was not found: %s", htmlspecialchars($paymentMethodId)),
+                ['source' => 'heidelpay']
+            );
+            return;
+        }
+
+        // If registration, do a debit on registration afterwards
+        if (($payCode[1] === 'RG' || $payCode[1] === 'CF') && $response->isSuccess()) {
+            $order->add_meta_data('heidelpay-Registration', $uid);
+            $order->save();
+            /** @var WC_Heidelpay_Payment_Gateway $paymethod */
+            $paymentMethod->prepareRequest($order);
+            //$paymentMethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
+            $paymentMethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
+            // Use the Response of the debitOnRegistration in order to set the correct paymentInfo
+            $debitOnRegistrationResponse = $paymentMethod->performNoGuiRequest($order, $uid);
+            if ($debitOnRegistrationResponse !== null) {
+                $redirectUrl = $debitOnRegistrationResponse->getFrontend()->getRedirectUrl();
+                if(!empty($redirectUrl)) {
+                    echo $redirectUrl;
+                    return;
+                }
+                $response = $debitOnRegistrationResponse;
+            }
+        }
+
+        if ($response->isSuccess() && !$response->isPending()) {
             $note = '';
 
-            $paymentGatewayList = WC_Payment_Gateways::instance()->payment_gateways();
-            $paymentMethodId = $order->get_payment_method();
-            /** @var WC_Heidelpay_Payment_Gateway $paymentMethod */
-            $paymentMethod = !empty($paymentGatewayList[$paymentMethodId])?$paymentGatewayList[$paymentMethodId]:null;
-            if (!$paymentMethod || !($paymentMethod instanceof WC_Heidelpay_Payment_Gateway)) {
-                wc_get_logger()->notice(
-                    sprintf("Payment method is not valid or was not found: %s", htmlspecialchars($paymentMethodId)),
-                    ['source' => 'heidelpay']
-                );
-                return;
-            }
-
-            // If registration, do a debit on registration afterwards
-            if ($payCode[1] === 'RG' || $payCode[1] === 'CF') {
-                $order->add_meta_data('heidelpay-Registration', $uid);
-                /** @var WC_Heidelpay_Payment_Gateway $paymethod */
-                $paymentMethod->prepareRequest($order);
-                $paymentMethod->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
-                $paymentMethod->payMethod->getRequest()->getIdentification()->setReferenceid($uid);
-                // Use the Response of the debitOnRegistration in order to set the correct paymentInfo
-                $noGuiResponse = $paymentMethod->performNoGuiRequest($order, $uid);
-                if ($noGuiResponse !== null) {
-                    self::$response = $noGuiResponse;
-                }
-            }
-
-            $paymentMethod->setPaymentInfo($order, self::$response);
+            $paymentMethod->setPaymentInfo($order, $response);
             $order->add_meta_data('heidelpay-UniqueID', $uid);
             $order->add_meta_data('heidelpay-ShortID', $sid);
 
@@ -129,8 +139,8 @@ class WC_Heidelpay_Response
             echo $order->get_checkout_order_received_url();
 
             /* redirect customer to success page */
-        } elseif (self::$response->isError()) {
-            $error = self::$response->getError();
+        } elseif ($response->isError()) {
+            $error = $response->getError();
             $order->update_status('failed');
 
             echo apply_filters('woocommerce_get_cancel_order_url_raw', add_query_arg(array(
@@ -140,7 +150,7 @@ class WC_Heidelpay_Response
                 '_wpnonce' => wp_create_nonce('woocommerce-cancel_order'),
                 'errorCode' => $error['code'],
             ), $order->get_cancel_endpoint()));
-        } elseif (self::$response->isPending()) {
+        } elseif ($response->isPending()) {
             //empty cart
             wc()->cart->empty_cart();
 
