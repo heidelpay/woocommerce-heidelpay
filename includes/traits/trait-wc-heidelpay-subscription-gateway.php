@@ -120,7 +120,7 @@ trait WC_Heidelpay_Subscription_Gateway
         /** @var Response $response */
         $response = $this->payMethod->getResponse();
 
-        if ($response->isSuccess()) {
+        if ($response->isSuccess() && !$response->isPending()) {
             parent::setPaymentInfo($renewalOrder, $response);
             $renewalOrder->payment_complete($response->getIdentification()->getShortId());
         }
