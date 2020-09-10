@@ -75,6 +75,7 @@ class WC_Heidelpay_Response
         $uid = $response->getIdentification()->getUniqueId();
         $sid = $response->getIdentification()->getShortId();
         $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
+        list($transactionMethod, $transactionType) = $payCode;
 
         // Get Payment Method.
         $paymentGatewayList = WC_Payment_Gateways::instance()->payment_gateways();
@@ -90,7 +91,7 @@ class WC_Heidelpay_Response
         }
 
         // If registration, do a debit on registration afterwards
-        if (($payCode[1] === 'RG' || $payCode[1] === 'CF') && $response->isSuccess()) {
+        if (($transactionType === 'RG' || $transactionType === 'CF') && $response->isSuccess()) {
             $order->add_meta_data('heidelpay-Registration', $uid);
             $order->save_meta_data();
             /** @var WC_Heidelpay_Payment_Gateway $paymethod */
@@ -117,9 +118,8 @@ class WC_Heidelpay_Response
             $order->add_meta_data('heidelpay-ShortID', $sid);
 
             // If no money has been payed yet.
-            if ($payCode[0] !== 'IV' && $payCode[1] === 'PA') {
-                // If not Prepayment and Invoice payment can be captured manually
-                if ($payCode [0] !== 'PP') {
+            if ($transactionType === 'PA') {
+                if ($transactionMethod !== 'PP') {
                     $note = __(
                         'Payment reservation successful. Please use the hiP to check the payment.',
                         'woocommerce-heidelpay'
@@ -133,9 +133,8 @@ class WC_Heidelpay_Response
             } else {
                 $order->payment_complete($sid);
             }
-            echo $order->get_checkout_order_received_url();
-
             /* redirect customer to success page */
+            echo $order->get_checkout_order_received_url();
         } elseif ($response->isError()) {
             $error = $response->getError();
             $order->update_status('failed');

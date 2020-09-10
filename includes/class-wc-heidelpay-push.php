@@ -64,7 +64,8 @@ class WC_Heidelpay_Push
         $order = wc_get_order($orderID);
         $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
-        wc_get_logger()->debug($order->get_status(), array('source' => 'heidelpay'));
+        wc_get_logger()->debug('Processsing Order' . $orderID, ['source' => 'heidelpay']);
+        wc_get_logger()->debug('Order has status: '. $order->get_status(), ['source' => 'heidelpay']);
 
         // Do not process pending transactions.
         if ($response->isPending()) {
@@ -76,13 +77,13 @@ class WC_Heidelpay_Push
             switch ($transactionType) {
                 case 'FI':
                     $order->update_status(
-                        'on-hold',
+                        'processing',
                         'Order has been finalized'
                     );
                     break;
                 case 'PA':
                     $order->update_status(
-                        'processing',
+                        'on-hold',
                         'Reservation done'
                     );
                     break;
@@ -98,11 +99,6 @@ class WC_Heidelpay_Push
                     if ($transactionMethod === 'IV') {
                         $order->update_status(
                             'completed',
-                            $this->getNote($response)
-                        );
-                    } else {
-                        $order->update_status(
-                            'processing',
                             $this->getNote($response)
                         );
                     }
