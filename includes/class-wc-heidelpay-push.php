@@ -96,12 +96,6 @@ class WC_Heidelpay_Push
             if ($response->isSuccess() && !$order->is_paid()) {
                 if ($order->get_total() === $response->getPresentation()->getAmount()) {
                     $order->payment_complete($response->getIdentification()->getShortId());
-                    if ($transactionMethod === 'IV') {
-                        $order->update_status(
-                            'completed',
-                            $this->getNote($response)
-                        );
-                    }
                 } else {
                     $order->add_order_note(
                         $this->getNote($response),
