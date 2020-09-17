@@ -659,9 +659,15 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
         $connector = $response->getConnector();
         $presentation = $response->getPresentation();
+        $presentationAmount = number_format(
+            $presentation->getAmount(),
+            wc_get_price_decimals(),
+            wc_get_price_decimal_separator(),
+            wc_get_price_thousand_separator()
+        );
 
         $paymentData = [
-            '{AMOUNT}' => $presentation->getAmount(),
+            '{AMOUNT}' => $presentationAmount,
             '{CURRENCY}' => $presentation->getCurrency(),
             '{CONNECTOR_ACCOUNT_HOLDER}' => $connector->getAccountHolder(),
             '{CONNECTOR_ACCOUNT_IBAN}' => $connector->getAccountIBan(),
