@@ -10,13 +10,16 @@ use Heidelpay\MessageCodeMapper\MessageCodeMapper;
  * Plugin Name: heidelpay WooCommerce
  * Plugin URI: https://dev.heidelpay.com
  * Description: heidelpay payment integration for WooCommerce
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: heidelpay
- * Author URI: htts://www.heidelpay.com
+ * Author URI: https://www.heidelpay.com
  * Developer: heidelpay
  * Developer URI: https://dev.heidelpay.com
  * Text Domain: woocommerce-heidelpay
  * Domain Path: /languages
+ *
+ * WC requires at least: 3.0
+ * WC tested up to: 4.3
  *
  * Copyright: © 2018-present heidelpay GmbH
  * License: see LICENSE.txt
@@ -29,7 +32,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     /**
      * Required minimums and constants
      */
-    define('WC_HEIDELPAY_VERSION', '1.6.0');
+    define('WC_HEIDELPAY_VERSION', '1.7.0');
     define('WC_HEIDELPAY_MIN_PHP_VER', '5.6.0');
     define('WC_HEIDELPAY_MIN_WC_VER', '3.0.0');
     define('WC_HEIDELPAY_MAIN_FILE', __FILE__);
@@ -40,7 +43,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
         class WC_Heidelpay
         {
-
             /**
              * @var Singleton The reference the *Singleton* instance of this class
              */
@@ -298,5 +300,4 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         WC_Heidelpay::get_instance();
 
     endif;
-
 }

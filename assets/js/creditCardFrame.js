@@ -49,10 +49,7 @@ function sendMessage(e) {
      * Get the iFrame element
      */
     var paymentFrameIframe = document.getElementById('paymentFrameIframe');
-    /**
-     * Get hostname and protocol from paymentIframe
-     */
-    var targetOrigin = getDomainFromUrl(paymentFrameIframe.src);
+    var targetOrigin = getUrlFromIframe(paymentFrameIframe);
 
     /**
      * Send html postmessage to payment frame
@@ -60,11 +57,17 @@ function sendMessage(e) {
     paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
 }
 
-
 /**
  * Function to get the domain from a given url
  */
-function getDomainFromUrl(url) {
+function getUrlFromIframe(paymentIframe) {
+    /**
+     * Get hostname and protocol from paymentIframe
+     */
+    var url = paymentIframe.getAttribute("src");
+    if (url === null) {
+        url = paymentIframe.getAttribute("data-src");
+    }
     var arr = url.split("/");
     return arr[0] + "//" + arr[2];
 }
@@ -79,15 +82,10 @@ function receiveMessage(e) {
      * Get the iFrame element
      */
     var paymentFrameIframe = document.getElementById('paymentFrameIframe');
-    /**
-     * Get hostname and protocol from paymentIframe
-     */
-
-    var targetOrigin = getDomainFromUrl(paymentFrameIframe.src);
+    var targetOrigin = getUrlFromIframe(paymentFrameIframe);
     if (e.origin !== targetOrigin) {
         return;
     }
 
     var antwort = JSON.parse(e.data);
-    //console.log(antwort);
 }

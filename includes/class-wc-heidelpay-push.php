@@ -45,9 +45,11 @@ class WC_Heidelpay_Push
             $response->verifySecurityHash($secret, $response->getIdentification()->getTransactionId());
         } catch (\Exception $e) {
             $callers = debug_backtrace();
-            wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('Heidelpay - ' .
-                $callers [0] ['function'] . ': Invalid push hash from ' .
-                $_SERVER ['REMOTE_ADDR'] . ', suspecting manipulation', 1));
+            wc_get_logger()->notice(
+                print_r($callers [0] ['function'] . ': Invalid push hash from ' .
+                $_SERVER ['REMOTE_ADDR'] . ', suspecting manipulation', 1),
+                array('source' => 'heidelpay')
+            );
             exit(); //error
         }
         $this->handlePush($response);
@@ -62,41 +64,38 @@ class WC_Heidelpay_Push
         $order = wc_get_order($orderID);
         $payCode = explode('.', strtoupper($response->getPayment()->getCode()));
 
-        wc_get_logger()->log(WC_Log_Levels::DEBUG, $order->get_status());
+        wc_get_logger()->debug('Processsing Order' . $orderID, ['source' => 'heidelpay']);
+        wc_get_logger()->debug('Order has status: '. $order->get_status(), ['source' => 'heidelpay']);
 
-        if ($payCode[0] === 'IV') {
-            if ($response->isSuccess()) {
-                switch ($payCode[1]) {
-                    case 'FI':
-                        $order->update_status(
-                            'on-hold',
-                            'Order has been finalized'
-                        );
-                        break;
-                    case 'PA':
-                        $order->update_status(
-                            'processing',
-                            'Reservation done'
-                        );
-                        break;
-                }
+        // Do not process pending transactions.
+        if ($response->isPending()) {
+            return;
+        }
+
+        list($transactionMethod, $transactionType) = $payCode;
+        if ($transactionMethod === 'IV' && $response->isSuccess()) {
+            switch ($transactionType) {
+                case 'FI':
+                    $order->update_status(
+                        'processing',
+                        'Order has been finalized'
+                    );
+                    break;
+                case 'PA':
+                    $order->update_status(
+                        'on-hold',
+                        'Reservation done'
+                    );
+                    break;
             }
         }
 
-        if ($payCode[1] === 'CP' || $payCode[1] === 'RC' || $payCode[1] === 'DB') {
-            if ($response->isSuccess()) {
+        $paidTransactionTypes = ['CP', 'RC', 'DB'];
+
+        if (in_array($transactionType, $paidTransactionTypes, true)) {
+            if ($response->isSuccess() && !$order->is_paid()) {
                 if ($order->get_total() === $response->getPresentation()->getAmount()) {
-                    if ($payCode[0] === 'IV') {
-                        $order->update_status(
-                            'completed',
-                            $this->getNote($response)
-                        );
-                    } else {
-                        $order->update_status(
-                            'processing',
-                            $this->getNote($response)
-                        );
-                    }
+                    $order->payment_complete($response->getIdentification()->getShortId());
                 } else {
                     $order->add_order_note(
                         $this->getNote($response),

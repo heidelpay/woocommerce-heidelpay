@@ -15,16 +15,27 @@
  * @category WooCommerce
  */
 
+use Heidelpay\PhpPaymentApi\Response;
+
+/**
+ * Trait WC_Heidelpay_Subscription_Gateway
+ * @property \Heidelpay\PhpPaymentApi\TransactionTypes\DebitOnRegistrationTransactionType payMethod
+ */
 trait WC_Heidelpay_Subscription_Gateway
 {
+    /**
+     * constructor for subscription support
+     */
     public function constructorAddon()
     {
-        if (class_exists('WC_Subscriptions_Order')) {
+        if (class_exists('WC_Subscriptions')) {
             $this->supports = array(
                 'subscriptions',
                 'subscription_cancellation',
                 'subscription_suspension',
                 'subscription_reactivation',
+                'subscription_amount_changes',
+                'subscription_date_changes'
             );
 
             add_action(
@@ -36,15 +47,52 @@ trait WC_Heidelpay_Subscription_Gateway
         }
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function setAvailability($available_gateways)
+    {
+        if (class_exists('WC_Subscriptions') &&
+            WC_Subscriptions_Cart::cart_contains_subscription() &&
+            !$this->isSubscriptionEnabled()) {
+            unset($available_gateways[$this->id]);
+        }
+        return $available_gateways;
+    }
+
+    /**
+     * Checks if Payment is enabled for Subsciptions
+     *
+     * @return bool
+     */
+    public function isSubscriptionEnabled()
+    {
+        $enabled = false;
+        if ($this->get_option('activate_for_subscriptions') === 'yes') {
+            $enabled = true;
+        }
+        return $enabled;
+    }
+
+    /**
+     * additional formfields for admin backend
+     */
     public function initFormFieldsAddon()
     {
-        if (class_exists('WC_Subscriptions_Order')) {
+        if (class_exists('WC_Subscriptions')) {
+            $this->form_fields['activate_for_subscriptions'] = array(
+                'title' => __('Enable/Disable Sub', 'woocommerce-heidelpay'),
+                'type' => 'checkbox',
+                'label' => __('Enable for Subscriptions', 'woocommerce-heidelpay'),
+                'default' => 'yes'
+            );
             $this->form_fields['transaction_channel_subscription'] = array(
                 'title' => __('Transaction Channel for Subscriptions', 'woocommerce-heidelpay'),
                 'type' => 'text',
                 'id' => $this->id . '_transaction_channel_subscriptions',
                 'description' => 'Transaction Channel for Subscriptions',
-                'default' => '');
+                'default' => ''
+            );
         }
     }
 
@@ -52,32 +100,57 @@ trait WC_Heidelpay_Subscription_Gateway
      * @param $amount float
      * @param $renewalOrder WC_Order
      * @return array|null
-     * @throws \Heidelpay\PhpPaymentApi\Exceptions\PaymentFormUrlException
+     * @throws Exception
      */
     public function scheduledSubscriptionPayment($amount, $renewalOrder)
     {
         /** @var WC_Order $order */
         //$order = wcs_get_order
         $order = WC_Subscriptions_Renewal_Order::get_parent_order($renewalOrder->get_id());
-        parent::prepareRequest($renewalOrder);
+        $this->prepareSubscriptionPayment($renewalOrder);
         $this->payMethod->getRequest()->getFrontend()->setEnabled('FALSE');
 
         try {
             $this->payMethod->debitOnRegistration($order->get_meta('heidelpay-Registration'));
         } catch (Exception $e) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, $e);
+            wc_get_logger()->error($e, array('source' => 'heidelpay'));
             return null;
         }
 
-        /** @var \Heidelpay\PhpPaymentApi\Response $response */
+        /** @var Response $response */
         $response = $this->payMethod->getResponse();
 
-        if ($this->payMethod->getResponse()->isSuccess()) {
+        if ($response->isSuccess() && !$response->isPending()) {
+            parent::setPaymentInfo($renewalOrder, $response);
             $renewalOrder->payment_complete($response->getIdentification()->getShortId());
         }
-        if ($this->payMethod->getResponse()->isError()) {
-            wc_get_logger()->log(WC_Log_Levels::DEBUG, print_r($this->payMethod->getResponse()->getError(), 1));
+        if ($response->isError()) {
+            wc_get_logger()->error(
+                print_r($this->payMethod->getResponse()->getError(), 1),
+                array('source' => 'heidelpay')
+            );
         }
         return null;
+    }
+
+    public function prepareSubscriptionPayment($order)
+    {
+        $isSandbox = false;
+        $channel = $this->get_option('transaction_channel_subscription');
+        if ($this->get_option('sandbox') === 'yes') {
+            $isSandbox = true;
+        }
+        $this->payMethod->getRequest()->authentification(
+            $this->get_option('security_sender'),
+            $this->get_option('user_login'),
+            $this->get_option('user_password'),
+            $channel,
+            $isSandbox
+        );
+        $this->setAsync();
+        $this->setCustomer($order);
+        $this->setBasket($order->get_id());
+        $this->setCriterions();
+        $this->payMethod->getRequest()->getContact()->setIp(WC_Geolocation::get_ip_address());
     }
 }

@@ -57,6 +57,11 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         }
     }
 
+    public function getPaymentInfoTemplate()
+    {
+        return __('invoice_info', 'woocommerce-heidelpay');
+    }
+
     private function is18($given)
     {
         $given = strtotime($given);
@@ -78,10 +83,6 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
         $this->form_fields['description']['default'] = sprintf(
             __('Insert payment data for %s', 'woocommerce-heidelpay'),
             $this->name
-        );
-        $this->form_fields['instructions']['default'] = __(
-            'please send the money to IBAN BIC ',
-            'woocommerce-heidelpay'
         );
         $this->form_fields['enabled']['label'] = sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['security_sender']['default'] = '31HA07BC8142C5A171745D00AD63D182';
@@ -235,6 +236,7 @@ class WC_Gateway_HP_IVPG extends WC_Heidelpay_Payment_Gateway
 
 
         echo '<div>';
+        parent::payment_fields();
 
         echo
             '<label for="hp_salutation">' . $salutationText . ':</label>' .

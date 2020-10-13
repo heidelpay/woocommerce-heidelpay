@@ -50,7 +50,6 @@ class WC_Gateway_HP_CC extends WC_Heidelpay_IFrame_Gateway
      */
     public function setPayMethod()
     {
-        /** @var \Heidelpay\PhpPaymentApi\PaymentMethods\CreditCardPaymentMethod payMethod */
         $this->payMethod = new CreditCardPaymentMethod();
         $this->id = 'hp_cc';
         $this->name = __('Credit Card', 'woocommerce-heidelpay');

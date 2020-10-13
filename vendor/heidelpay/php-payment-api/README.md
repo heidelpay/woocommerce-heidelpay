@@ -28,8 +28,10 @@ This is the php payment api for heidelpay. The library will help you to easily i
 * EPS
 * invoice
 * invoice secured b2c
+* invoice secured b2b
 * direct debit secured b2c
 * Santander invoice
+* Santander hire purchase
 * easyCredit
 * Payolution invoice
 
@@ -45,6 +47,21 @@ application takes care of sql injection, cross-site-scripting (xss) and so on. T
 
 You can find a copy of this license in [LICENSE.txt](LICENSE.txt).
 
+## Support
+For any issues or questions please get in touch with our support.
+
+#### Web page
+https://dev.heidelpay.com/
+ 
+#### Email
+support@heidelpay.com
+ 
+#### Phone
++49 (0)6221/6471-100
+
+#### Twitter
+@devHeidelpay
+
 ## Documentation
 
 Please visit [http://dev.heidelpay.com/heidelpay-php-payment-api/](http://dev.heidelpay.com/heidelpay-php-payment-api/) for the developer documentation.
@@ -54,19 +71,25 @@ Please visit [http://dev.heidelpay.com/heidelpay-php-payment-api/](http://dev.he
 This library comes with a set of unit and integration tests. Please do not run the integration tests on each build.
 
 Run prior to tests:
-`codecept build`
+`vendor/bin/codecept build`
 
 Run unit tests:
-`codecept run unit`
+`vendor/bin/codecept run unit`
 
 Run unit tests with code coverage report:
-`codecept run unit --coverage --coverage-html`
+`vendor/bin/codecept run unit --coverage --coverage-html`
 
 Run integration tests:
-`codecept run integration`
+`vendor/bin/codecept run integration`
 
 Run integration tests with debug output:
-`codecept run integration --debug`
+`vendor/bin/codecept run integration --debug`
+
+Run all integration test of a specific class:
+`vendor/bin/codecept run tests/integration/PaymentMethods/EasyCreditPaymentMethodTest`
+
+Run a specific integration test:
+`vendor/bin/codecept run tests/integration/PaymentMethods/EasyCreditPaymentMethodTest:initialRequest`
 
 For coverage analysis results see:
 `./tests/_output/coverage/index.html`
@@ -85,3 +108,5 @@ to
 
 Please make sure to switch it off again, after you launch your application.
 
+To enable the easyCredit example you might have to change the file permissions for the file "example/EasyCredit/EasyCreditResponseParams.txt".\
+It will be used to store the post-parameters send asynchronously by the payment which otherwise would not be accessable in the client session.

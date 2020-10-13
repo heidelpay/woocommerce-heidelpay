@@ -27,6 +27,7 @@ use Heidelpay\PhpPaymentApi\Response;
 
 abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 {
+    protected $templateTextKey = '';
     /**
      * @var \Heidelpay\PhpPaymentApi\PaymentMethods\BasicPaymentMethodTrait $payMethod
      */
@@ -37,9 +38,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public $bookingAction;
 
-    /**
-     * @var string $name
-     */
+    /** @var WC_Logger $wcLogger */
+    public $wcLogger;
+
+    /** @var string $name */
     protected $name;
 
     /**
@@ -49,6 +51,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     public function __construct()
     {
+        $this->wcLogger = wc_get_logger();
         $this->has_fields = false;
         $this->bookingAction = 'debit';
         $this->messageMapper = new MessageCodeMapper(get_locale());
@@ -177,9 +180,13 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
      */
     public function pushHandler()
     {
-        if (array_key_exists('<?xml_version', $_POST)) {
+        $this->wcLogger->debug('received push', ['source' => 'heidelpay']);
+        $rawPayload = file_get_contents('php://input');
+        if (!empty($rawPayload)) {
             $push = new WC_Heidelpay_Push();
-            $push->init(file_get_contents('php://input'), $this->get_option('secret'));
+            $push->init($rawPayload, $this->get_option('secret'));
+        } else {
+            $this->wcLogger->warning('Push was empty or did not process', ['source' => 'heidelpay']);
         }
         exit;
     }
@@ -235,11 +242,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order WC_Order
-     * @throws Exception
      */
     public function prepareRequest(WC_Order $order)
     {
-        $this->setAuthentification($order);
+        $this->setAuthentication($order);
         $this->setAsync();
         $this->setCustomer($order);
         $this->setBasket($order->get_id());
@@ -248,20 +254,15 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Set up your authentification data for Heidepay api
+     * Set up your authentication data for heidelpay api
      * @param WC_order $order
      */
-    protected function setAuthentification(WC_order $order = null)
+    protected function setAuthentication(WC_order $order = null)
     {
         $isSandbox = false;
         $channel = $this->get_option('transaction_channel');
         if ($this->get_option('sandbox') === 'yes') {
             $isSandbox = true;
-        }
-        if (class_exists('WC_Subscriptions_Order')) {
-            if ($order !== null && (wcs_order_contains_renewal($order) || wcs_order_contains_subscription($order))) {
-                $channel = $this->get_option('transaction_channel_subscription');
-            }
         }
         $this->payMethod->getRequest()->authentification(
             $this->get_option('security_sender'),
@@ -279,7 +280,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     {
         $this->payMethod->getRequest()->async(
             $this->getLanguage(), // Language code for the Frame
-            $this->getResponeUrl()
+            $this->getResponseUrl()
         );
     }
 
@@ -317,7 +318,6 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * @param $order_id
-     * @throws Exception
      */
     protected function setBasket($order_id)
     {
@@ -331,7 +331,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * @global string $wp_version
+     * @param null|string $orderID
      */
     protected function setCriterions($orderID = null)
     {
@@ -360,13 +360,16 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             try {
                 $this->handleFormPost($_POST);
             } catch (\Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                $this->wcLogger->debug(
+                    htmlspecialchars(print_r($e->getMessage(), 1)),
+                    array('source' => 'heidelpay')
+                );
                 return null;
             }
         }
 
         if (!empty($this->bookingAction) && method_exists($this->payMethod, $this->bookingAction)) {
-            if (class_exists('WC_Subscriptions_Order') &&
+            if (class_exists('WC_Subscriptions') &&
                 wcs_order_contains_subscription($order) &&
                 empty($order->get_meta('heidelpay-Registration'))) {
                 $action = 'registration';
@@ -376,7 +379,10 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
             try {
                 $this->payMethod->$action($uid);
             } catch (Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                $this->wcLogger->debug(
+                    htmlspecialchars(print_r($e->getMessage(), 1)),
+                    array('source' => 'heidelpay')
+                );
 
                 $this->addPaymentError($this->getErrorMessage());
 
@@ -398,17 +404,17 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         } else {
             $this->addPaymentError($this->getErrorMessage());
 
-            wc_get_logger()->log(
-                WC_Log_Levels::ERROR,
+            $this->wcLogger->error(
                 htmlspecialchars(
                     print_r(
                         $this->plugin_id . ' - ' . $this->id . __(
-                            ' Error: Paymentmethod was not found: ',
+                            ' Error: Payment method was not found: ',
                             'woocommerce-heidelpay'
                         ) . $this->bookingAction,
                         1
                     )
-                )
+                ),
+                array('source' => 'heidelpay')
             );
 
             return null;
@@ -442,7 +448,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Get the mapped Errormessage from Respone wich is html escaped.
+     * Get the mapped Errormessage from response which is html escaped.
      * If a response is given as a parameter that will determine the message. Otherwise the Response from the payMethod
      * is used. If none of them is given return the default message
      * @param Response|null $response
@@ -465,49 +471,56 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * Funktion to log Events as a notice. It has a prefix to identify that the log entry is from heidelpay and which
+     * Function to log Events as a notice. It adds a context to identify that the log entry is from heidelpay and which
      * function has created it.
      * @param  string|array $logData
      */
     protected function paymentLog($logData)
     {
         $callers = debug_backtrace();
-        wc_get_logger()->log(WC_Log_Levels::NOTICE, print_r('heidelpay - ' .
-            $callers [1] ['function'] . ': ' . print_r($logData, 1), 1));
+        $this->wcLogger->notice(
+            print_r($callers[1]['function'] . ': ' . print_r($logData, 1), 1),
+            array('source' => 'heidelpay')
+        );
     }
 
     /**
      * @param $order
      * @param $uid
-     * @throws WC_Data_Exception
+     * @return Response
      */
     public function performNoGuiRequest($order, $uid)
     {
-        $this->performAfterRegistrationRequest($order, $uid);
+        return $this->performAfterRegistrationRequest($order, $uid);
     }
 
     /**
      * @param WC_Order $order
      * @param $uid
-     * @throws WC_Data_Exception
+     * @return Response
      */
     public function performAfterRegistrationRequest($order, $uid)
     {
         if (!empty($_POST)) {
-            $this->handleFormPost($_POST);
+            $this->handleFormPost();
         }
         if ($order->get_meta('heidelpay-Registration') !== '') {
             try {
                 $this->payMethod->debitOnRegistration($uid);
             } catch (Exception $e) {
-                wc_get_logger()->log(WC_Log_Levels::DEBUG, htmlspecialchars(print_r($e->getMessage(), 1)));
+                $this->wcLogger->debug(
+                    htmlspecialchars(print_r($e->getMessage(), 1)),
+                    array('source' => 'heidelpay')
+                );
 
                 $this->addPaymentError($this->getErrorMessage());
             }
             if ($this->payMethod->getResponse()->isError()) {
                 $order->set_status('on-hold');
             }
+            return $this->payMethod->getResponse();
         }
+        return null;
     }
 
     /**
@@ -535,10 +548,12 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
         } else {
             // Add Error Msg, debug log and redirect to cart.
             $this->addPaymentError($this->getErrorMessage());
-            wc_get_logger()->log(WC_Log_Levels::DEBUG,
+            wc_get_logger()->log(
+                WC_Log_Levels::DEBUG,
                 'heidelpay - Response: There has been an error fetching the RedirectURL by the payment. '
-                . 'Please make sure the ResponseURL (' . $this->getResponeUrl() .')is accessible from the internet.',
-                array('source' => 'heidelpay'));
+                . 'Please make sure the ResponseURL (' . $this->getResponseUrl() .')is accessible from the internet.',
+                array('source' => 'heidelpay')
+            );
             wp_redirect(wc_get_cart_url());
         }
         exit();
@@ -546,7 +561,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
 
     /**
      * Filter function for the hook: woocommerce_available_payment_gateways
-     * Can be used to set conditions vor availability of a paymethod.
+     * Can be used to set conditions vor availability of a payment method.
      * @param $available_gateways
      * @return mixed
      */
@@ -556,7 +571,7 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
-     * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the successpage after
+     * "woocommerce_thankyou_order_received_text" hook to display heidelpay-paymentInfo text on the success page after
      * payment.
      * @param $orderReceivedText
      * @return string
@@ -628,6 +643,46 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     }
 
     /**
+     * Add payment information to the order if available.
+     * Information usually are set for invoice, direct debit and prepayment.
+     * @param WC_Order $order
+     * @param Response $response
+     * @return null
+     */
+    public function setPaymentInfo(WC_Order $order, Response $response)
+    {
+        // Load template text for Payment information
+        $paymentInfoTemplate = $this->getPaymentInfoTemplate();
+        if (empty($paymentInfoTemplate)) {
+            return;
+        }
+
+        $connector = $response->getConnector();
+        $presentation = $response->getPresentation();
+        $presentationAmount = number_format(
+            $presentation->getAmount(),
+            wc_get_price_decimals(),
+            wc_get_price_decimal_separator(),
+            wc_get_price_thousand_separator()
+        );
+
+        $paymentData = [
+            '{AMOUNT}' => $presentationAmount,
+            '{CURRENCY}' => $presentation->getCurrency(),
+            '{CONNECTOR_ACCOUNT_HOLDER}' => $connector->getAccountHolder(),
+            '{CONNECTOR_ACCOUNT_IBAN}' => $connector->getAccountIBan(),
+            '{CONNECTOR_ACCOUNT_BIC}' => $connector->getAccountBic(),
+            '{IDENTIFICATION_SHORTID}' => $response->getIdentification()->getShortId(),
+            '{Iban}' => $response->getAccount()->getIban(),
+            '{Ident}' => $response->getAccount()->getIdentification(),
+            '{CreditorId}' => $response->getIdentification()->getCreditorId(),
+        ];
+
+        $paymentText = strtr($paymentInfoTemplate, $paymentData);
+        $order->add_meta_data('heidelpay-paymentInfo', $paymentText);
+    }
+
+    /**
      * @return array Containing the option field to select booking mode in the admin menu.
      */
     protected function getBookingSelection()
@@ -648,8 +703,18 @@ abstract class WC_Heidelpay_Payment_Gateway extends WC_Payment_Gateway
     /**
      * @return string
      */
-    protected function getResponeUrl()
+    protected function getResponseUrl()
     {
-        return get_home_url() . '/wc-api/' . strtolower(get_class($this));
+        return get_home_url(null, '/wc-api/' . strtolower(get_class($this)));
+    }
+
+    /** Default Payment info template is empty.
+     * Override this method in order to assign an individual Template text translation.
+     *
+     * @return string|void
+     */
+    public function getPaymentInfoTemplate()
+    {
+        return __('', 'woocommerce-heidelpay');
     }
 }

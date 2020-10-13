@@ -74,8 +74,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
     {
         parent::init_form_fields();
 
-        $this->initFormFieldsAddon();
-
         $this->form_fields['title']['default'] = sprintf(__('%s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['description']['default'] = sprintf(__('Insert payment data for %s', 'woocommerce-heidelpay'), $this->name);
         $this->form_fields['enabled']['label'] = sprintf(__('Enable %s', 'woocommerce-heidelpay'), $this->name);
@@ -93,6 +91,8 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
             'default' => 'yes',
             'desc_tip' => true,
         );
+
+        $this->initFormFieldsAddon();
     }
 
     /**
@@ -106,6 +106,7 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
         $accountHolder = wc()->customer->get_billing_first_name() . ' ' . wc()->customer->get_billing_last_name();
 
         echo '<div>';
+        parent::payment_fields();
 
         echo '<label for="accountholder">' . $accountHolderLabel . ':</label>';
         echo '<input type="text" class="form-row-wiede validate-required" id="accountholder" name="accountholder" value="' . $accountHolder . '"> ';
@@ -116,8 +117,6 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
 
         echo '</div>';
     }
-
-    //payment form
 
     /**
      * Set the id and PaymenMethod
@@ -141,5 +140,10 @@ class WC_Gateway_HP_DD extends WC_Heidelpay_Payment_Gateway
             $this->payMethod->getRequest()->getAccount()->setHolder(htmlspecialchars($_POST['accountholder']));
             $this->payMethod->getRequest()->getAccount()->setIban(htmlspecialchars($_POST['accountiban']));
         }
+    }
+
+    public function getPaymentInfoTemplate()
+    {
+        return __('direct_debit_info', 'woocommerce-heidelpay');
     }
 }

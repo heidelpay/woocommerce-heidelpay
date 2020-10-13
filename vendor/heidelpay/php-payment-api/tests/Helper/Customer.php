@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Simon.Gabriel
- * Date: 24.10.2017
- * Time: 14:00
- */
+
 namespace Heidelpay\Tests\PhpPaymentApi\Helper;
 
 class Customer
@@ -24,7 +19,7 @@ class Customer
     protected $shopperId = '1234';
 
     /** @var string $addressStreet */
-    protected $addressStreet = 'Vagerowstr. 18';
+    protected $addressStreet = 'Vangerowstr. 18';
 
     /** @var string $addressState */
     protected $addressState = 'DE-BW';

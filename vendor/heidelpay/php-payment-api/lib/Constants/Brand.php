@@ -50,6 +50,7 @@ class Brand
     const BILLSAFE = 'BILLSAFE';
     const PAYOLUTION_DIRECT = 'PAYOLUTION_DIRECT';
     const SANTANDER = 'SANTANDER';
+    const UNIVERSUM_B2B = 'UNIVERSUM_B2B';
 
     // Online Transfer
     const EPS = 'EPS';
@@ -76,4 +77,5 @@ class Brand
 
     // Hire Purchase
     const EASYCREDIT = 'EASYCREDIT';
+    const SANTANDER_HP = 'SANTANDER_HP';
 }

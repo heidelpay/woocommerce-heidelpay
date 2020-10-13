@@ -3,6 +3,58 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [v1.7.1][v1.7.1]
+
+### Added
+- Support for factoring.
+
+## [v1.7.0][v1.7.0]
+
+### Fixed
+- Santanter Invoice integration tests.
+
+### Added
+- Payment method for B2B invoice secured and corresponding tests.
+- Missing parameter CUSTOMER.OptIn_2 for Santander Invoice.
+- Example implementation for Santander paying by instalments.
+
+### Changed
+- Used BasketApi to enable additional integration tests for Santander IV.
+
+## [v1.6.2][v1.6.2]
+
+### Fixed
+- Path to autoloader in EasyCredit example.
+
+## [v1.6.1][v1.6.1]
+
+### Added
+- Example implementation for easyCredit payment method.
+- Json extension dependency to composer.json.
+
+### Changed
+- Updated readme file.
+
+## [v1.6.0][v1.6.0]
+
+### Added
+- Payment method 'Santander Hire Purchase' and corresponding tests (unit and integration).
+- Missing unit tests.
+
+### Changed
+- Replaced warning suppression in mapFromPost method.
+- Visibility of *Parent methods in `CreditCardPaymentMethod` and `DebitCardPaymentMethods`
+- Prohibit setting the mode parameter of the frontend group.
+- Renamed 'Heidelberger Payment GmbH' to 'heidelpay GmbH'.
+- Re-enabled test deactivated due to error with aspect-mock package.
+
+### Fixed
+- Parameter names in riskinformation group.
+- Fix test data.
+
+### Removed
+- Php 5.6 from travis workflow.
+
 ## [v1.5.0][v1.5.0]
 ### Added
 - New unit test to cover finalize payment method.
@@ -109,4 +161,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [v1.3.0]: https://github.com/heidelpay/php-payment-api/compare/v1.2.0...v1.3.0
 [v1.4.0]: https://github.com/heidelpay/php-payment-api/compare/v1.3.0...v1.4.0
 [v1.4.1]: https://github.com/heidelpay/php-payment-api/compare/v1.4.0...v1.4.1
-[v1.5.0]: https://github.com/heidelpay/php-payment-api/compare/v1.4.0...v1.5.0
+[v1.5.0]: https://github.com/heidelpay/php-payment-api/compare/v1.4.1...v1.5.0
+[v1.6.0]: https://github.com/heidelpay/php-payment-api/compare/v1.5.0...v1.6.0
+[v1.6.1]: https://github.com/heidelpay/php-payment-api/compare/v1.6.0...v1.6.1
+[v1.6.2]: https://github.com/heidelpay/php-payment-api/compare/v1.6.1...v1.6.2

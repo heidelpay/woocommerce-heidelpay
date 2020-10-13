@@ -35,10 +35,6 @@ class WC_Gateway_HP_IV extends WC_Heidelpay_Payment_Gateway
             __('Insert payment data for %s', 'woocommerce-heidelpay'),
             $this->name
         );
-        $this->form_fields['instructions']['default'] = __(
-            'please send the money to IBAN BIC ',
-            'woocommerce-heidelpay'
-        );
         $this->form_fields['transaction_channel']['default'] = '31HA07BC8142C5A171749A60D979B6E4';
 
         $this->form_fields['send_payment_info'] = array(
@@ -51,6 +47,11 @@ class WC_Gateway_HP_IV extends WC_Heidelpay_Payment_Gateway
             'default' => 'yes',
             'desc_tip' => true,
         );
+    }
+
+    public function getPaymentInfoTemplate()
+    {
+        return __('invoice_info', 'woocommerce-heidelpay');
     }
 
     /**
